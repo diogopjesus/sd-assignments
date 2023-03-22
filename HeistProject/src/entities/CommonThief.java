@@ -1,4 +1,4 @@
-package Threads;
+package entities;
 
 public class CommonThief {
 	

@@ -1,4 +1,4 @@
-package Threads;
+package entities;
 
 /**
  *    Definition of the internal states of the MasterThief during his life cycle.
@@ -31,7 +31,7 @@ public class MasterThiefStates {
 	public static final int WAITING_FOR_GROUP_ARRIVAL = 3;
 
 	/**
-	 * The Master Thief declares the end of the assault and presents the results obtained
+	 * The Master Thief declares the end of the heist and presents the results obtained
 	 */
 	
 	public static final int PRESENTING_THE_REPORT = 4;

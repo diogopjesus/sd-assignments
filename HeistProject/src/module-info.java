@@ -6,4 +6,5 @@
  *
  */
 module HeistProject {
+	requires genclass;
 }

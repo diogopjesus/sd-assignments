@@ -1,4 +1,4 @@
-package Interfaces;
+package interfaces;
 
 public interface AssaultPartyInterface {
 	int crawlIn(int thief_id) throws Exception;
