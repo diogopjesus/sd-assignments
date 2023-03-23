@@ -6,7 +6,7 @@ import entities.*;
 import genclass.*;
 import main.SimulPar;
 
-public class Museum {
+public class Museum implements MuseumInterface {
 	
 	private final GeneralRepository repo;
 	

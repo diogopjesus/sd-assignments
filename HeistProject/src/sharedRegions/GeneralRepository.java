@@ -7,7 +7,7 @@ import genclass.GenericIO;
 import genclass.TextFile;
 import java.util.Objects;
 
-public class GeneralRepository {
+public class GeneralRepository implements GeneralRepositoryInterface {
 	
 	private final String log_filename;
 	private int masterThiefState;
