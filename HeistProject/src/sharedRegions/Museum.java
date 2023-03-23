@@ -20,6 +20,7 @@ public class Museum implements MuseumInterface {
         repo.setRoomPaintings(room_paintings);
     }
 	
+	@Override
 	public synchronized boolean rollACanvas(int room_id) {
         if(room_paintings[room_id]>0) {
         	room_paintings[room_id]--;

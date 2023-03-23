@@ -62,25 +62,30 @@ public class GeneralRepository implements GeneralRepositoryInterface {
         logInitialStatus();
     }
 	
+	@Override
 	public synchronized void setMasterThiefState(int state) {
 		masterThiefState = state;
 		logStatus();
 	}
 	
+	@Override
 	public synchronized void setCommonThiefState(int thief_id, int state){
 		commonThiefStates[thief_id] = state;
 		logStatus();
 	}
 	
+	@Override
 	public synchronized void setCommonThiefSituation(int thief_id, char situation) {
 		commonThiefSituations[thief_id] = situation;
 		logStatus();
 	}
 	
+	@Override
 	public synchronized void setCommonThiefMD(int thief_id, int md) {
 		this.commonThiefMD[thief_id] = md;
 	}
 	
+	@Override
 	public synchronized void setAssPartElem(int thief_id, int room_id, int elem) {
 		thieves[elem][0] = thief_id;
         thieves[elem][1] = room_id;
@@ -88,6 +93,7 @@ public class GeneralRepository implements GeneralRepositoryInterface {
         thieves[elem][3] = 0;
 	}
 	
+	@Override
 	public synchronized void resetAssPartElem(int elem) {
 		thieves[elem][0] = -1;
         thieves[elem][1] = -1;
@@ -95,29 +101,35 @@ public class GeneralRepository implements GeneralRepositoryInterface {
         thieves[elem][3] = 0;
 	}
 	
+	@Override
 	public synchronized void setCommonThiefPosition(int elem, int pos) {
 		thieves[elem][2] = pos;
         logStatus();
 	}
 	
+	@Override
 	public synchronized void setCarryCanvas(int elem, int canvas) {
 		thieves[elem][3] = canvas;
 		logStatus();
 	}
 	
+	@Override
 	public synchronized void setRoomPaintings(int[] room_paintings) {
 		this.room_paintings = room_paintings;
         logStatus();
 	}
 	
+	@Override
 	public synchronized void setRoomDistance(int[] distances) {
 		this.room_distances = distances;
 	}
 	
+	@Override
 	public synchronized void incStolenPaintings() {
 		this.stolen_paintings++;
 	}
 	
+	@Override
 	public void logInitialStatus() {
 		TextFile logs = new TextFile(); // instantiate a text file handler
 
@@ -146,6 +158,7 @@ public class GeneralRepository implements GeneralRepositoryInterface {
         logStatus();
     }
 	
+	@Override
 	public void logStatus() {
 		TextFile logs = new TextFile(); // instantiate a text file handler
         String status = ""; // status to be printed
@@ -215,6 +228,7 @@ public class GeneralRepository implements GeneralRepositoryInterface {
         }
 	}
 	
+	@Override
 	public void logFinalStatus() {
 		TextFile logs = new TextFile();
 
