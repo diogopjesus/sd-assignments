@@ -94,6 +94,7 @@ public class MasterThief extends Thread
     public void setMasterThiefState(int masterThiefState)
     {
         this.masterThiefState = masterThiefState;
+        repos.setMasterThiefState(masterThiefState);
     }
 
 
