@@ -163,8 +163,6 @@ public class ControlCollectionSite
         MasterThief mt = (MasterThief)Thread.currentThread();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-
-        //TODO: log;
     }
 
     /**
@@ -284,7 +282,9 @@ public class ControlCollectionSite
         }
 
         if(ot.isHoldingCanvas())
-            numberOfCanvas++;
+        {   numberOfCanvas++;
+            repos.yieldAssaultPartyElementCanvas(assaultPartyId, ot.getOrdinaryThiefId());
+        }
         else
             emptyRooms[roomId] = true;
             
@@ -292,6 +292,9 @@ public class ControlCollectionSite
         //}
 
         assaultParties[assaultPartyId].removeThief(ot.getOrdinaryThiefId());
+        
+        repos.removeAssaultPartyElement(assaultPartyId, ot.getOrdinaryThiefId());
+
         if(!assaultParties[assaultPartyId].operationStatus())
             activeAssaultParties--;
         

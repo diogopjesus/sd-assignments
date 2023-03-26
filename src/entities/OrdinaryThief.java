@@ -1,6 +1,5 @@
 package entities;
 
-import main.SimulPar;
 import sharedRegions.*;
 
 /**
@@ -70,7 +69,7 @@ public class OrdinaryThief extends Thread
      * @param museum
      * @param ordinaryThiefId
      */
-    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite, AssaultParty [] assaultParties, Museum museum, int ordinaryThiefId)
+    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite, AssaultParty [] assaultParties, Museum museum, int ordinaryThiefId, int maxDis)
     {
         this.repos = repos;
         this.contColSite = contColSite;
@@ -80,7 +79,7 @@ public class OrdinaryThief extends Thread
 
         this.ordinaryThiefId = ordinaryThiefId;
         this.ordinaryThiefState = OrdinaryThiefStates.COLLECTION_SITE;
-        this.maximumDisplacement = SimulPar.md +(int)Math.round(Math.random() * (SimulPar.MD - SimulPar.md));
+        this.maximumDisplacement = maxDis;
         this.withCanvas = false;
     }
 
@@ -111,6 +110,7 @@ public class OrdinaryThief extends Thread
     public void setOrdinaryThiefState(int ordinaryThiefState)
     {
         this.ordinaryThiefState = ordinaryThiefState;
+        repos.setOrdinaryThiefState(ordinaryThiefId, ordinaryThiefState);
     }
 
     /**
@@ -162,7 +162,7 @@ public class OrdinaryThief extends Thread
 
             while(assaultParties[assaultPartyId].crawlIn());
 
-            museum.rollACanvas(roomId);
+            museum.rollACanvas(assaultPartyId, roomId);
 
             assaultParties[assaultPartyId].reverseDirection();
 

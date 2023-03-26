@@ -88,7 +88,7 @@ public class ConcentrationSite
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        /* Check if thief returns from ControlSite */
+        /* Check if thief returns from ControlSite (or started running) */
         if(ot.getOrdinaryThiefState() == OrdinaryThiefStates.COLLECTION_SITE)
         {
             ot.setOrdinaryThiefState(OrdinaryThiefStates.CONCENTRATION_SITE);
@@ -143,6 +143,8 @@ public class ConcentrationSite
         assaultParties[assaultPartyId].setTargetRoom(roomId, roomDistance);
         assaultParties[assaultPartyId].startOperation();
 
+        repos.setAssaultPartyRoomId(assaultPartyId, roomId);
+
         for(int i = 0; i < SimulPar.K; i++) {
 			try
             {   summonedThieves[i] = waitingThieves.read();
@@ -180,7 +182,9 @@ public class ConcentrationSite
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
    
         assaultParties[availableAssaultParty].assignNewThief(ot.getOrdinaryThiefId());
-        
+        repos.addAssaultPartyElement(availableAssaultParty, ot.getOrdinaryThiefId());
+
+
         ot.setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_INWARDS);
         
         for(int i = 0; i < SimulPar.K-1; i++)

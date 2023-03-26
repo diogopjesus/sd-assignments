@@ -21,6 +21,11 @@ public class AssaultParty
     /**
      * 
      */
+    private int assaultPartyId;
+
+    /**
+     * 
+     */
     private int numberOfThievesInParty;
 
     /**
@@ -86,9 +91,10 @@ public class AssaultParty
     /**
      * 
      */
-    public AssaultParty(GeneralRepository repos)
+    public AssaultParty(GeneralRepository repos, int assaultPartyId)
     {
         this.repos = repos;
+        this.assaultPartyId = assaultPartyId;
         this.numberOfThievesInParty = 0;
         this.inOperation = false;
         this.thievesIdsInParty = new int[SimulPar.K];
@@ -363,7 +369,7 @@ public class AssaultParty
         }
 
         int thiefIndex = getThiefIndex(ot.getOrdinaryThiefId());
-        
+
         if(thievesPositionsInParty[thiefIndex] < targetRoomDistance)
         {
             int temporaryThiefPosition = thievesPositionsInParty[thiefIndex];
@@ -407,15 +413,15 @@ public class AssaultParty
 
                 thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance, temporaryThiefPosition);
                 updateMinMaxPositions();
+                repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(), thievesIdsInParty[thiefIndex]);
             } while (thiefInMovement);
-
 
             if(thievesPositionsInParty[thiefIndex] == targetRoomDistance) {
                 numberOfThievesAtRoom++;
                 ot.setOrdinaryThiefState(OrdinaryThiefStates.AT_A_ROOM);
             }
         }
-        
+
         nextThiefToMove = thievesIdsInParty[getPreviousThiefIndex(thiefIndex)];
 
         notifyAll();
@@ -496,10 +502,12 @@ public class AssaultParty
                 }
 
                 if(thievesPositionsInParty[thiefIndex] > Math.max(0, temporaryThiefPosition))
-                    thiefInMovement = true;
+                {   thiefInMovement = true;
+                }
 
                 thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0,temporaryThiefPosition);
                 updateMinMaxPositions();
+                repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(), temporaryThiefPosition);
             } while(thiefInMovement);
 
 

@@ -134,5 +134,6 @@ public class MasterThief extends Thread
         numberOfCanvas = contColSite.getNumberOfCanvas();
         
         concentSite.sumUpResults(numberOfCanvas);
+        repos.endAssault(numberOfCanvas);
     }
 }

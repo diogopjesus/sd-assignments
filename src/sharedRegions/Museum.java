@@ -31,36 +31,11 @@ public class Museum
     /**
      * 
      */
-    public Museum(GeneralRepository repos)
+    public Museum(GeneralRepository repos, int [] numPaint, int [] roomDist)
     {
         this.repos = repos;
-        generatePaintingsInRooms();
-        calculateRoomDistances();
-        //TODO: repos
-    }
-
-
-
-    /**
-     * 
-     */
-    private void generatePaintingsInRooms()
-    {
-        paitingsInRoom = new int[SimulPar.N];
-        
-        for(int i = 0; i < SimulPar.N; i++)
-            paitingsInRoom[i] = SimulPar.p + (int)Math.round(Math.random() * (SimulPar.P - SimulPar.p));
-    }
-
-    /**
-     * 
-     */
-    private void calculateRoomDistances()
-    {
-        roomDistances = new int[SimulPar.N];
-
-        for(int i = 0; i < SimulPar.N; i++)
-            roomDistances[i] = SimulPar.d + (int)Math.round(Math.random() * (SimulPar.D - SimulPar.d));
+        paitingsInRoom = numPaint;
+        roomDistances = roomDist;
     }
 
 
@@ -80,13 +55,14 @@ public class Museum
     /**
      * 
      */
-    public synchronized void rollACanvas(int roomId)
+    public synchronized void rollACanvas(int assaultPartyId, int roomId)
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
         if(paitingsInRoom[roomId] > 0)
         {   paitingsInRoom[roomId]--;
             ot.holdCanvas();
+            repos.holdAssaultPartyElementCanvas(assaultPartyId, ot.getOrdinaryThiefId(), roomId);
         }
         else
         {   ot.dropCanvas();
