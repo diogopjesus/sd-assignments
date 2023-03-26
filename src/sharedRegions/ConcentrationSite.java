@@ -1,105 +1,216 @@
 package sharedRegions;
 
-import main.SimulPar;
 import commInfra.*;
+import genclass.*;
 import entities.*;
+import main.*;
 
-public class ConcentrationSite {
+/**
+ * Ordinary thieves concentration site.
+ * 
+ * It is responsible to (...)
+ * All public methods are executed in mutual exclusion.
+ * There are three internal synchronization points:
+ *   - a single blocking point for the master thief, where he waits for sufficient ordinary thieves to form a assault party.
+ *   - a single blocking point for the master thief, where he waits for every ordinary thieves to sum up results.
+ *   - an array of blocking points, one per each ordinary thief, where he waits to be called to an assault party or to terminate operations.
+ */
 
-	private MemFIFO<Integer> waitingThieves;
-	private int numberOfWaitingThieves;
-	private boolean endOfOps;
-	private int availableAssaultParty;
-	private int[] thievesOnHold = new int[SimulPar.K]; 
+public class ConcentrationSite
+{
+    /**
+     * Reference to the general repository.
+     */
+    private final GeneralRepository repos;
 
-	private AssaultParty[] assParts;
+    /**
+     * 
+     */
+    private final AssaultParty [] assaultParties;
 
-	public synchronized char amINeeded() {
-		CommonThief ct = (CommonThief)Thread.currentThread();
-		
-		if(ct.getCommonThiefState() == CommonThiefStates.COLLECTION_SITE) {
-			ct.setCommonThiefState(CommonThiefStates.CONCENTRATION_SITE);
+    /**
+     * 
+     */
+    private MemFIFO<Integer> waitingThieves;
 
-			try {
-				waitingThieves.write(ct.getCommonThiefId());
-				numberOfWaitingThieves++;
-			} catch(MemException me) {
-				// TODO;
+    /**
+     * 
+     */
+    private int numberOfWaitingThieves;
+
+    /**
+     * 
+     */
+    private int [] summonedThieves;
+
+    /**
+     * 
+     */
+    private int availableAssaultParty;
+
+    /**
+     * 
+     */
+    private boolean endOfOps;
+
+
+
+    /**
+     * 
+     */
+    public ConcentrationSite(GeneralRepository repos, AssaultParty [] assaultParties)
+    {
+        this.repos = repos;
+        this.assaultParties = assaultParties;
+        
+        try
+        {   this.waitingThieves = new MemFIFO<>(new Integer [SimulPar.M - 1] );
+        }
+        catch(MemException e)
+        {   GenericIO.writelnString ("Instance of waiting  FIFO failed: " + e.getMessage());
+            System.exit(1);
+        }
+        this.numberOfWaitingThieves = 0;
+
+        this.endOfOps = false;
+
+        this.summonedThieves = new int[SimulPar.K];
+        summonedThieves = new int[]{-1,-1,-1};
+    }
+
+
+
+    /**
+     * 
+     * @return
+     */
+    public synchronized char amINeeded()
+    {
+        OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
+
+        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered amINeeded");
+
+        /* Check if thief returns from ControlSite */
+        if(ot.getOrdinaryThiefState() == OrdinaryThiefStates.COLLECTION_SITE)
+        {
+            ot.setOrdinaryThiefState(OrdinaryThiefStates.CONCENTRATION_SITE);
+            
+            try
+            {   waitingThieves.write(ot.getOrdinaryThiefId());
+            }
+            catch(MemException e)
+            {   GenericIO.writelnString ("Instantiation of waiting FIFO failed: " + e.getMessage ());
+                System.exit(1);
+            }
+            numberOfWaitingThieves++;
+
+            notifyAll();
+        }
+
+        while(!endOfOps && summonedThieves[0] != ot.getOrdinaryThiefId())
+        {
+            try
+            {   wait();
+            }
+            catch(InterruptedException e)
+            {   e.printStackTrace();
+            }
+        }
+
+        if(endOfOps) {
+            for(int i = 0; i < SimulPar.K-1; i++)
+                summonedThieves[i] = summonedThieves[i+1];
+            notifyAll();
+        }
+
+        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left amINeeded");
+
+        return endOfOps ? 'E' : 'P';
+    }
+
+    /**
+     * 
+     */
+    public synchronized void prepareAssaultParty(int assaultPartyId, int roomId, int roomDistance)
+    {
+        System.out.println("Master thief entered prepareAssaultParty");
+
+        MasterThief mt = (MasterThief)Thread.currentThread();
+    
+        while(numberOfWaitingThieves < SimulPar.K)
+        {
+            try
+            {   wait();
+			} catch(InterruptedException e) {
+				e.printStackTrace();
 			}
-		}
-		
-		while(!endOfOps || thievesOnHold[0] == ct.getCommonThiefId()) {
-			try {
-				wait();
-			} catch(InterruptedException ie) {
-				ie.printStackTrace();
-			}
-		}
+        }
 
-		return endOfOps ? 'E' : 'P';
-	}
+        assaultParties[assaultPartyId].setTargetRoom(roomId, roomDistance);
+        assaultParties[assaultPartyId].startOperation();
 
-	public synchronized void prepareAssaultParty(int asspart_id, int room_id) {
-		
-		MasterThief mt = (MasterThief)Thread.currentThread();
-		//TODO: LOG
-
-		while(numberOfWaitingThieves < SimulPar.K) {
-			try {
-				wait();
-			} catch(InterruptedException ie) {
-				ie.printStackTrace();
-			}
-		}
-
-		this.availableAssaultParty = asspart_id;
-
-		assParts[availableAssaultParty].setTargetRoom(room_id);
-
-		for(int i = 0; i < SimulPar.K; i++) {
-			try {
-				thievesOnHold[i] = waitingThieves.read();
+        for(int i = 0; i < SimulPar.K; i++) {
+			try
+            {   summonedThieves[i] = waitingThieves.read();
+                numberOfWaitingThieves--;
 			} catch(MemException me) {
 				//TODO
 			}
-
-			numberOfWaitingThieves--;
 		}
-		notifyAll();
-		
-		while(assParts[availableAssaultParty].getNumberOfThieves() < SimulPar.K) {
-			try{
-				wait();
-			} catch(InterruptedException ie) {
-				ie.printStackTrace();
+
+    
+        mt.setMasterThiefState(MasterThiefStates.ASSEMBLING_A_GROUP);
+    
+        availableAssaultParty = assaultPartyId;
+        notifyAll();
+
+        while(assaultParties[assaultPartyId].getNumberOfThievesInParty() < SimulPar.K)
+        {
+            try
+            {   wait();
+			} catch(InterruptedException e) {
+				e.printStackTrace();
 			}
-		}
+        }
 
-		// TODO: check whether its here
-		mt.setMasterThiefState(MasterThiefStates.ASSEMBLING_A_GROUP);
-	}
+        // Clear summonedThieves array
+        summonedThieves = new int[]{-1,-1,-1};
 
+        System.out.println("Master thief left prepareAssaultParty");
+    }
 
-	public synchronized int prepareExcursion() {
-		CommonThief ct = (CommonThief)Thread.currentThread();
-		
-		assParts[availableAssaultParty].assignNewThief(ct.getCommonThiefId());
+    /**
+     * @return
+     */
+    public synchronized int prepareExcursion()
+    {
+        OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
+     
+        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered prepareExcursion");
+   
+        assaultParties[availableAssaultParty].assignNewThief(ot.getOrdinaryThiefId());
+        
+        ot.setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_INWARDS);
+        
+        for(int i = 0; i < SimulPar.K-1; i++)
+            summonedThieves[i] = summonedThieves[i+1];
 
-		ct.setCommonThiefState(CommonThiefStates.CRAWLING_INWARDS);
+        notifyAll();
 
-		for(int i= 0; i < SimulPar.K-1; i++) {
-			thievesOnHold[i] = thievesOnHold[i+1];
-		}
+        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left prepareExcursion");
 
-		notifyAll();
+        return availableAssaultParty;
+    }
 
-		return availableAssaultParty;
-	}
+    /**
+     * 
+     */
+    public synchronized void sumUpResults(int numberOfCanvas)
+    {
+        System.out.println("Master thief entered sumUpResults");
+        MasterThief mt = (MasterThief)Thread.currentThread();
 
-	public synchronized void sumUpResults(int numberOfPaintings) {
-		MasterThief mt = (MasterThief)Thread.currentThread();
-		
-		while(numberOfWaitingThieves < SimulPar.M) {
+        while(numberOfWaitingThieves < SimulPar.M) {
 			try {
 				wait();
 			} catch(InterruptedException ie) {
@@ -107,10 +218,10 @@ public class ConcentrationSite {
 			}
 		}
 
-		endOfOps = true;
+        endOfOps = true;
         notifyAll();
-        
+
         mt.setMasterThiefState(MasterThiefStates.PRESENTING_THE_REPORT);
-        //repo.setMasterThiefState(((MasterThief) Thread.currentThread()).getMasterThiefState());
-	}
+        System.out.println("Master thief entered sumUpResults");
+    }
 }

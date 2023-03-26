@@ -1,5 +1,7 @@
-for i in $(seq 1 1000)
+javac -cp .:$(pwd)/lib/genclass.jar */src/*/*.java
+
+for i in $(seq 1 100)
 do
 echo -e "\nRun n.o " $i
-java main.HeistToTheMuseum < inData
+java -cp .:$(pwd)/lib/genclass.jar src.main.HeistToTheMuseum
 done

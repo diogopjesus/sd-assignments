@@ -1,105 +1,140 @@
 package entities;
-import sharedRegions.AssaultParty;
-import sharedRegions.ConcentrationSite;
-import sharedRegions.ControlSite;
-import sharedRegions.GeneralRepository;
 
-public class MasterThief extends Thread {
+import sharedRegions.*;
+
+/**
+ * Master thief thread.
+ * 
+ * It simulates the master thief life cycle.
+ */
+
+public class MasterThief extends Thread
+{
+    /**
+     * 
+     */
+    private GeneralRepository repos;
+
+    /**
+     * 
+     */
+    private ControlCollectionSite contColSite;
     
+    /**
+     * 
+     */
+    private ConcentrationSite concentSite;
+
+    /**
+     * 
+     */
+    private AssaultParty [] assaultParties;
+
+    /**
+     * 
+     */
+    private Museum museum;
+
     /**
      * 
      */
     private int masterThiefId;
-    
+
     /**
      * 
      */
     private int masterThiefState;
-    
-    /**
-     * 
-     */
-    private final AssaultParty[] assPart;
-    
-    /**
-     * 
-     */
-    private final ConcentrationSite concSite;
-    
-    /**
-     * 
-     */
-    private final ControlSite contSite;
-    
-    /**
-     * 
-     */
-    private final GeneralRepository genRep;
 
+
+    
     /**
      * 
-     * @param id
-     * @param assPart
-     * @param concSite
-     * @param contSite
-     * @param genRep
+     * @param repos
+     * @param contColSite
+     * @param concentSite
+     * @param assaultParties
+     * @param masterThiefId
      */
-    public MasterThief(int masterThiefId, AssaultParty[] assPart, ConcentrationSite concSite, ControlSite contSite, GeneralRepository genRep) {
+    public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite, AssaultParty [] assaultParties, Museum museum, int masterThiefId)
+    {
+        this.repos = repos;
+        this.contColSite = contColSite;
+        this.concentSite = concentSite;
+        this.assaultParties = assaultParties;
+        this.museum = museum;
+
         this.masterThiefId = masterThiefId;
-        this.masterThiefState = 0;
-        this.assPart = assPart;
-        this.concSite = concSite;
-        this.contSite = contSite;
-        this.genRep = genRep;
+        this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
     }
 
 
-	/**
-	 * @return the state
-	 */
-	public int getMasterThiefState() {
-		return masterThiefState;
-	}
+
+    /**
+     * 
+     * @return
+     */
+    public int getMasterThiefId()
+    {
+        return masterThiefId;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public int getMasterThiefState()
+    {
+        return masterThiefState;
+    }
+
+    /**
+     * 
+     * @param masterThiefState
+     */
+    public void setMasterThiefState(int masterThiefState)
+    {
+        this.masterThiefState = masterThiefState;
+    }
 
 
-	/**
-	 * @param masterThiefState the state to set
-	 */
-	public void setMasterThiefState(int masterThiefState) {
-		this.masterThiefState = masterThiefState;
-	}
 
+    @Override
+    public void run()
+    {
+        char oper;
+        int assaultPartyId, roomId, roomDistance;
+        int numberOfCanvas;
 
-	/**
-	 * @return the id
-	 */
-	public int getMasterThiefId() {
-		return masterThiefId;
-	}
+        contColSite.startOperations();
+        
+        while((oper = contColSite.appraiseSit()) != 'E')
+        {
+            System.out.println("Current master thief operation: " + oper);
+            switch(oper)
+            {
+                case 'P':
+                    assaultPartyId = contColSite.getAvailableAssaultParty();
+                    roomId = contColSite.getAvailableRoom();
+                    roomDistance = museum.getRoomDistance(roomId);
 
+                    concentSite.prepareAssaultParty(assaultPartyId, roomId, roomDistance);
 
-	@Override
-	public void run() {
-		char oper;
-		int assPartID, roomID;
-		contSite.startOperations();
-		
-		while((oper = contSite.appraiseSit()) != 'E') {
-			switch(oper) {
-				case 'P':
-					assPartID = contSite.getAssaultID();
-					roomID = contSite.getRoomID();
-					concSite.prepareAssaultParty(assPartID, roomID);
-					assPart[assPartID].sendAssaultParty();
-					break;
-					
-				case 'R':
-					contSite.takeARest();
-					contSite.collectACanvas();
-					break;
-			}
-		}
-		
-	    concSite.sumUpResults(contSite.getNumberOfCanvas());
-	}
+                    assaultParties[assaultPartyId].sendAssaultParty();
+
+                    break;
+                
+                case 'R':
+                    contColSite.takeARest();
+
+                    contColSite.collectACanvas();
+                    
+                    break;
+            }
+        }
+
+        numberOfCanvas = contColSite.getNumberOfCanvas();
+        concentSite.sumUpResults(numberOfCanvas);
+
+        System.out.println("Master thief has terminated!");
+    }
 }
