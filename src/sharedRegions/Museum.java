@@ -28,7 +28,6 @@ public class Museum
      */
     private int [] roomDistances;
 
-
     /**
      * 
      */
@@ -38,7 +37,6 @@ public class Museum
         generatePaintingsInRooms();
         calculateRoomDistances();
         //TODO: repos
-
     }
 
 
@@ -86,8 +84,6 @@ public class Museum
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered rollACanvas");
-
         if(paitingsInRoom[roomId] > 0)
         {   paitingsInRoom[roomId]--;
             ot.holdCanvas();
@@ -95,7 +91,5 @@ public class Museum
         else
         {   ot.dropCanvas();
         }
-
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left rollACanvas");
     }
 }

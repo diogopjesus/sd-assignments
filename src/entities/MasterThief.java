@@ -109,7 +109,6 @@ public class MasterThief extends Thread
         
         while((oper = contColSite.appraiseSit()) != 'E')
         {
-            System.out.println("Current master thief operation: " + oper);
             switch(oper)
             {
                 case 'P':
@@ -133,8 +132,7 @@ public class MasterThief extends Thread
         }
 
         numberOfCanvas = contColSite.getNumberOfCanvas();
+        
         concentSite.sumUpResults(numberOfCanvas);
-
-        System.out.println("Master thief has terminated!");
     }
 }

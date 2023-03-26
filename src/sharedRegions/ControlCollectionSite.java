@@ -128,10 +128,14 @@ public class ControlCollectionSite
     {
         for(int i = 0; i < SimulPar.N; i++)
             if(!emptyRooms[i])
-                for(int j = 0; j < SimulPar.M/SimulPar.K; j++)
-                    if(!assaultParties[j].operationStatus() && assaultParties[j].getTargetRoom() != i)
-                        return i;
-        
+            {
+                int j;
+                for(j = 0; j < (SimulPar.M-1)/SimulPar.K; j++)
+                    if(assaultParties[j].operationStatus() && (assaultParties[j].getTargetRoom() == i))
+                        break;
+                if(j == (SimulPar.M-1)/SimulPar.K)
+                    return i;
+            }              
         return -1;
     }
 
@@ -156,13 +160,10 @@ public class ControlCollectionSite
      */
     public synchronized void startOperations()
     {
-        System.out.println("Master thief entered startOperations");
-     
         MasterThief mt = (MasterThief)Thread.currentThread();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        
-        System.out.println("Master thief left startOperations");
+
         //TODO: log;
     }
 
@@ -173,8 +174,6 @@ public class ControlCollectionSite
     public synchronized char appraiseSit()
     {
         // MasterThief mt = (MasterThief)Thread.currentThread();
-        System.out.println("Master thief entered appraiseSit");
-
 
         /* Get Number of Empty Rooms and ID of a not empty room */
         int numberOfEmptyRooms = 0;
@@ -198,14 +197,15 @@ public class ControlCollectionSite
         
         // Wait arrival of ordinary thieves
         if((activeAssaultParties == ((SimulPar.M-1)/SimulPar.K)) ||
-           ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N-1) && (assaultParties[assaultPartyId].getTargetRoom() == roomNotEmptyId)))
-        {   System.out.println("Master thief left appraiseSit");
-            return 'R';
+           ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N-1) && (assaultParties[assaultPartyId].getTargetRoom() == roomNotEmptyId)) ||
+           ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N)))
+
+        {   return 'R';
         }
         
         if(allRoomsCleared())
         {
-            while(clearedOrdinaryThieves < SimulPar.M)
+            while(clearedOrdinaryThieves < SimulPar.M-1)
             {
                 try
                 {   wait();
@@ -215,7 +215,6 @@ public class ControlCollectionSite
                 }
             }
             
-            System.out.println("Master thief left appraiseSit");
             return 'E';
         }
 
@@ -232,7 +231,6 @@ public class ControlCollectionSite
         activeAssaultParties++;
         clearedOrdinaryThieves-=3;
 
-        System.out.println("Master thief left appraiseSit");
         return 'P';
     }
 
@@ -241,8 +239,6 @@ public class ControlCollectionSite
      */
     public synchronized void takeARest()
     {
-        System.out.println("Master thief entered takeARest");
-
         MasterThief mt = (MasterThief)Thread.currentThread();
 
         mt.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
@@ -255,7 +251,6 @@ public class ControlCollectionSite
                 ie.printStackTrace();
             }
         }
-        System.out.println("Master thief left takeARest");
     }
 
     /**
@@ -265,50 +260,44 @@ public class ControlCollectionSite
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered handACanvas");
-
         ot.setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
 
-        if(ot.isHoldingCanvas() || !emptyRooms[roomId])
+        //if(ot.isHoldingCanvas() || !emptyRooms[roomId])
+        //{
+        try
+        {   waitingThieves.write(ot.getOrdinaryThiefId());
+            numberOfWaitingThieves++;
+        } catch(MemException e)
+        {   GenericIO.writelnString ("Retrieval of customer id from waiting FIFO failed: " + e.getMessage ());
+            System.exit(1);
+        }
+
+        notifyAll();
+    
+        while(nextThiefInLine != ot.getOrdinaryThiefId())
         {
             try
-            {   waitingThieves.write(ot.getOrdinaryThiefId());
-                numberOfWaitingThieves++;
-            } catch(MemException e)
-            {   GenericIO.writelnString ("Retrieval of customer id from waiting FIFO failed: " + e.getMessage ());
-                System.exit(1);
+            {   wait();
+            } catch(InterruptedException e)
+            {   e.printStackTrace();
             }
-
-            notifyAll();
-        
-            while(nextThiefInLine != ot.getOrdinaryThiefId())
-            {
-                try
-                {   wait();
-                } catch(InterruptedException e)
-                {   e.printStackTrace();
-                }
-            }
-
-            if(ot.isHoldingCanvas())
-                numberOfCanvas++;
-            else
-                emptyRooms[roomId] = true;            
-            
-            infoUpdated = true;
-
-            System.out.println("Number of paintings: " + numberOfCanvas);    
         }
+
+        if(ot.isHoldingCanvas())
+            numberOfCanvas++;
+        else
+            emptyRooms[roomId] = true;
+            
+        infoUpdated = true;  
+        //}
 
         assaultParties[assaultPartyId].removeThief(ot.getOrdinaryThiefId());
         if(!assaultParties[assaultPartyId].operationStatus())
             activeAssaultParties--;
         
         clearedOrdinaryThieves++;
-
+      
         notifyAll();
-
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left handACanvas");
     }
 
     /**
@@ -316,8 +305,6 @@ public class ControlCollectionSite
      */
     public synchronized void collectACanvas()
     {
-        System.out.println("Master thief entered collectACanvas");
-
         MasterThief mt = (MasterThief)Thread.currentThread();
 
         try
@@ -342,7 +329,8 @@ public class ControlCollectionSite
             }
         }
 
+        nextThiefInLine = -1;
+
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        System.out.println("Master thief left collectACanvas");
     }
 }

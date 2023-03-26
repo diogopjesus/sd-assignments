@@ -170,7 +170,5 @@ public class OrdinaryThief extends Thread
 
             contColSite.handACanvas(assaultPartyId, roomId);
         }
-    
-        System.out.println("Ordinary thief " + ordinaryThiefId + " has terminated");
     }
 }

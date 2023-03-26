@@ -88,8 +88,6 @@ public class ConcentrationSite
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered amINeeded");
-
         /* Check if thief returns from ControlSite */
         if(ot.getOrdinaryThiefState() == OrdinaryThiefStates.COLLECTION_SITE)
         {
@@ -123,8 +121,6 @@ public class ConcentrationSite
             notifyAll();
         }
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left amINeeded");
-
         return endOfOps ? 'E' : 'P';
     }
 
@@ -133,8 +129,6 @@ public class ConcentrationSite
      */
     public synchronized void prepareAssaultParty(int assaultPartyId, int roomId, int roomDistance)
     {
-        System.out.println("Master thief entered prepareAssaultParty");
-
         MasterThief mt = (MasterThief)Thread.currentThread();
     
         while(numberOfWaitingThieves < SimulPar.K)
@@ -153,8 +147,9 @@ public class ConcentrationSite
 			try
             {   summonedThieves[i] = waitingThieves.read();
                 numberOfWaitingThieves--;
-			} catch(MemException me) {
-				//TODO
+			} catch(MemException e)
+            {   GenericIO.writelnString ("Retrieval of customer id from waiting FIFO failed: " + e.getMessage ());
+                System.exit(1);
 			}
 		}
 
@@ -175,8 +170,6 @@ public class ConcentrationSite
 
         // Clear summonedThieves array
         summonedThieves = new int[]{-1,-1,-1};
-
-        System.out.println("Master thief left prepareAssaultParty");
     }
 
     /**
@@ -185,8 +178,6 @@ public class ConcentrationSite
     public synchronized int prepareExcursion()
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
-     
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered prepareExcursion");
    
         assaultParties[availableAssaultParty].assignNewThief(ot.getOrdinaryThiefId());
         
@@ -197,8 +188,6 @@ public class ConcentrationSite
 
         notifyAll();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left prepareExcursion");
-
         return availableAssaultParty;
     }
 
@@ -207,10 +196,9 @@ public class ConcentrationSite
      */
     public synchronized void sumUpResults(int numberOfCanvas)
     {
-        System.out.println("Master thief entered sumUpResults");
         MasterThief mt = (MasterThief)Thread.currentThread();
 
-        while(numberOfWaitingThieves < SimulPar.M) {
+        while(numberOfWaitingThieves < SimulPar.M-1) {
 			try {
 				wait();
 			} catch(InterruptedException ie) {
@@ -222,6 +210,5 @@ public class ConcentrationSite
         notifyAll();
 
         mt.setMasterThiefState(MasterThiefStates.PRESENTING_THE_REPORT);
-        System.out.println("Master thief entered sumUpResults");
     }
 }

@@ -78,6 +78,10 @@ public class AssaultParty
      */
     private int numberOfThievesAtControlSite;
 
+    /**
+     * 
+     */
+    private int numberOfThievesOutsideRoom;
 
     /**
      * 
@@ -94,6 +98,7 @@ public class AssaultParty
         this.minThiefPosition = 0;
         this.numberOfThievesAtRoom = 0;
         this.numberOfThievesAtControlSite = 0; 
+        this.numberOfThievesOutsideRoom = 0;
     }
 
 
@@ -162,14 +167,14 @@ public class AssaultParty
      */
     public void removeThief(int thiefId)
     {
-        for(int i = 0; i < numberOfThievesInParty-1; i++)
-        {
-            if(thievesIdsInParty[i] == thiefId)
-            {
-                thievesIdsInParty[i] = thievesIdsInParty[numberOfThievesInParty-1];
-                thievesIdsInParty[numberOfThievesInParty-1] = -1;
-            }
-        }
+        // for(int i = 0; i < numberOfThievesInParty-1; i++)
+        // {
+        //     if(thievesIdsInParty[i] == thiefId)
+        //     {
+        //         thievesIdsInParty[i] = thievesIdsInParty[numberOfThievesInParty-1];
+        //         thievesIdsInParty[numberOfThievesInParty-1] = -1;
+        //     }
+        // }
 
         numberOfThievesInParty--;
         if(numberOfThievesInParty == 0)
@@ -198,6 +203,19 @@ public class AssaultParty
      * @return
      */
     private int getPreviousThiefIndex(int thiefIndex) {
+        // if they are all at the same step send the next one based on index (to prevent blockings)
+        boolean atTheSameStep = true;
+        for(int i = 0; i < SimulPar.K-1; i++)
+        {
+            if(thievesPositionsInParty[i] != thievesPositionsInParty[i+1]) {
+                atTheSameStep = false;
+                break;
+            }
+        }
+        if(atTheSameStep) {
+            return (thiefIndex+1) % SimulPar.K;
+        }
+
         // if the last thief then get value to the first thief
         if (minThiefPosition == thievesPositionsInParty[thiefIndex])
             for (int i = 0; i < SimulPar.K; i++)
@@ -222,6 +240,19 @@ public class AssaultParty
      * @return
      */
     private int getNextThiefIndex(int thiefIndex) {
+        // if they are all at the same step send the next one based on index (to prevent blockings)
+        boolean atTheSameStep = true;
+        for(int i = 0; i < SimulPar.K-1; i++)
+        {
+            if(thievesPositionsInParty[i] != thievesPositionsInParty[i+1]) {
+                atTheSameStep = false;
+                break;
+            }
+        }
+        if(atTheSameStep) {
+            return (thiefIndex+1) % SimulPar.K;
+        }
+
         // if the first thief then get value to the last thief
         if (maxThiefPosition == thievesPositionsInParty[thiefIndex]){
             for (int i = 0; i < SimulPar.K; i++){
@@ -296,12 +327,11 @@ public class AssaultParty
      */
     public synchronized void sendAssaultParty()
     {
-        System.out.println("Master thief entered sendAssaultParty");
-
         MasterThief mt = (MasterThief)Thread.currentThread();
 
         numberOfThievesAtRoom = 0;
         numberOfThievesAtControlSite = 0;
+        numberOfThievesOutsideRoom = 0;
         
         executeAssault = true;
 
@@ -315,8 +345,6 @@ public class AssaultParty
         notifyAll();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-
-        System.out.println("Master thief left sendAssaultParty");
     }
 
     /**
@@ -326,10 +354,7 @@ public class AssaultParty
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered crawlIn");
-
-        System.out.println("Number of thieves at room: " + numberOfThievesAtRoom);
-        while ((!executeAssault || nextThiefToMove != ot.getOrdinaryThiefId()) && numberOfThievesAtRoom < SimulPar.K) {
+        while (!executeAssault || nextThiefToMove != ot.getOrdinaryThiefId()) {
             try {
                 wait();
             } catch (InterruptedException ie) {
@@ -337,70 +362,65 @@ public class AssaultParty
             }
         }
 
-        /* check if all thieves are already at room */
-        if(numberOfThievesAtRoom == SimulPar.K)
-        {
-            System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left crawlIn");
-            return false;
-        }
-
         int thiefIndex = getThiefIndex(ot.getOrdinaryThiefId());
-        int temporaryThiefPosition = thievesPositionsInParty[thiefIndex];
-        boolean thiefInMovement;
-
-        // Loop to allow multiple moves of the same thief
-        do
+        
+        if(thievesPositionsInParty[thiefIndex] < targetRoomDistance)
         {
-            thiefInMovement = false;
+            int temporaryThiefPosition = thievesPositionsInParty[thiefIndex];
+            boolean thiefInMovement;
 
-            if (temporaryThiefPosition == maxThiefPosition) {
-                int previousThiefPosition = thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
-                temporaryThiefPosition += Math.min(ot.getMaximumDisplacement(), SimulPar.S - (temporaryThiefPosition - previousThiefPosition));
-            }
+            // Loop to allow multiple moves of the same thief
+            do
+            {
+                thiefInMovement = false;
 
-            else if (temporaryThiefPosition == minThiefPosition) {
-                temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
-            }
-
-            else {
-                // crawl the maximum possible if the distance between the first and the last is
-                // <= MaxSeparation
-                if (maxThiefPosition - minThiefPosition <= SimulPar.S)
-                {   temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
+                if (temporaryThiefPosition == maxThiefPosition) {
+                    int previousThiefPosition = thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
+                    temporaryThiefPosition += Math.min(ot.getMaximumDisplacement(), SimulPar.S - (temporaryThiefPosition - previousThiefPosition));
                 }
-                else
-                {
-                    // get the distance to the thief before and after the current one
-                    int distanceToPrevious = temporaryThiefPosition - thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
-                    int distanceToNext = thievesPositionsInParty[getNextThiefIndex(thiefIndex)] - temporaryThiefPosition;
 
-                    if (distanceToNext + distanceToPrevious <= SimulPar.S)
-                        temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
+                else if (temporaryThiefPosition == minThiefPosition) {
+                    temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
+                }
+
+                else {
+                    // crawl the maximum possible if the distance between the first and the last is
+                    // <= MaxSeparation
+                    if (maxThiefPosition - minThiefPosition <= SimulPar.S)
+                    {   temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
+                    }
                     else
-                        temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(SimulPar.S - distanceToPrevious, ot.getMaximumDisplacement()), true);
+                    {
+                        // get the distance to the thief before and after the current one
+                        int distanceToPrevious = temporaryThiefPosition - thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
+                        int distanceToNext = thievesPositionsInParty[getNextThiefIndex(thiefIndex)] - temporaryThiefPosition;
+
+                        if (distanceToNext + distanceToPrevious <= SimulPar.S)
+                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S), true);
+                        else
+                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(SimulPar.S - distanceToPrevious, ot.getMaximumDisplacement()), true);
+                    }
                 }
+
+                if(thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance, temporaryThiefPosition))
+                    thiefInMovement = true;
+
+                thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance, temporaryThiefPosition);
+                updateMinMaxPositions();
+            } while (thiefInMovement);
+
+
+            if(thievesPositionsInParty[thiefIndex] == targetRoomDistance) {
+                numberOfThievesAtRoom++;
+                ot.setOrdinaryThiefState(OrdinaryThiefStates.AT_A_ROOM);
             }
-
-            if(thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance, temporaryThiefPosition))
-                thiefInMovement = true;
-
-            thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance, temporaryThiefPosition);
-            updateMinMaxPositions();
-        } while (thiefInMovement);
-
+        }
+        
         nextThiefToMove = thievesIdsInParty[getPreviousThiefIndex(thiefIndex)];
 
-        if(thievesPositionsInParty[thiefIndex] == targetRoomDistance) {
-            numberOfThievesAtRoom++;
-        
-            ot.setOrdinaryThiefState(OrdinaryThiefStates.AT_A_ROOM);
-        }
-        
         notifyAll();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left crawlIn");
-
-        return true;
+        return (thievesPositionsInParty[thiefIndex] < targetRoomDistance) || (numberOfThievesAtRoom < SimulPar.K);
     }
 
     /**
@@ -410,20 +430,15 @@ public class AssaultParty
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered reverseDirection");
+        numberOfThievesOutsideRoom++;
 
-        numberOfThievesAtRoom--;
-
-        if(numberOfThievesAtRoom == 0) {
+        if(numberOfThievesOutsideRoom == 3) {
             executeAssault = false;
             nextThiefToMove = thievesIdsInParty[0];
             notifyAll();
         }
 
         ot.setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_OUTWARDS);
-
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left reverseDirection");
-
     }
 
     /**
@@ -433,9 +448,6 @@ public class AssaultParty
     {
         OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " entered crawlOut");
-
-        System.out.println("CRAWLOUT: netxtThiefToMove=" + nextThiefToMove + " | executeAssault=" + executeAssault);
         while (executeAssault || nextThiefToMove != ot.getOrdinaryThiefId()) {
             try {
                 wait();
@@ -445,61 +457,63 @@ public class AssaultParty
         }
 
         int thiefIndex = getThiefIndex(ot.getOrdinaryThiefId());
-        int temporaryThiefPosition = thievesPositionsInParty[thiefIndex];
-        boolean thiefInMovement;
 
-        // Loop to allow multiple moves of the same thief
-        do
+        if(thievesPositionsInParty[thiefIndex] > 0)
         {
-            thiefInMovement = false;
+            int temporaryThiefPosition = thievesPositionsInParty[thiefIndex];
+            boolean thiefInMovement;
 
-            if (temporaryThiefPosition == maxThiefPosition) {
-                temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (temporaryThiefPosition - minThiefPosition) + SimulPar.S), false);
-            }
+            // Loop to allow multiple moves of the same thief
+            do
+            {
+                thiefInMovement = false;
 
-            else if (temporaryThiefPosition == minThiefPosition) {
-                int nextThiefPosition = thievesPositionsInParty[getNextThiefIndex(thiefIndex)];
-                temporaryThiefPosition -= Math.min(ot.getMaximumDisplacement(), SimulPar.S - (nextThiefPosition - temporaryThiefPosition));
-            }
-
-            else {
-                // crawl the maximum possible if the distance between the first and the last is
-                // <= MaxSeparation
-                if (maxThiefPosition - minThiefPosition <= SimulPar.S)
+                if (temporaryThiefPosition == maxThiefPosition) {
                     temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (temporaryThiefPosition - minThiefPosition) + SimulPar.S), false);
+                }
+
+                else if (temporaryThiefPosition == minThiefPosition) {
+                    int nextThiefPosition = thievesPositionsInParty[getNextThiefIndex(thiefIndex)];
+                    temporaryThiefPosition -= Math.min(ot.getMaximumDisplacement(), SimulPar.S - (nextThiefPosition - temporaryThiefPosition));
+                }
 
                 else {
-                    // get the distance to the thief before and after the current one
-                    int distanceToPrevious = temporaryThiefPosition - thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
-                    int distanceToNext = thievesPositionsInParty[getNextThiefIndex(thiefIndex)] - temporaryThiefPosition;
-
-                    if (distanceToNext + distanceToPrevious <= SimulPar.S)
+                    // crawl the maximum possible if the distance between the first and the last is
+                    // <= MaxSeparation
+                    if (maxThiefPosition - minThiefPosition <= SimulPar.S)
                         temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (temporaryThiefPosition - minThiefPosition) + SimulPar.S), false);
-                    else
-                        temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (SimulPar.S - distanceToNext)), false);
-                }       
+
+                    else {
+                        // get the distance to the thief before and after the current one
+                        int distanceToPrevious = temporaryThiefPosition - thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
+                        int distanceToNext = thievesPositionsInParty[getNextThiefIndex(thiefIndex)] - temporaryThiefPosition;
+
+                        if (distanceToNext + distanceToPrevious <= SimulPar.S)
+                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (temporaryThiefPosition - minThiefPosition) + SimulPar.S), false);
+                        else
+                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(), (SimulPar.S - distanceToNext)), false);
+                    }       
+                }
+
+                if(thievesPositionsInParty[thiefIndex] > Math.max(0, temporaryThiefPosition))
+                    thiefInMovement = true;
+
+                thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0,temporaryThiefPosition);
+                updateMinMaxPositions();
+            } while(thiefInMovement);
+
+
+            if(thievesPositionsInParty[thiefIndex] == 0) {
+                numberOfThievesAtControlSite++;
+
+                ot.setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
             }
-
-            if(thievesPositionsInParty[thiefIndex] > Math.max(0, temporaryThiefPosition))
-                thiefInMovement = true;
-
-            thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0,temporaryThiefPosition);
-            updateMinMaxPositions();
-        } while(thiefInMovement);
+        }
 
         nextThiefToMove = thievesIdsInParty[getNextThiefIndex(thiefIndex)];
 
-        if(thievesPositionsInParty[thiefIndex] == 0) {
-            numberOfThievesAtControlSite++;
-
-            ot.setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
-        }
-
         notifyAll();
-        
-        if(thievesPositionsInParty[thiefIndex] == 0)
-            System.out.println("Ordinary thief " + ot.getOrdinaryThiefId() + " left crawlOut");
 
-        return thievesPositionsInParty[thiefIndex] > 0;
+        return (thievesPositionsInParty[thiefIndex] > 0) || (numberOfThievesAtControlSite < SimulPar.K);
     }
 }

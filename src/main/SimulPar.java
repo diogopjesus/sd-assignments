@@ -10,7 +10,7 @@ public final class SimulPar
      * Number of Thieves.
      */
 
-    public static final int M = 4;
+    public static final int M = 7;
 
     /**
      * Number of Rooms.

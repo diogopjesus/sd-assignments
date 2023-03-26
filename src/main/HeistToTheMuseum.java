@@ -40,8 +40,6 @@ public class HeistToTheMuseum
 
         masterThief = new MasterThief(repos, contColSite, concentSite, assaultParties, museum, 0);
 
-        System.out.println("Start Simulation");
-
         for(int i = 0; i < SimulPar.M-1; i++)
             ordinaryThieves[i] = new OrdinaryThief(repos, contColSite, concentSite, assaultParties, museum, i);
         
