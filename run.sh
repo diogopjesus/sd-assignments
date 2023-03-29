@@ -22,20 +22,20 @@ fi
 
 
 # run project
-NUMBER_OF_RUNS=100
 re='^[0-9]+$'
-if ! [[ $1 =~ $re ]] ; then
+
+if ! [[ $1 =~ $re || "$1" =~ "" ]] ; then
    echo "Error: Argument passed is not a number" >&2; exit 1
 fi
 
-if [ "$1" -eq 1 ]; then
+if [[ "$1" = 1 || "$1" = "" ]]; then
     java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum
     exit $?
 fi
 
 rm -rf ../logs/
 mkdir ../logs/
-for i in $(seq 1 100)
+for i in $(seq 1 $1)
 do
     echo -e "Run n.o " $i
     echo "../logs/run$i.log" | java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum > /dev/null
