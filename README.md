@@ -4,7 +4,7 @@
 ```bash
 ./run.sh
 ```
-### Run N times, with N >= 1, (log files stored in a newly created logs directory at root)
+### Run N times, with N >= 1, (log files stored in a newly created log directory at root)
 ```bash
 ./run.sh N
 ```
@@ -17,4 +17,14 @@
 ### Check integrity of log file
 ```bash
 ./run.sh check-log FILEPATH
+```
+
+### Check integrity of log files on dir
+```bash
+./run.sh check-log-dir DIR
+```
+
+### Generate documentation
+```bash
+./run.sh doc
 ```
