@@ -41,6 +41,10 @@ if [ "$1" = "check-log" ]; then
         echo "Error: No log file passed as an argument!" >&2;
         exit 1
     fi
+    if [ ! -f "$2" ]; then
+        echo "Error: $2 is not a file!" >&2;
+        exit 1;
+    fi
     python3 utils/check-log.py $2
     exit $?;
 fi
