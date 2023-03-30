@@ -9,7 +9,17 @@
 ./run.sh N
 ```
 
-### Clean .class and log files
+### Compile only
+```bash
+./run-sh compile
+```
+
+### Generate documentation
+```bash
+./run.sh doc
+```
+
+### Clean .class, logs and docs
 ```bash
 ./run.sh clean
 ```
@@ -24,7 +34,7 @@
 ./run.sh check-log-dir DIR
 ```
 
-### Generate documentation
+### Print help message
 ```bash
-./run.sh doc
+./run.sh help
 ```
