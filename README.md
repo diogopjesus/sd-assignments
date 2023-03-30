@@ -1,15 +1,20 @@
-# sd-assignment-1
-## To run
+# SD Assignment 1
+## Help guide to run.sh script
 ### Run once
 ```bash
-./run.sh 1
+./run.sh
 ```
-### Run N times, with N > 1, (log files stored in a newly created logs directory at root)
+### Run N times, with N >= 1, (log files stored in a newly created logs directory at root)
 ```bash
 ./run.sh N
 ```
 
-### clean .class files
+### Clean .class and log files
 ```bash
 ./run.sh clean
+```
+
+### Check integrity of log file
+```bash
+./run.sh check-log FILEPATH
 ```

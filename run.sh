@@ -7,6 +7,15 @@ if [ "$1" = "clean" ]; then
     exit 0;
 fi
 
+if [[ "$1" = "check-log" ]]; then
+    if [[ "$2" = "" ]]; then
+        echo "Error: No log file passed as an argument!" >&2;
+        exit 1
+    fi
+    python3 utils/check-log.py $2
+    exit $?;
+fi
+
 # check if script is being run at root of project
 cd $(pwd)/src/ 2> /dev/null
 if [ "$?" -ne 0 ]; then
@@ -26,11 +35,12 @@ fi
 # check if argument is a number
 re='^[0-9]+$'
 if ! [[ $1 =~ $re || "$1" =~ "" ]] ; then
-   echo "Error: Argument passed is not a number" >&2; exit 1
+   echo "Error: Argument passed is not a number" >&2;
+   exit 1
 fi
 
 # run project once
-if [[ "$1" = 1 || "$1" = "" ]]; then
+if [[ "$1" = "" ]]; then
     java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum
     exit $?
 fi
