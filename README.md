@@ -1,4 +1,17 @@
-# SD Assignment 1
+# SD Assignments
+This repository contains the assignments for the Distributed Systems course at Universidade de Aveiro.
+TODO: explain the assignments and how they are correlated.
+
+## Assignment 1
+Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag/first-assignment).
+Final Grade: 14/16.
+## Assignment 2
+Code not yet available.
+Final Grade: ??/16.
+## Assignment 3
+Code not yet available.
+Final Grade: ??/16.
+
 ## Help guide to run.sh script
 ### Run once
 ```bash
@@ -38,3 +51,4 @@
 ```bash
 ./run.sh help
 ```
+
