@@ -23,7 +23,7 @@
 hs_err_pid*
 
 # logs directory
-logs/
+log/
 
-# doc directory
+# documentation directories
 doc/
