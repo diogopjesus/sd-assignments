@@ -23,7 +23,7 @@ jobs:
 
       - name: Compile project (run 'run.sh compile')
         run: |
-          chmod +x  ./run.sh
+          chmod +x ./run.sh
           ./run.sh compile
         shell: bash
 
@@ -36,7 +36,7 @@ jobs:
       - name: Check if logs are valid
         run: |
           chmod +x ./run.sh
-          ./run.sh check-log-dir log/
+          ./run.sh check-log-dir log
         shell: bash
 
   # TODO: deploy docs based on success
