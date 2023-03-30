@@ -25,7 +25,7 @@ def check_file_lines(file, show_diff=False):
     no_equal_lines = True
     with open(file) as f:
         lines = f.readlines()
-        for i in range(8, len(lines) - 4, 4):
+        for i in range(8, len(lines) - 4, 2):
             if lines[i] == lines[i + 2] and lines[i + 1] == lines[i + 3]:
                 print("Status was not updated between lines %d and %d!" % (i + 1, i + 4))
                 no_equal_lines = False
