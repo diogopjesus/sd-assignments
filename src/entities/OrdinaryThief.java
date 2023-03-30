@@ -7,7 +7,9 @@ import sharedRegions.*;
  * 
  * It simulates the ordinary thief life cycle.
  */
-public class OrdinaryThief extends Thread {
+
+public class OrdinaryThief extends Thread
+{
     /**
      * 
      */
@@ -17,7 +19,7 @@ public class OrdinaryThief extends Thread {
      * 
      */
     private ControlCollectionSite contColSite;
-
+    
     /**
      * 
      */
@@ -26,7 +28,7 @@ public class OrdinaryThief extends Thread {
     /**
      * 
      */
-    private AssaultParty[] assaultParties;
+    private AssaultParty [] assaultParties;
 
     /**
      * 
@@ -42,7 +44,7 @@ public class OrdinaryThief extends Thread {
      * 
      */
     private int ordinaryThiefState;
-
+    
     /**
      * 
      */
@@ -67,8 +69,8 @@ public class OrdinaryThief extends Thread {
      * @param museum
      * @param ordinaryThiefId
      */
-    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties, Museum museum, int ordinaryThiefId, int maxDis) {
+    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite, AssaultParty [] assaultParties, Museum museum, int ordinaryThiefId, int maxDis)
+    {
         this.repos = repos;
         this.contColSite = contColSite;
         this.concentSite = concentSite;
@@ -81,11 +83,14 @@ public class OrdinaryThief extends Thread {
         this.withCanvas = false;
     }
 
+
+
     /**
      * 
      * @return
      */
-    public int getOrdinaryThiefId() {
+    public int getOrdinaryThiefId()
+    {
         return ordinaryThiefId;
     }
 
@@ -93,7 +98,8 @@ public class OrdinaryThief extends Thread {
      * 
      * @return
      */
-    public int getOrdinaryThiefState() {
+    public int getOrdinaryThiefState()
+    {
         return ordinaryThiefState;
     }
 
@@ -101,7 +107,8 @@ public class OrdinaryThief extends Thread {
      * 
      * @param ordinaryThiefState
      */
-    public void setOrdinaryThiefState(int ordinaryThiefState) {
+    public void setOrdinaryThiefState(int ordinaryThiefState)
+    {
         this.ordinaryThiefState = ordinaryThiefState;
         repos.setOrdinaryThiefState(ordinaryThiefId, ordinaryThiefState);
     }
@@ -110,49 +117,56 @@ public class OrdinaryThief extends Thread {
      * 
      * @return
      */
-    public int getMaximumDisplacement() {
+    public int getMaximumDisplacement()
+    {
         return maximumDisplacement;
     }
 
     /**
      * 
      */
-    public boolean isHoldingCanvas() {
+    public boolean isHoldingCanvas()
+    {
         return withCanvas;
     }
 
     /**
      * 
      */
-    public void holdCanvas() {
+    public void holdCanvas()
+    {
         withCanvas = true;
     }
 
     /**
      * 
      */
-    public void dropCanvas() {
+    public void dropCanvas()
+    {
         withCanvas = false;
     }
 
+
+
+
     @Override
-    public void run() {
+    public void run()
+    {
         int roomId;
 
-        while (concentSite.amINeeded() != 'E') {
+        while(concentSite.amINeeded() != 'E')
+        {
             assaultPartyId = concentSite.prepareExcursion();
 
             roomId = assaultParties[assaultPartyId].getTargetRoom();
 
-            while (assaultParties[assaultPartyId].crawlIn())
-                ;
+            while(assaultParties[assaultPartyId].crawlIn());
 
             museum.rollACanvas(assaultPartyId, roomId);
 
             assaultParties[assaultPartyId].reverseDirection();
 
-            while (assaultParties[assaultPartyId].crawlOut())
-                ;
+            while(assaultParties[assaultPartyId].crawlOut());
 
             contColSite.handACanvas(assaultPartyId, roomId);
         }

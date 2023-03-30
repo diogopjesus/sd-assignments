@@ -7,7 +7,9 @@ import sharedRegions.*;
  * 
  * It simulates the master thief life cycle.
  */
-public class MasterThief extends Thread {
+
+public class MasterThief extends Thread
+{
     /**
      * 
      */
@@ -17,7 +19,7 @@ public class MasterThief extends Thread {
      * 
      */
     private ControlCollectionSite contColSite;
-
+    
     /**
      * 
      */
@@ -26,7 +28,7 @@ public class MasterThief extends Thread {
     /**
      * 
      */
-    private AssaultParty[] assaultParties;
+    private AssaultParty [] assaultParties;
 
     /**
      * 
@@ -43,6 +45,8 @@ public class MasterThief extends Thread {
      */
     private int masterThiefState;
 
+
+    
     /**
      * 
      * @param repos
@@ -51,8 +55,8 @@ public class MasterThief extends Thread {
      * @param assaultParties
      * @param masterThiefId
      */
-    public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties, Museum museum, int masterThiefId) {
+    public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite, AssaultParty [] assaultParties, Museum museum, int masterThiefId)
+    {
         this.repos = repos;
         this.contColSite = contColSite;
         this.concentSite = concentSite;
@@ -63,11 +67,14 @@ public class MasterThief extends Thread {
         this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
     }
 
+
+
     /**
      * 
      * @return
      */
-    public int getMasterThiefId() {
+    public int getMasterThiefId()
+    {
         return masterThiefId;
     }
 
@@ -75,7 +82,8 @@ public class MasterThief extends Thread {
      * 
      * @return
      */
-    public int getMasterThiefState() {
+    public int getMasterThiefState()
+    {
         return masterThiefState;
     }
 
@@ -83,21 +91,27 @@ public class MasterThief extends Thread {
      * 
      * @param masterThiefState
      */
-    public void setMasterThiefState(int masterThiefState) {
+    public void setMasterThiefState(int masterThiefState)
+    {
         this.masterThiefState = masterThiefState;
         repos.setMasterThiefState(masterThiefState);
     }
 
+
+
     @Override
-    public void run() {
+    public void run()
+    {
         char oper;
         int assaultPartyId, roomId, roomDistance;
         int numberOfCanvas;
 
         contColSite.startOperations();
-
-        while ((oper = contColSite.appraiseSit()) != 'E') {
-            switch (oper) {
+        
+        while((oper = contColSite.appraiseSit()) != 'E')
+        {
+            switch(oper)
+            {
                 case 'P':
                     assaultPartyId = contColSite.getAvailableAssaultParty();
                     roomId = contColSite.getAvailableRoom();
@@ -108,18 +122,18 @@ public class MasterThief extends Thread {
                     assaultParties[assaultPartyId].sendAssaultParty();
 
                     break;
-
+                
                 case 'R':
                     contColSite.takeARest();
 
                     contColSite.collectACanvas();
-
+                    
                     break;
             }
         }
 
         numberOfCanvas = contColSite.getNumberOfCanvas();
-
+        
         concentSite.sumUpResults(numberOfCanvas);
         repos.endAssault(numberOfCanvas);
     }

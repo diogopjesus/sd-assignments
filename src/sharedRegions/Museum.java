@@ -10,7 +10,9 @@ import main.*;
  * All public methods are executed in mutual exclusion.
  * There are X internal synchronization points: (...)
  */
-public class Museum {
+
+public class Museum
+{
     /**
      * Reference to the general repository.
      */
@@ -19,43 +21,51 @@ public class Museum {
     /**
      * 
      */
-    private int[] paitingsInRoom;
+    private int [] paitingsInRoom;
 
     /**
      * 
      */
-    private int[] roomDistances;
+    private int [] roomDistances;
 
     /**
      * 
      */
-    public Museum(GeneralRepository repos, int[] numPaint, int[] roomDist) {
+    public Museum(GeneralRepository repos, int [] numPaint, int [] roomDist)
+    {
         this.repos = repos;
         paitingsInRoom = numPaint;
         roomDistances = roomDist;
     }
 
+
+
     /**
      * 
      */
-    public int getRoomDistance(int roomId) {
-        if (roomId < SimulPar.N && roomId >= 0)
+    public int getRoomDistance(int roomId)
+    {
+        if(roomId < SimulPar.N && roomId >= 0)
             return roomDistances[roomId];
         return -1;
     }
 
+
+
     /**
      * 
      */
-    public synchronized void rollACanvas(int assaultPartyId, int roomId) {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+    public synchronized void rollACanvas(int assaultPartyId, int roomId)
+    {
+        OrdinaryThief ot = (OrdinaryThief)Thread.currentThread();
 
-        if (paitingsInRoom[roomId] > 0) {
-            paitingsInRoom[roomId]--;
+        if(paitingsInRoom[roomId] > 0)
+        {   paitingsInRoom[roomId]--;
             ot.holdCanvas();
             repos.holdAssaultPartyElementCanvas(assaultPartyId, ot.getOrdinaryThiefId(), roomId);
-        } else {
-            ot.dropCanvas();
+        }
+        else
+        {   ot.dropCanvas();
         }
     }
 }

@@ -1,4 +1,5 @@
 /**
  * Common infrastructure.
  */
+
 package commInfra;
