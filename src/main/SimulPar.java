@@ -21,7 +21,7 @@ public final class SimulPar {
     public static final int MD = 6;
 
     /**
-     * Minimum value possible to be assigned to displacement.
+     * Minimum value possible to be assigned to maximum displacement.
      */
     public static final int md = 2;
 
