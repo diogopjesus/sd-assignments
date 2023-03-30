@@ -5,10 +5,9 @@ import main.SimulPar;
 
 /**
  * Assault party.
- * 
- * It is responsible to (...)
- * All public methods are executed in mutual exclusion.
- * There are X internal synchronization points: (...)
+ *
+ * It is responsible to (...) All public methods are executed in mutual exclusion. There are X
+ * internal synchronization points: (...)
  */
 public class AssaultParty {
     /**
@@ -17,77 +16,77 @@ public class AssaultParty {
     private final GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private int assaultPartyId;
 
     /**
-     * 
+     *
      */
     private int numberOfThievesInParty;
 
     /**
-     * 
+     *
      */
     private boolean inOperation;
 
     /**
-     * 
+     *
      */
     private int targetRoom;
 
     /**
-     * 
+     *
      */
     private int targetRoomDistance;
 
     /**
-     * 
+     *
      */
     private int[] thievesIdsInParty;
 
     /**
-     * 
+     *
      */
     private int nextThiefToMove;
 
     /**
-     * 
+     *
      */
     private boolean executeAssault;
 
     /**
-     * 
+     *
      */
     private int[] thievesPositionsInParty;
 
     /**
-     * 
+     *
      */
     private int maxThiefPosition;
 
     /**
-     * 
+     *
      */
     private int minThiefPosition;
 
     /**
-     * 
+     *
      */
     private int numberOfThievesAtRoom;
 
     /**
-     * 
+     *
      */
     private int numberOfThievesAtControlSite;
 
     /**
-     * 
+     *
      */
     private int numberOfThievesOutsideRoom;
 
     /**
-     * 
+     *
      */
     public AssaultParty(GeneralRepository repos, int assaultPartyId) {
         this.repos = repos;
@@ -105,28 +104,28 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public boolean operationStatus() {
         return inOperation;
     }
 
     /**
-     * 
+     *
      */
     public void startOperation() {
         this.inOperation = true;
     }
 
     /**
-     * 
+     *
      */
     public void endOperation() {
         this.inOperation = false;
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getNumberOfThievesInParty() {
@@ -134,7 +133,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public void setTargetRoom(int targetRoom, int targetRoomDistance) {
         this.targetRoom = targetRoom;
@@ -142,14 +141,14 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public int getTargetRoom() {
         return targetRoom;
     }
 
     /**
-     * 
+     *
      */
     public void assignNewThief(int thiefId) {
         numberOfThievesInParty++;
@@ -157,7 +156,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public void removeThief(int thiefId) {
         numberOfThievesInParty--;
@@ -166,7 +165,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      * @param commonThiefId
      * @return
      */
@@ -182,7 +181,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      * @param thiefIndex
      * @return
      */
@@ -208,7 +207,8 @@ public class AssaultParty {
 
         int distanceBetweenThieves, minDistanceBetweenThieves = SimulPar.S, previousThiefIndex = -1;
         for (int i = 0; i < SimulPar.K; i++) {
-            distanceBetweenThieves = thievesPositionsInParty[thiefIndex] - thievesPositionsInParty[i];
+            distanceBetweenThieves =
+                    thievesPositionsInParty[thiefIndex] - thievesPositionsInParty[i];
             if (distanceBetweenThieves > 0 && distanceBetweenThieves <= minDistanceBetweenThieves) {
                 minDistanceBetweenThieves = distanceBetweenThieves;
                 previousThiefIndex = i;
@@ -219,7 +219,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      * @param thiefIndex
      * @return
      */
@@ -247,7 +247,8 @@ public class AssaultParty {
 
         int distanceBetweenThieves, minDistanceBetweenThieves = SimulPar.S, nextThiefIndex = -1;
         for (int i = 0; i < SimulPar.K; i++) {
-            distanceBetweenThieves = thievesPositionsInParty[i] - thievesPositionsInParty[thiefIndex];
+            distanceBetweenThieves =
+                    thievesPositionsInParty[i] - thievesPositionsInParty[thiefIndex];
             if (distanceBetweenThieves > 0 && distanceBetweenThieves <= minDistanceBetweenThieves) {
                 minDistanceBetweenThieves = distanceBetweenThieves;
                 nextThiefIndex = i;
@@ -258,7 +259,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     private void updateMinMaxPositions() {
         // Update maximum and minimum position
@@ -275,13 +276,14 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      * @param currentPosition
      * @param maximumDistance
      * @param crawlIn
      * @return
      */
-    private int calculateAvailablePosition(int currentPosition, int maximumDistance, boolean crawlIn) {
+    private int calculateAvailablePosition(int currentPosition, int maximumDistance,
+            boolean crawlIn) {
         int tempPosition;
 
         for (int d = maximumDistance; d > 0; d--) {
@@ -305,7 +307,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void sendAssaultParty() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -329,7 +331,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public synchronized boolean crawlIn() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -353,14 +355,16 @@ public class AssaultParty {
                 thiefInMovement = false;
 
                 if (temporaryThiefPosition == maxThiefPosition) {
-                    int previousThiefPosition = thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
+                    int previousThiefPosition =
+                            thievesPositionsInParty[getPreviousThiefIndex(thiefIndex)];
                     temporaryThiefPosition += Math.min(ot.getMaximumDisplacement(),
                             SimulPar.S - (temporaryThiefPosition - previousThiefPosition));
                 }
 
                 else if (temporaryThiefPosition == minThiefPosition) {
-                    temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math
-                            .min(ot.getMaximumDisplacement(), (maxThiefPosition - temporaryThiefPosition) + SimulPar.S),
+                    temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
+                            Math.min(ot.getMaximumDisplacement(),
+                                    (maxThiefPosition - temporaryThiefPosition) + SimulPar.S),
                             true);
                 }
 
@@ -380,23 +384,29 @@ public class AssaultParty {
                                 - temporaryThiefPosition;
 
                         if (distanceToNext + distanceToPrevious <= SimulPar.S)
-                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
-                                    Math.min(ot.getMaximumDisplacement(),
-                                            (maxThiefPosition - temporaryThiefPosition) + SimulPar.S),
-                                    true);
+                            temporaryThiefPosition =
+                                    calculateAvailablePosition(temporaryThiefPosition,
+                                            Math.min(ot.getMaximumDisplacement(),
+                                                    (maxThiefPosition - temporaryThiefPosition)
+                                                            + SimulPar.S),
+                                            true);
                         else
-                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
-                                    Math.min(SimulPar.S - distanceToPrevious, ot.getMaximumDisplacement()), true);
+                            temporaryThiefPosition =
+                                    calculateAvailablePosition(temporaryThiefPosition,
+                                            Math.min(SimulPar.S - distanceToPrevious,
+                                                    ot.getMaximumDisplacement()),
+                                            true);
                     }
                 }
 
-                if (thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance, temporaryThiefPosition)) {
+                if (thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance,
+                        temporaryThiefPosition)) {
                     thiefInMovement = true;
-                    thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance,
-                            temporaryThiefPosition);
+                    thievesPositionsInParty[thiefIndex] = temporaryThiefPosition =
+                            Math.min(targetRoomDistance, temporaryThiefPosition);
                     updateMinMaxPositions();
                     repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
-                        thievesIdsInParty[thiefIndex]);
+                            thievesIdsInParty[thiefIndex]);
                 }
             } while (thiefInMovement);
 
@@ -410,11 +420,12 @@ public class AssaultParty {
 
         notifyAll();
 
-        return (thievesPositionsInParty[thiefIndex] < targetRoomDistance) || (numberOfThievesAtRoom < SimulPar.K);
+        return (thievesPositionsInParty[thiefIndex] < targetRoomDistance)
+                || (numberOfThievesAtRoom < SimulPar.K);
     }
 
     /**
-     * 
+     *
      */
     public synchronized void reverseDirection() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -431,7 +442,7 @@ public class AssaultParty {
     }
 
     /**
-     * 
+     *
      */
     public synchronized boolean crawlOut() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -455,8 +466,9 @@ public class AssaultParty {
                 thiefInMovement = false;
 
                 if (temporaryThiefPosition == maxThiefPosition) {
-                    temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition, Math
-                            .min(ot.getMaximumDisplacement(), (temporaryThiefPosition - minThiefPosition) + SimulPar.S),
+                    temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
+                            Math.min(ot.getMaximumDisplacement(),
+                                    (temporaryThiefPosition - minThiefPosition) + SimulPar.S),
                             false);
                 }
 
@@ -483,23 +495,28 @@ public class AssaultParty {
                                 - temporaryThiefPosition;
 
                         if (distanceToNext + distanceToPrevious <= SimulPar.S)
-                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
-                                    Math.min(ot.getMaximumDisplacement(),
-                                            (temporaryThiefPosition - minThiefPosition) + SimulPar.S),
-                                    false);
+                            temporaryThiefPosition =
+                                    calculateAvailablePosition(temporaryThiefPosition,
+                                            Math.min(ot.getMaximumDisplacement(),
+                                                    (temporaryThiefPosition - minThiefPosition)
+                                                            + SimulPar.S),
+                                            false);
                         else
-                            temporaryThiefPosition = calculateAvailablePosition(temporaryThiefPosition,
-                                    Math.min(ot.getMaximumDisplacement(), (SimulPar.S - distanceToNext)), false);
+                            temporaryThiefPosition = calculateAvailablePosition(
+                                    temporaryThiefPosition, Math.min(ot.getMaximumDisplacement(),
+                                            (SimulPar.S - distanceToNext)),
+                                    false);
                     }
                 }
 
                 if (thievesPositionsInParty[thiefIndex] > Math.max(0, temporaryThiefPosition)) {
                     thiefInMovement = true;
-                    thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0, temporaryThiefPosition);
+                    thievesPositionsInParty[thiefIndex] =
+                            temporaryThiefPosition = Math.max(0, temporaryThiefPosition);
                     updateMinMaxPositions();
                     repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
-                        temporaryThiefPosition);
-                }                    
+                            temporaryThiefPosition);
+                }
             } while (thiefInMovement);
 
             if (thievesPositionsInParty[thiefIndex] == 0) {
@@ -513,6 +530,7 @@ public class AssaultParty {
 
         notifyAll();
 
-        return (thievesPositionsInParty[thiefIndex] > 0) || (numberOfThievesAtControlSite < SimulPar.K);
+        return (thievesPositionsInParty[thiefIndex] > 0)
+                || (numberOfThievesAtControlSite < SimulPar.K);
     }
 }

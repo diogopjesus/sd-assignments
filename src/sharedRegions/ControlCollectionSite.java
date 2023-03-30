@@ -7,10 +7,9 @@ import main.*;
 
 /**
  * Master thief control and collection site.
- * 
- * It is responsible to (...)
- * All public methods are executed in mutual exclusion.
- * There are X internal synchronization points: (...)
+ *
+ * It is responsible to (...) All public methods are executed in mutual exclusion. There are X
+ * internal synchronization points: (...)
  */
 
 public class ControlCollectionSite {
@@ -20,52 +19,52 @@ public class ControlCollectionSite {
     private final GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private AssaultParty[] assaultParties;
 
     /**
-     * 
+     *
      */
     private int numberOfCanvas;
 
     /**
-     * 
+     *
      */
     private boolean[] emptyRooms;
 
     /**
-     * 
+     *
      */
     private MemFIFO<Integer> waitingThieves;
 
     /**
-     * 
+     *
      */
     private int numberOfWaitingThieves;
 
     /**
-     * 
+     *
      */
     private int nextThiefInLine;
 
     /**
-     * 
+     *
      */
     private int clearedOrdinaryThieves;
 
     /**
-     * 
+     *
      */
     private int activeAssaultParties;
 
     /**
-     * 
+     *
      */
     private boolean infoUpdated;
 
     /**
-     * 
+     *
      * @param repos
      */
     public ControlCollectionSite(GeneralRepository repos, AssaultParty[] assaultParties) {
@@ -94,7 +93,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getNumberOfCanvas() {
@@ -102,7 +101,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     public int getAvailableAssaultParty() {
         for (int i = 0; i < (SimulPar.M - 1) / SimulPar.K; i++)
@@ -113,7 +112,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getAvailableRoom() {
@@ -121,7 +120,8 @@ public class ControlCollectionSite {
             if (!emptyRooms[i]) {
                 int j;
                 for (j = 0; j < (SimulPar.M - 1) / SimulPar.K; j++)
-                    if (assaultParties[j].operationStatus() && (assaultParties[j].getTargetRoom() == i))
+                    if (assaultParties[j].operationStatus()
+                            && (assaultParties[j].getTargetRoom() == i))
                         break;
                 if (j == (SimulPar.M - 1) / SimulPar.K)
                     return i;
@@ -130,7 +130,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     private boolean allRoomsCleared() {
         for (int i = 0; i < SimulPar.N; i++)
@@ -141,7 +141,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void startOperations() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -150,7 +150,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public synchronized char appraiseSit() {
@@ -175,11 +175,10 @@ public class ControlCollectionSite {
             }
 
         // Wait arrival of ordinary thieves
-        if ((activeAssaultParties == ((SimulPar.M - 1) / SimulPar.K)) ||
-                ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N - 1)
+        if ((activeAssaultParties == ((SimulPar.M - 1) / SimulPar.K))
+                || ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N - 1)
                         && (assaultParties[assaultPartyId].getTargetRoom() == roomNotEmptyId))
-                ||
-                ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N)))
+                || ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N)))
 
         {
             return 'R';
@@ -212,7 +211,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void takeARest() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -229,7 +228,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void handACanvas(int assaultPartyId, int roomId) {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -242,7 +241,8 @@ public class ControlCollectionSite {
             waitingThieves.write(ot.getOrdinaryThiefId());
             numberOfWaitingThieves++;
         } catch (MemException e) {
-            GenericIO.writelnString("Retrieval of customer id from waiting FIFO failed: " + e.getMessage());
+            GenericIO.writelnString(
+                    "Retrieval of customer id from waiting FIFO failed: " + e.getMessage());
             System.exit(1);
         }
 
@@ -278,7 +278,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void collectACanvas() {
         MasterThief mt = (MasterThief) Thread.currentThread();

@@ -4,55 +4,56 @@ import sharedRegions.*;
 
 /**
  * Master thief thread.
- * 
+ *
  * It simulates the master thief life cycle.
  */
 public class MasterThief extends Thread {
     /**
-     * 
+     *
      */
     private GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private ControlCollectionSite contColSite;
 
     /**
-     * 
+     *
      */
     private ConcentrationSite concentSite;
 
     /**
-     * 
+     *
      */
     private AssaultParty[] assaultParties;
 
     /**
-     * 
+     *
      */
     private Museum museum;
 
     /**
-     * 
+     *
      */
     private int masterThiefId;
 
     /**
-     * 
+     *
      */
     private int masterThiefState;
 
     /**
-     * 
+     *
      * @param repos
      * @param contColSite
      * @param concentSite
      * @param assaultParties
      * @param masterThiefId
      */
-    public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties, Museum museum, int masterThiefId) {
+    public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite,
+            ConcentrationSite concentSite, AssaultParty[] assaultParties, Museum museum,
+            int masterThiefId) {
         this.repos = repos;
         this.contColSite = contColSite;
         this.concentSite = concentSite;
@@ -64,7 +65,7 @@ public class MasterThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getMasterThiefId() {
@@ -72,7 +73,7 @@ public class MasterThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getMasterThiefState() {
@@ -80,7 +81,7 @@ public class MasterThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @param masterThiefState
      */
     public void setMasterThiefState(int masterThiefState) {
