@@ -11,12 +11,14 @@ import main.*;
  * It is responsible to (...)
  * All public methods are executed in mutual exclusion.
  * There are three internal synchronization points:
- * - a single blocking point for the master thief, where he waits for sufficient
- * ordinary thieves to form a assault party.
- * - a single blocking point for the master thief, where he waits for every
- * ordinary thieves to sum up results.
- * - an array of blocking points, one per each ordinary thief, where he waits to
- * be called to an assault party or to terminate operations.
+ * <ul>
+ * <li>a single blocking point for the master thief, where he waits for sufficient
+ * ordinary thieves to form a assault party.</li>
+ * <li>a single blocking point for the master thief, where he waits for every
+ * ordinary thieves to sum up results.</li>
+ * <li>an array of blocking points, one per each ordinary thief, where he waits to
+ * be called to an assault party or to terminate operations.</li>
+ * </ul>
  */
 public class ConcentrationSite {
     /**
