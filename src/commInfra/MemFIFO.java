@@ -6,25 +6,20 @@ package commInfra;
  *
  * @param <R> data type of stored objects
  */
-
-public class MemFIFO<R> extends MemObject<R>
-{
+public class MemFIFO<R> extends MemObject<R> {
     /**
      * Pointer to the first empty location.
      */
-
     private int inPnt;
 
     /**
      * Pointer to the first occupied location.
      */
-
     private int outPnt;
 
     /**
      * Signaling FIFO empty state.
      */
-
     private boolean empty;
 
     /**
@@ -35,10 +30,8 @@ public class MemFIFO<R> extends MemObject<R>
      * @param storage memory to be used
      * @throws MemException when the memory does not exist
      */
-
-    public MemFIFO (R [] storage) throws MemException
-    {
-        super (storage);
+    public MemFIFO(R[] storage) throws MemException {
+        super(storage);
         inPnt = outPnt = 0;
         empty = true;
     }
@@ -51,16 +44,14 @@ public class MemFIFO<R> extends MemObject<R>
      * @param val parametric object to be written
      * @throws MemException when the FIFO is full
      */
-
     @Override
-    public void write (R val) throws MemException
-    {
-        if ((inPnt != outPnt) || empty)
-        { mem[inPnt] = val;
+    public void write(R val) throws MemException {
+        if ((inPnt != outPnt) || empty) {
+            mem[inPnt] = val;
             inPnt = (inPnt + 1) % mem.length;
             empty = false;
-        }
-        else throw new MemException ("Fifo full!");
+        } else
+            throw new MemException("Fifo full!");
     }
 
     /**
@@ -71,18 +62,16 @@ public class MemFIFO<R> extends MemObject<R>
      * @return first parametric object that was written
      * @throws MemException when the FIFO is empty
      */
-
     @Override
-    public R read () throws MemException
-    {
+    public R read() throws MemException {
         R val;
 
-        if (!empty)
-        { val = mem[outPnt];
+        if (!empty) {
+            val = mem[outPnt];
             outPnt = (outPnt + 1) % mem.length;
             empty = (inPnt == outPnt);
-        }
-        else throw new MemException ("Fifo empty!");
+        } else
+            throw new MemException("Fifo empty!");
         return val;
     }
 
@@ -92,9 +81,7 @@ public class MemFIFO<R> extends MemObject<R>
      * @return true, if FIFO is full -
      *         false, otherwise
      */
-
-    public boolean full ()
-    {
+    public boolean full() {
         return !((inPnt != outPnt) || empty);
     }
 }

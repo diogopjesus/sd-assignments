@@ -8,13 +8,11 @@ package commInfra;
  * @param <R> data type of stored objects
  */
 
-public abstract class MemObject<R>
-{
+public abstract class MemObject<R> {
     /**
      * Internal storage area.
      */
-
-    protected R [] mem;
+    protected R[] mem;
 
     /**
      * Memory instantiation.
@@ -23,12 +21,11 @@ public abstract class MemObject<R>
      * @param storage memory to be used
      * @throws MemException when the memory does not exist
      */
-
-    protected MemObject (R [] storage) throws MemException
-    {
+    protected MemObject(R[] storage) throws MemException {
         if (storage != null)
             mem = storage;
-        else throw new MemException ("illegal storage device!");
+        else
+            throw new MemException("illegal storage device!");
     }
 
     /**
@@ -39,8 +36,7 @@ public abstract class MemObject<R>
      * @param val parametric object to be written
      * @throws MemException when the memory is full
      */
-
-    protected abstract void write (R val) throws MemException;
+    protected abstract void write(R val) throws MemException;
 
     /**
      * Memory read.
@@ -50,6 +46,5 @@ public abstract class MemObject<R>
      * @return last parametric object that was written
      * @throws MemException when the memory is empty
      */
-
-    protected abstract R read () throws MemException;
+    protected abstract R read() throws MemException;
 }
