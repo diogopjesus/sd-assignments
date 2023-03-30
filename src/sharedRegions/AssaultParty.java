@@ -390,14 +390,14 @@ public class AssaultParty {
                     }
                 }
 
-                if (thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance, temporaryThiefPosition))
+                if (thievesPositionsInParty[thiefIndex] < Math.min(targetRoomDistance, temporaryThiefPosition)) {
                     thiefInMovement = true;
-
-                thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance,
-                        temporaryThiefPosition);
-                updateMinMaxPositions();
-                repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
+                    thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.min(targetRoomDistance,
+                            temporaryThiefPosition);
+                    updateMinMaxPositions();
+                    repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
                         thievesIdsInParty[thiefIndex]);
+                }
             } while (thiefInMovement);
 
             if (thievesPositionsInParty[thiefIndex] == targetRoomDistance) {
@@ -495,12 +495,11 @@ public class AssaultParty {
 
                 if (thievesPositionsInParty[thiefIndex] > Math.max(0, temporaryThiefPosition)) {
                     thiefInMovement = true;
-                }
-
-                thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0, temporaryThiefPosition);
-                updateMinMaxPositions();
-                repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
+                    thievesPositionsInParty[thiefIndex] = temporaryThiefPosition = Math.max(0, temporaryThiefPosition);
+                    updateMinMaxPositions();
+                    repos.updateAssaultPartyElementPosition(assaultPartyId, ot.getOrdinaryThiefId(),
                         temporaryThiefPosition);
+                }                    
             } while (thiefInMovement);
 
             if (thievesPositionsInParty[thiefIndex] == 0) {
