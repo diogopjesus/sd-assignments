@@ -10,7 +10,7 @@ import sharedRegions.*;
 public class HeistToTheMuseum {
     /**
      * Main method.
-     * 
+     *
      * @param args runtime arguments
      */
     public static void main(String[] args) {
@@ -33,7 +33,8 @@ public class HeistToTheMuseum {
             fileName = GenericIO.readlnString();
             if (FileOp.exists(".", fileName)) {
                 do {
-                    GenericIO.writeString("There is already a file with this name. Delete it (y - yes; n - no)? ");
+                    GenericIO.writeString(
+                            "There is already a file with this name. Delete it (y - yes; n - no)? ");
                     opt = GenericIO.readlnChar();
                 } while ((opt != 'y') && (opt != 'n'));
                 if (opt == 'y')
@@ -71,8 +72,8 @@ public class HeistToTheMuseum {
         masterThief = new MasterThief(repos, contColSite, concentSite, assaultParties, museum, 0);
 
         for (int i = 0; i < SimulPar.M - 1; i++)
-            ordinaryThieves[i] = new OrdinaryThief(repos, contColSite, concentSite, assaultParties, museum, i,
-                    maxDis[i]);
+            ordinaryThieves[i] = new OrdinaryThief(repos, contColSite, concentSite, assaultParties,
+                    museum, i, maxDis[i]);
 
         masterThief.start();
         for (int i = 0; i < SimulPar.M - 1; i++)

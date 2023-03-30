@@ -58,6 +58,5 @@ public final class SimulPar {
     /**
      * It can not be instantiated.
      */
-    private SimulPar() {
-    }
+    private SimulPar() {}
 }

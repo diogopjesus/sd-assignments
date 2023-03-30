@@ -6,67 +6,65 @@ import genclass.*;
 
 /**
  * General repository.
- * 
- * It is responsible to keep the visible internal state of the heist and provide
- * means to it to be printed in the logging file.
- * It is implemented as an implicit monitor.
- * All public methods are executed in mutual exclusion.
- * There are no internal synchronization points.
+ *
+ * It is responsible to keep the visible internal state of the heist and provide means to it to be
+ * printed in the logging file. It is implemented as an implicit monitor. All public methods are
+ * executed in mutual exclusion. There are no internal synchronization points.
  */
 public class GeneralRepository {
     /**
-     * 
+     *
      */
     private final String logFileName;
 
     /**
-     * 
+     *
      */
     private int masterThiefState;
 
     /**
-     * 
+     *
      */
 
     private int[] ordinaryThiefState;
 
     /**
-     * 
+     *
      */
     private char[] ordinaryThiefSituation;
 
     /**
-     * 
+     *
      */
     private int[] ordinaryThiefMaximumDisplacement;
 
     /**
-     * 
+     *
      */
     private int[] assaultPartyRoomId;
 
     /**
-     * 
+     *
      */
     private int[][] assaultPartyElementId;
 
     /**
-     * 
+     *
      */
     private int[][] assaultPartyElementPosition;
 
     /**
-     * 
+     *
      */
     private boolean[][] assaultPartyElementCanvas;
 
     /**
-     * 
+     *
      */
     private int[] museumRoomNumberPaitings;
 
     /**
-     * 
+     *
      */
     private int[] museumRoomDistance;
 
@@ -114,7 +112,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param state
      */
     public synchronized void setMasterThiefState(int state) {
@@ -123,7 +121,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param state
      */
@@ -133,7 +131,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param roomId
      */
@@ -143,7 +141,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param elemId
      */
@@ -163,7 +161,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param elemId
      */
@@ -187,7 +185,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param elemId
      * @param pos
@@ -202,7 +200,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param elemId
      */
@@ -217,7 +215,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param id
      * @param elemId
      */
@@ -231,7 +229,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param numberOfCanvas
      */
     public synchronized void endAssault(int numberOfCanvas) {
@@ -239,8 +237,7 @@ public class GeneralRepository {
     }
 
     /**
-     * Write the header to the logging file.
-     * Internal operation.
+     * Write the header to the logging file. Internal operation.
      */
     private void reportInitialStatus() {
         TextFile log = new TextFile();
@@ -250,10 +247,13 @@ public class GeneralRepository {
             System.exit(1);
         }
 
-        log.writelnString("                             Heist to the Museum - Description of the internal state");
+        log.writelnString(
+                "                             Heist to the Museum - Description of the internal state");
         log.writelnString();
-        log.writelnString("MstT   Thief 1      Thief 2      Thief 3      Thief 4      Thief 5      Thief 6");
-        log.writelnString("Stat  Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD");
+        log.writelnString(
+                "MstT   Thief 1      Thief 2      Thief 3      Thief 4      Thief 5      Thief 6");
+        log.writelnString(
+                "Stat  Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD");
         log.writelnString(
                 "                   Assault party 1                       Assault party 2                       Museum");
         log.writelnString(
@@ -263,7 +263,8 @@ public class GeneralRepository {
         log.writelnString();
 
         if (!log.close()) {
-            GenericIO.writelnString("The operation of closing the file " + logFileName + " failed!");
+            GenericIO
+                    .writelnString("The operation of closing the file " + logFileName + " failed!");
             System.exit(1);
         }
 
@@ -271,8 +272,7 @@ public class GeneralRepository {
     }
 
     /**
-     * Write a state line at the end of the logging file.
-     * Internal operation.
+     * Write a state line at the end of the logging file. Internal operation.
      */
     private void reportStatus() {
         TextFile log = new TextFile();
@@ -310,13 +310,14 @@ public class GeneralRepository {
         log.writelnString(lineStatus);
 
         if (!log.close()) {
-            GenericIO.writelnString("The operation of closing the file " + logFileName + " failed!");
+            GenericIO
+                    .writelnString("The operation of closing the file " + logFileName + " failed!");
             System.exit(1);
         }
     }
 
     /**
-     * 
+     *
      * @param numberOfPaintings
      */
     private void reportFinalStatus(int numberOfPaintings) {
@@ -327,16 +328,18 @@ public class GeneralRepository {
             System.exit(1);
         }
 
-        log.writelnString("My friends, tonight's effort produced " + numberOfPaintings + " priceless paintings!");
+        log.writelnString("My friends, tonight's effort produced " + numberOfPaintings
+                + " priceless paintings!");
 
         if (!log.close()) {
-            GenericIO.writelnString("The operation of closing the file " + logFileName + " failed!");
+            GenericIO
+                    .writelnString("The operation of closing the file " + logFileName + " failed!");
             System.exit(1);
         }
     }
 
     /**
-     * 
+     *
      * @return
      */
     private String getMasterThiefStateRep() {
@@ -357,7 +360,7 @@ public class GeneralRepository {
     }
 
     /**
-     * 
+     *
      * @param thiefId
      * @return
      */

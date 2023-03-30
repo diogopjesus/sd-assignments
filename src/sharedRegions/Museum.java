@@ -5,10 +5,9 @@ import main.*;
 
 /**
  * Museum.
- * 
- * It is responsible to (...)
- * All public methods are executed in mutual exclusion.
- * There are X internal synchronization points: (...)
+ *
+ * It is responsible to (...) All public methods are executed in mutual exclusion. There are X
+ * internal synchronization points: (...)
  */
 public class Museum {
     /**
@@ -17,17 +16,17 @@ public class Museum {
     private final GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private int[] paitingsInRoom;
 
     /**
-     * 
+     *
      */
     private int[] roomDistances;
 
     /**
-     * 
+     *
      */
     public Museum(GeneralRepository repos, int[] numPaint, int[] roomDist) {
         this.repos = repos;
@@ -36,7 +35,7 @@ public class Museum {
     }
 
     /**
-     * 
+     *
      */
     public int getRoomDistance(int roomId) {
         if (roomId < SimulPar.N && roomId >= 0)
@@ -45,7 +44,7 @@ public class Museum {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void rollACanvas(int assaultPartyId, int roomId) {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();

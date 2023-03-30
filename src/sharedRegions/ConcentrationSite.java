@@ -7,17 +7,16 @@ import main.*;
 
 /**
  * Ordinary thieves concentration site.
- * 
- * It is responsible to (...)
- * All public methods are executed in mutual exclusion.
- * There are three internal synchronization points:
+ *
+ * It is responsible to (...) All public methods are executed in mutual exclusion. There are three
+ * internal synchronization points:
  * <ul>
- * <li>a single blocking point for the master thief, where he waits for sufficient
- * ordinary thieves to form a assault party.</li>
- * <li>a single blocking point for the master thief, where he waits for every
- * ordinary thieves to sum up results.</li>
- * <li>an array of blocking points, one per each ordinary thief, where he waits to
- * be called to an assault party or to terminate operations.</li>
+ * <li>a single blocking point for the master thief, where he waits for sufficient ordinary thieves
+ * to form a assault party.</li>
+ * <li>a single blocking point for the master thief, where he waits for every ordinary thieves to
+ * sum up results.</li>
+ * <li>an array of blocking points, one per each ordinary thief, where he waits to be called to an
+ * assault party or to terminate operations.</li>
  * </ul>
  */
 public class ConcentrationSite {
@@ -27,37 +26,37 @@ public class ConcentrationSite {
     private final GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private final AssaultParty[] assaultParties;
 
     /**
-     * 
+     *
      */
     private MemFIFO<Integer> waitingThieves;
 
     /**
-     * 
+     *
      */
     private int numberOfWaitingThieves;
 
     /**
-     * 
+     *
      */
     private int[] summonedThieves;
 
     /**
-     * 
+     *
      */
     private int availableAssaultParty;
 
     /**
-     * 
+     *
      */
     private boolean endOfOps;
 
     /**
-     * 
+     *
      */
     public ConcentrationSite(GeneralRepository repos, AssaultParty[] assaultParties) {
         this.repos = repos;
@@ -74,11 +73,11 @@ public class ConcentrationSite {
         this.endOfOps = false;
 
         this.summonedThieves = new int[SimulPar.K];
-        summonedThieves = new int[] { -1, -1, -1 };
+        summonedThieves = new int[] {-1, -1, -1};
     }
 
     /**
-     * 
+     *
      * @return
      */
     public synchronized char amINeeded() {
@@ -117,7 +116,7 @@ public class ConcentrationSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void prepareAssaultParty(int assaultPartyId, int roomId, int roomDistance) {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -140,7 +139,8 @@ public class ConcentrationSite {
                 summonedThieves[i] = waitingThieves.read();
                 numberOfWaitingThieves--;
             } catch (MemException e) {
-                GenericIO.writelnString("Retrieval of customer id from waiting FIFO failed: " + e.getMessage());
+                GenericIO.writelnString(
+                        "Retrieval of customer id from waiting FIFO failed: " + e.getMessage());
                 System.exit(1);
             }
         }
@@ -159,7 +159,7 @@ public class ConcentrationSite {
         }
 
         // Clear summonedThieves array
-        summonedThieves = new int[] { -1, -1, -1 };
+        summonedThieves = new int[] {-1, -1, -1};
     }
 
     /**
@@ -182,7 +182,7 @@ public class ConcentrationSite {
     }
 
     /**
-     * 
+     *
      */
     public synchronized void sumUpResults(int numberOfCanvas) {
         MasterThief mt = (MasterThief) Thread.currentThread();

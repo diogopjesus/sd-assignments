@@ -4,62 +4,62 @@ import sharedRegions.*;
 
 /**
  * Ordinary thief thread.
- * 
+ *
  * It simulates the ordinary thief life cycle.
  */
 public class OrdinaryThief extends Thread {
     /**
-     * 
+     *
      */
     private GeneralRepository repos;
 
     /**
-     * 
+     *
      */
     private ControlCollectionSite contColSite;
 
     /**
-     * 
+     *
      */
     private ConcentrationSite concentSite;
 
     /**
-     * 
+     *
      */
     private AssaultParty[] assaultParties;
 
     /**
-     * 
+     *
      */
     private Museum museum;
 
     /**
-     * 
+     *
      */
     private int ordinaryThiefId;
 
     /**
-     * 
+     *
      */
     private int ordinaryThiefState;
 
     /**
-     * 
+     *
      */
     private int assaultPartyId;
 
     /**
-     * 
+     *
      */
     private int maximumDisplacement;
 
     /**
-     * 
+     *
      */
     private boolean withCanvas;
 
     /**
-     * 
+     *
      * @param repos
      * @param contColSite
      * @param concentSite
@@ -67,8 +67,9 @@ public class OrdinaryThief extends Thread {
      * @param museum
      * @param ordinaryThiefId
      */
-    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties, Museum museum, int ordinaryThiefId, int maxDis) {
+    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite,
+            ConcentrationSite concentSite, AssaultParty[] assaultParties, Museum museum,
+            int ordinaryThiefId, int maxDis) {
         this.repos = repos;
         this.contColSite = contColSite;
         this.concentSite = concentSite;
@@ -82,7 +83,7 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getOrdinaryThiefId() {
@@ -90,7 +91,7 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getOrdinaryThiefState() {
@@ -98,7 +99,7 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @param ordinaryThiefState
      */
     public void setOrdinaryThiefState(int ordinaryThiefState) {
@@ -107,7 +108,7 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public int getMaximumDisplacement() {
@@ -115,21 +116,21 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     * 
+     *
      */
     public boolean isHoldingCanvas() {
         return withCanvas;
     }
 
     /**
-     * 
+     *
      */
     public void holdCanvas() {
         withCanvas = true;
     }
 
     /**
-     * 
+     *
      */
     public void dropCanvas() {
         withCanvas = false;
@@ -144,15 +145,13 @@ public class OrdinaryThief extends Thread {
 
             roomId = assaultParties[assaultPartyId].getTargetRoom();
 
-            while (assaultParties[assaultPartyId].crawlIn())
-                ;
+            while (assaultParties[assaultPartyId].crawlIn());
 
             museum.rollACanvas(assaultPartyId, roomId);
 
             assaultParties[assaultPartyId].reverseDirection();
 
-            while (assaultParties[assaultPartyId].crawlOut())
-                ;
+            while (assaultParties[assaultPartyId].crawlOut());
 
             contColSite.handACanvas(assaultPartyId, roomId);
         }
