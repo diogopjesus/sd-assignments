@@ -62,11 +62,12 @@ if [ "$1" = "check-log-dir" ]; then
     FILES=$2/*.log
     for f in $FILES
     do
-        echo "Processing $f file..."
+        echo -n "Processing $f file..."
         python3 utils/check-log.py $f > /dev/null
         if [ "$?" -ne 0 ]; then
             exit 1;
         fi
+        echo "Done"
     done
     exit $?;
 fi
