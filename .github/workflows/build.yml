@@ -1,0 +1,42 @@
+name: Build
+# Events
+on:
+  # Push to main
+  push:
+    branches:
+      - 'main'
+  # Manual dispatch
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository files
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Compile project (run 'run.sh compile')
+        run: |
+          chmod +x  ./run.sh
+          ./run.sh compile
+        shell: bash
+
+      - name: Run program 10 times
+        run: |
+          chmod +x ./run.sh
+          ./run.sh 10
+        shell: bash
+
+      - name: Check if logs are valid
+        run: |
+          chmod +x ./run.sh
+          ./run.sh check-log-dir log/
+        shell: bash
+
+  # TODO: deploy docs based on success
