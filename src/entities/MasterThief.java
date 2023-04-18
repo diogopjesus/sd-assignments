@@ -9,47 +9,50 @@ import sharedRegions.*;
  */
 public class MasterThief extends Thread {
     /**
-     *
+     *  Reference to the general repository.
      */
     private GeneralRepository repos;
 
     /**
-     *
+     * Reference to the control and collection site.
      */
     private ControlCollectionSite contColSite;
 
     /**
-     *
+     * Reference to the concentration site.
      */
     private ConcentrationSite concentSite;
 
     /**
-     *
-     */
+     * Reference to the Assault Party.
+    */
     private AssaultParty[] assaultParties;
 
     /**
-     *
-     */
+     * Reference to the Museum.
+    */
     private Museum museum;
 
+
     /**
-     *
-     */
+     * Master Thief id. 
+    */
     private int masterThiefId;
 
     /**
-     *
-     */
+     *  Master Thief state. 
+    */
     private int masterThiefState;
 
     /**
-     *
-     * @param repos
-     * @param contColSite
-     * @param concentSite
-     * @param assaultParties
-     * @param masterThiefId
+     * Instantiation of a ordinary thief thread.
+     * 
+     * @param repos  Reference to GeneralRepository 
+     * @param contColSite  Reference to Control collection site 
+     * @param concentSite  Reference to concentration site
+     * @param assaultParties Reference to Assault party
+     * @param museum  Reference to Museum
+     * @param masterThiefId Master thief id
      */
     public MasterThief(GeneralRepository repos, ControlCollectionSite contColSite,
             ConcentrationSite concentSite, AssaultParty[] assaultParties, Museum museum,
@@ -64,31 +67,26 @@ public class MasterThief extends Thread {
         this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
     }
 
-    /**
-     *
-     * @return
-     */
-    public int getMasterThiefId() {
-        return masterThiefId;
-    }
-
-    /**
-     *
-     * @return
+   /**
+     * Get Master Thief State
+     * @return master thief state
      */
     public int getMasterThiefState() {
         return masterThiefState;
     }
 
     /**
-     *
-     * @param masterThiefState
+     * Set Master Thief State
+     * @param masterThiefState master thief state
      */
     public void setMasterThiefState(int masterThiefState) {
         this.masterThiefState = masterThiefState;
         repos.setMasterThiefState(masterThiefState);
     }
 
+    /**
+     *  Life cycle of the master thief.
+     */
     @Override
     public void run() {
         char oper;

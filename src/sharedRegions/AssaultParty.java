@@ -16,77 +16,81 @@ public class AssaultParty {
     private final GeneralRepository repos;
 
     /**
-     *
+     * Assault party ID
      */
     private int assaultPartyId;
 
     /**
-     *
+     * Number of thieves in the party
      */
     private int numberOfThievesInParty;
 
     /**
-     *
+     * Indicates whether the party is in operation
      */
     private boolean inOperation;
 
     /**
-     *
+     * Indicates what is the target room
      */
     private int targetRoom;
 
     /**
-     *
+     * Stores the distance to the target room
      */
     private int targetRoomDistance;
 
     /**
-     *
+     * Stores the ID's of the members of the party
      */
     private int[] thievesIdsInParty;
 
     /**
-     *
+     * Indicates the next thief that's going to move
      */
     private int nextThiefToMove;
 
     /**
-     *
+     * Indicates whether the assault is being executed
      */
     private boolean executeAssault;
 
     /**
-     *
+     * Stores the positions of the members of the party
      */
     private int[] thievesPositionsInParty;
 
     /**
-     *
+     * Stores the maximum position of the thief
      */
     private int maxThiefPosition;
 
     /**
-     *
+     * Stores the minimum position of the thief
      */
     private int minThiefPosition;
 
     /**
-     *
+     * Indicates how many thieves are at the room
      */
     private int numberOfThievesAtRoom;
 
     /**
-     *
+     * Indicates how many thieves are at the control site
      */
     private int numberOfThievesAtControlSite;
 
     /**
-     *
+     * Indicates how many thieves are outside the room
      */
     private int numberOfThievesOutsideRoom;
 
     /**
      *
+     * Instantiation of a ordinary thief thread.
+     * 
+     * @param repos  Reference to GeneralRepository 
+     * @param assaultPartyId assault party id
      */
     public AssaultParty(GeneralRepository repos, int assaultPartyId) {
         this.repos = repos;
@@ -104,36 +108,39 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * Check status of the operation
+     * @return status of the operation
      */
     public boolean operationStatus() {
         return inOperation;
     }
 
     /**
-     *
+     * Starts the operation
      */
     public void startOperation() {
         this.inOperation = true;
     }
 
     /**
-     *
+     * Ends the operation
      */
     public void endOperation() {
         this.inOperation = false;
     }
 
     /**
-     *
-     * @return
+     * Get number of thieves in the assault party
+     * @return number of thieves in the party
      */
     public int getNumberOfThievesInParty() {
         return numberOfThievesInParty;
     }
 
     /**
-     *
+     * Set the target room to assault
+     * @param targetRoom target room to assault
+     * @param targetRoomDistance distance to the target room
      */
     public void setTargetRoom(int targetRoom, int targetRoomDistance) {
         this.targetRoom = targetRoom;
@@ -141,14 +148,16 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * Get the target room
+     * @return target room
      */
     public int getTargetRoom() {
         return targetRoom;
     }
 
     /**
-     *
+     * Assigns a new thief to an assault party
+     * @param thiefId thief id
      */
     public void assignNewThief(int thiefId) {
         numberOfThievesInParty++;
@@ -156,7 +165,8 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * Removes the thief from the assault party
+     * @param thiedId thied id
      */
     public void removeThief(int thiefId) {
         numberOfThievesInParty--;
@@ -165,9 +175,9 @@ public class AssaultParty {
     }
 
     /**
-     *
-     * @param commonThiefId
-     * @return
+     * Get the thief index 
+     * @param commonThiefId common thief id
+     * @return index of the thief 
      */
     private int getThiefIndex(int commonThiefId) {
         int thiefIndex = -1;
@@ -181,9 +191,9 @@ public class AssaultParty {
     }
 
     /**
-     *
-     * @param thiefIndex
-     * @return
+     * Get previous thief index
+     * @param thiefIndex thief index
+     * @return index of the previous thief 
      */
     private int getPreviousThiefIndex(int thiefIndex) {
         // if they are all at the same step send the next one based on index (to prevent
@@ -219,9 +229,9 @@ public class AssaultParty {
     }
 
     /**
-     *
-     * @param thiefIndex
-     * @return
+     * Get next thief index
+     * @param thiefIndex thief index 
+     * @return index of the next thief 
      */
     private int getNextThiefIndex(int thiefIndex) {
         // if they are all at the same step send the next one based on index (to prevent
@@ -259,7 +269,7 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * Updates minimum and maximum positions of the thieves
      */
     private void updateMinMaxPositions() {
         // Update maximum and minimum position
@@ -276,11 +286,11 @@ public class AssaultParty {
     }
 
     /**
-     *
-     * @param currentPosition
-     * @param maximumDistance
-     * @param crawlIn
-     * @return
+     * Calculate the available position
+     * @param currentPosition current position of the thief
+     * @param maximumDistance maximum distance
+     * @param crawlIn crawl in 
+     * @return available position for the thief to move
      */
     private int calculateAvailablePosition(int currentPosition, int maximumDistance,
             boolean crawlIn) {
@@ -307,7 +317,7 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * The Master Thief sends an assault party to a room
      */
     public synchronized void sendAssaultParty() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -331,7 +341,7 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * The assault party get in line and crawl to the room of the museum
      */
     public synchronized boolean crawlIn() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -425,7 +435,7 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * Ordinary Thief reverses his direction towards the colection site 
      */
     public synchronized void reverseDirection() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -442,7 +452,7 @@ public class AssaultParty {
     }
 
     /**
-     *
+     * The assault party get in line and crawl to the colection site
      */
     public synchronized boolean crawlOut() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();

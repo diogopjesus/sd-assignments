@@ -9,47 +9,47 @@ import sharedRegions.*;
  */
 public class OrdinaryThief extends Thread {
     /**
-     *
+     *  Reference to the general repository.
      */
     private GeneralRepository repos;
 
     /**
-     *
+     * Reference to the control and collection site.
      */
     private ControlCollectionSite contColSite;
 
     /**
-     *
+     * Reference to the concentration site.
      */
     private ConcentrationSite concentSite;
 
     /**
-     *
+     * Reference to the Assault Party.
      */
     private AssaultParty[] assaultParties;
 
     /**
-     *
+     * Reference to the Museum.
      */
     private Museum museum;
 
     /**
-     *
+     * Ordinary Thief id. 
      */
     private int ordinaryThiefId;
 
     /**
-     *
+     * Ordinary Thief state. 
      */
     private int ordinaryThiefState;
 
     /**
-     *
+     * Assault Party id. 
      */
     private int assaultPartyId;
 
     /**
-     *
+     * Ordinary Thief maximum displacement. 
      */
     private int maximumDisplacement;
 
@@ -59,13 +59,15 @@ public class OrdinaryThief extends Thread {
     private boolean withCanvas;
 
     /**
-     *
-     * @param repos
-     * @param contColSite
-     * @param concentSite
-     * @param assaultParties
-     * @param museum
-     * @param ordinaryThiefId
+     * Instantiation of a ordinary thief thread.
+     * 
+     * @param repos  Reference to GeneralRepository 
+     * @param contColSite  Reference to Control collection site 
+     * @param concentSite  Reference to concentration site
+     * @param assaultParties Reference to Assault party
+     * @param museum  Reference to Museum
+     * @param ordinaryThiefId ordinary thief id
+     * @param maxDis ordinary thief max displacement
      */
     public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite,
             ConcentrationSite concentSite, AssaultParty[] assaultParties, Museum museum,
@@ -83,24 +85,24 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     *
-     * @return
+     * Get Ordinary Thief Id
+     * @return ordinary thief id
      */
     public int getOrdinaryThiefId() {
         return ordinaryThiefId;
     }
 
     /**
-     *
-     * @return
+     * Get Ordinary Thief State
+     * @return ordinary thief state
      */
     public int getOrdinaryThiefState() {
         return ordinaryThiefState;
     }
 
     /**
-     *
-     * @param ordinaryThiefState
+     * Set Ordinary Thief State
+     * @param ordinaryThiefState ordinary thief state
      */
     public void setOrdinaryThiefState(int ordinaryThiefState) {
         this.ordinaryThiefState = ordinaryThiefState;
@@ -108,8 +110,8 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     *
-     * @return
+     * Ordinary Thief Maximum Displacement
+     * @return ordinary thief maximum displacement
      */
     public int getMaximumDisplacement() {
         return maximumDisplacement;
@@ -130,12 +132,15 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
-     *
+     * 
      */
     public void dropCanvas() {
         withCanvas = false;
     }
 
+    /**
+     *  Life cycle of the ordinary thieves.
+     */
     @Override
     public void run() {
         int roomId;
