@@ -19,53 +19,55 @@ public class ControlCollectionSite {
     private final GeneralRepository repos;
 
     /**
-     *
+     * Assault parties ID's 
      */
     private AssaultParty[] assaultParties;
 
     /**
-     *
+     * Number of canvas 
      */
     private int numberOfCanvas;
 
     /**
-     *
+     * Indicates what rooms are empty
      */
     private boolean[] emptyRooms;
 
     /**
-     *
+     * Fifo of waiting thieves 
      */
     private MemFIFO<Integer> waitingThieves;
 
     /**
-     *
+     * Number of waiting thieves
      */
     private int numberOfWaitingThieves;
 
     /**
-     *
+     * ID of the next thief waiting in the line 
      */
     private int nextThiefInLine;
 
     /**
-     *
+     * Number of ordinary thieves that have been cleared 
      */
     private int clearedOrdinaryThieves;
 
     /**
-     *
+     * Number of active assault parties 
      */
     private int activeAssaultParties;
 
     /**
-     *
+     * Indicates if the information was updated
      */
     private boolean infoUpdated;
 
     /**
-     *
-     * @param repos
+     * Instantiation of the control and collection site monitor.
+     * 
+     * @param repos  Reference to GeneralRepository 
+     * @param assaultParties id's of the assault parties 
      */
     public ControlCollectionSite(GeneralRepository repos, AssaultParty[] assaultParties) {
         this.repos = repos;
@@ -93,15 +95,18 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
-     * @return
+     * Get the number of canvas
+     * 
+     * @return number of canvas 
      */
     public int getNumberOfCanvas() {
         return numberOfCanvas;
     }
 
     /**
-     *
+     * Get an available assault party
+     * 
+     * @return ID of the assault party or -1 if no assault party is available
      */
     public int getAvailableAssaultParty() {
         for (int i = 0; i < (SimulPar.M - 1) / SimulPar.K; i++)
@@ -112,8 +117,9 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
-     * @return
+     * Get an available room 
+     * 
+     * @return available room or -1 if no room is available
      */
     public int getAvailableRoom() {
         for (int i = 0; i < SimulPar.N; i++)
@@ -130,7 +136,9 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
+     * Indicates if all rooms have been cleared
+     * 
+     * @return true if all rooms have been cleared
      */
     private boolean allRoomsCleared() {
         for (int i = 0; i < SimulPar.N; i++)
@@ -141,7 +149,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
+     * Starts the operations
      */
     public synchronized void startOperations() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -150,8 +158,9 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
-     * @return
+     * MasterThief appraises sit 
+     * 
+     * @return decision of the master thief
      */
     public synchronized char appraiseSit() {
         // MasterThief mt = (MasterThief)Thread.currentThread();
@@ -211,7 +220,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
+     * Master thief takes a rest
      */
     public synchronized void takeARest() {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -228,7 +237,10 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
+     * An ordinary thief hands a canvas to the master thief
+     * 
+     * @param assaultPartyId id of the assault party of the ordinary thief
+     * @param roomId id of the room that has been assaulted
      */
     public synchronized void handACanvas(int assaultPartyId, int roomId) {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -278,7 +290,7 @@ public class ControlCollectionSite {
     }
 
     /**
-     *
+     * The master thief collects the canvas that has been handed by an ordinary 
      */
     public synchronized void collectACanvas() {
         MasterThief mt = (MasterThief) Thread.currentThread();

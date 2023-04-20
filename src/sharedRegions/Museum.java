@@ -16,17 +16,21 @@ public class Museum {
     private final GeneralRepository repos;
 
     /**
-     *
+     * Number of paintings in each room 
      */
     private int[] paitingsInRoom;
 
     /**
-     *
+     * Distances to each room in the museum  
      */
     private int[] roomDistances;
 
     /**
-     *
+     * Instantiation of the museum monitor.
+     * 
+     * @param repos Reference to GeneralRepository 
+     * @param numPaint number of paintings of each room 
+     * @param roomDist distances to each room
      */
     public Museum(GeneralRepository repos, int[] numPaint, int[] roomDist) {
         this.repos = repos;
@@ -35,7 +39,9 @@ public class Museum {
     }
 
     /**
-     *
+     * Get the room distance 
+     * 
+     * @return the distance to the room
      */
     public int getRoomDistance(int roomId) {
         if (roomId < SimulPar.N && roomId >= 0)
@@ -44,7 +50,10 @@ public class Museum {
     }
 
     /**
-     *
+     * Ordinary thief rolls a canvas 
+     * 
+     * @param assaultPartyId assault party ID
+     * @param roomId id of the room
      */
     public synchronized void rollACanvas(int assaultPartyId, int roomId) {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();

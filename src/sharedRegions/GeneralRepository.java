@@ -13,58 +13,58 @@ import genclass.*;
  */
 public class GeneralRepository {
     /**
-     *
+     * Name of the log file
      */
     private final String logFileName;
 
     /**
-     *
+     * Master thief state 
      */
     private int masterThiefState;
 
     /**
-     *
+     * Ordinary thieves states 
      */
 
     private int[] ordinaryThiefState;
 
     /**
-     *
+     * Ordinary thieves situations 
      */
     private char[] ordinaryThiefSituation;
 
     /**
-     *
+     * Ordinary thieves maximum displacement
      */
     private int[] ordinaryThiefMaximumDisplacement;
 
     /**
-     *
+     * Room ID where the assault party is located 
      */
     private int[] assaultPartyRoomId;
 
     /**
-     *
+     * ID's of the elements of each assault party
      */
     private int[][] assaultPartyElementId;
 
     /**
-     *
+     * Position of the elements of each assault party
      */
     private int[][] assaultPartyElementPosition;
 
     /**
-     *
+     * Indicates the elements of each assault party that are holding a canvas 
      */
     private boolean[][] assaultPartyElementCanvas;
 
     /**
-     *
+     * Stores the number of paintings of each room of the museum 
      */
     private int[] museumRoomNumberPaitings;
 
     /**
-     *
+     * Distante to the rooms of the museum
      */
     private int[] museumRoomDistance;
 
@@ -112,8 +112,8 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param state
+     * Set master thief state 
+     * @param state state to set
      */
     public synchronized void setMasterThiefState(int state) {
         masterThiefState = state;
@@ -121,9 +121,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param state
+     * Set ordinary thief state
+     * @param id id of the ordinary thief
+     * @param state state to set
      */
     public synchronized void setOrdinaryThiefState(int id, int state) {
         ordinaryThiefState[id] = state;
@@ -131,9 +131,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param roomId
+     * Set the room ID where the assault party is located
+     * @param id id of the assault party
+     * @param roomId id of the room 
      */
     public synchronized void setAssaultPartyRoomId(int id, int roomId) {
         assaultPartyRoomId[id] = roomId + 1;
@@ -141,9 +141,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param elemId
+     * Adds a thief to the assault party 
+     * @param id id of the assault party
+     * @param elemId id of the element to be added
      */
     public synchronized void addAssaultPartyElement(int id, int elemId) {
 
@@ -161,9 +161,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param elemId
+     * Removes a thief from the assault party 
+     * @param id id of the assault party
+     * @param elemId id of the element to be removed
      */
     public synchronized void removeAssaultPartyElement(int id, int elemId) {
         int i = 0;
@@ -185,10 +185,10 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param elemId
-     * @param pos
+     * Updates the position of an element of the assault party
+     * @param id id of the assault party
+     * @param elemId id of the element to update position
+     * @param pos value of the position
      */
     public synchronized void updateAssaultPartyElementPosition(int id, int elemId, int pos) {
         int i = 0;
@@ -200,9 +200,10 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param elemId
+     * Update the number of canvas that an element of the assault party is holding
+     * @param id id of the assault party
+     * @param elemId id of the element to update the number of canvas
+     * @param roomId id of the room from where the canvas was robbed 
      */
     public synchronized void holdAssaultPartyElementCanvas(int id, int elemId, int roomId) {
         int i = 0;
@@ -215,9 +216,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param id
-     * @param elemId
+     * Collects the canvas of an element of the assault party
+     * @param id id of the assault party
+     * @param elemId id of the element to collect the canvas
      */
     public synchronized void yieldAssaultPartyElementCanvas(int id, int elemId) {
         int i = 0;
@@ -229,8 +230,8 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param numberOfCanvas
+     * Ends the assault 
+     * @param numberOfCanvas number of canvas that have been assaulted
      */
     public synchronized void endAssault(int numberOfCanvas) {
         reportFinalStatus(numberOfCanvas);
@@ -317,8 +318,8 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param numberOfPaintings
+     * Reports the final status of the heist
+     * @param numberOfPaintings number of paintings that have been robbed 
      */
     private void reportFinalStatus(int numberOfPaintings) {
         TextFile log = new TextFile();
@@ -339,8 +340,8 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @return
+     * Get master thief state report
+     * @return state of the master thief 
      */
     private String getMasterThiefStateRep() {
         switch (masterThiefState) {
@@ -360,9 +361,9 @@ public class GeneralRepository {
     }
 
     /**
-     *
-     * @param thiefId
-     * @return
+     * Get ordinary thief state report
+     * @param thiefId id of the ordinary thief 
+     * @return state of the ordinary thief 
      */
     private String getOrdinaryThiefStateRep(int thiefId) {
         switch (ordinaryThiefState[thiefId]) {

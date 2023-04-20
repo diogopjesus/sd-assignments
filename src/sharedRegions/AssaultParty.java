@@ -86,8 +86,7 @@ public class AssaultParty {
     private int numberOfThievesOutsideRoom;
 
     /**
-     *
-     * Instantiation of a ordinary thief thread.
+     * Instantiation of the assault party monitor.
      * 
      * @param repos  Reference to GeneralRepository 
      * @param assaultPartyId assault party id

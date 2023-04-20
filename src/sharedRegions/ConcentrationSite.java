@@ -26,37 +26,40 @@ public class ConcentrationSite {
     private final GeneralRepository repos;
 
     /**
-     *
+     * Assault parties ID's 
      */
     private final AssaultParty[] assaultParties;
 
     /**
-     *
+     * Fifo of waiting thieves 
      */
     private MemFIFO<Integer> waitingThieves;
 
     /**
-     *
+     * Number of waiting thieves
      */
     private int numberOfWaitingThieves;
 
     /**
-     *
+     *  Thieves that have been summoned
      */
     private int[] summonedThieves;
 
     /**
-     *
+     * Available assault party
      */
     private int availableAssaultParty;
 
     /**
-     *
+     * Indicates the end of the operation
      */
     private boolean endOfOps;
 
     /**
-     *
+     * Instantiation of the concentration site monitor.
+     * 
+     * @param repos  Reference to GeneralRepository 
+     * @param assaultParties id's of the assault parties 
      */
     public ConcentrationSite(GeneralRepository repos, AssaultParty[] assaultParties) {
         this.repos = repos;
@@ -77,8 +80,9 @@ public class ConcentrationSite {
     }
 
     /**
-     *
-     * @return
+     * Indicates whether the ordinary thief is needed
+     * 
+     * @return the master thief decision 
      */
     public synchronized char amINeeded() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -116,7 +120,11 @@ public class ConcentrationSite {
     }
 
     /**
-     *
+     * Prepares the assault party that is going to be sent to the museum
+     * 
+     * @param assaultPartyId assault party ID
+     * @param roomId room ID
+     * @param roomDistance distance to the rooom
      */
     public synchronized void prepareAssaultParty(int assaultPartyId, int roomId, int roomDistance) {
         MasterThief mt = (MasterThief) Thread.currentThread();
@@ -163,7 +171,9 @@ public class ConcentrationSite {
     }
 
     /**
-     * @return
+     * Prepares the excursion 
+     * 
+     * @return available assault party 
      */
     public synchronized int prepareExcursion() {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
@@ -182,7 +192,9 @@ public class ConcentrationSite {
     }
 
     /**
-     *
+     * After the assault, the master thief sums up the results of the heist
+     * 
+     * @param numberOfCanvas number of canvas
      */
     public synchronized void sumUpResults(int numberOfCanvas) {
         MasterThief mt = (MasterThief) Thread.currentThread();
