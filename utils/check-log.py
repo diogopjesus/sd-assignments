@@ -60,7 +60,8 @@ def check_if_file_is_log(file):
             line = lines[i].split()
             if line[0] not in MASTER_THIEF_STATES:
                 print(
-                    "Error: Line %d does not have a master thief state!" % (i + 1),
+                    "Error: Line %d does not have a master thief state!" % (
+                        i + 1),
                     file=sys.stderr,
                 )
                 sys.exit(1)
@@ -97,31 +98,23 @@ def check_if_file_is_log(file):
 
             # check first assault party
             line = lines[i + 1].split()
-            if not line[0].isnumeric() or len(line[0]) > 1:
+            if (line[0].isnumeric() and len(line[0]) > 1) or ((not line[0].isnumeric) and line[0] != "#"):
                 print(
-                    "Error: Line %d does not have a valid assault room id!" % (i + 1),
+                    "Error: Line %d does not have a valid assault room id!" % (
+                        i + 1),
                     file=sys.stderr,
                 )
                 sys.exit(1)
 
             for j in range(1, 10, 3):
-                if (
-                    (not line[j].isnumeric())
-                    or len(line[j]) > 1
-                    or int(line[j]) < 0
-                    or int(line[j]) > 6
-                ):
+                if (line[j].isnumeric() and (len(line[j]) > 1 or int(line[j]) < 0 or int(line[j]) > 6)) or ((not line[0].isnumeric) and line[j] != "#"):
                     print(
                         "Error: Line %d does not have a valid ordinary thief id!"
                         % (i + 1),
                         file=sys.stderr,
                     )
                     sys.exit(1)
-                if (
-                    not line[j + 1].isnumeric()
-                    or len(line[j + 1]) > 2
-                    or int(line[j + 1]) < 0
-                ):
+                if (line[j + 1].isnumeric() and (len(line[j + 1]) > 2 or int(line[j + 1]) < 0)) or ((not line[0].isnumeric) and line[j + 1] != "##"):
                     print(
                         "Error: Line %d does not have a valid ordinary thief position!"
                         % (i + 1),
@@ -129,10 +122,11 @@ def check_if_file_is_log(file):
                     )
                     sys.exit(1)
                 if (
-                    not line[j + 2].isnumeric()
-                    or len(line[j + 2]) > 1
-                    or int(line[j + 2]) < 0
-                    or int(line[j + 2]) > 1
+                    (line[j + 2].isnumeric() and (
+                        len(line[j + 2]) > 1
+                        or int(line[j + 2]) < 0
+                        or int(line[j + 2]) > 1))
+                        or ((not line[0].isnumeric) and line[j + 2] != "#")
                 ):
                     print(
                         "Error: Line %d does not have a valid ordinary thief carrying canvas!"
@@ -142,31 +136,23 @@ def check_if_file_is_log(file):
                     sys.exit(1)
 
             # check second assault party
-            if not line[10].isnumeric() or len(line[0]) > 1:
+            if (line[10].isnumeric() and len(line[0]) > 1) or ((not line[0].isnumeric) and line[10] != "#"):
                 print(
-                    "Error: Line %d does not have a valid assault room id!" % (i + 1),
+                    "Error: Line %d does not have a valid assault room id!" % (
+                        i + 1),
                     file=sys.stderr,
                 )
                 sys.exit(1)
 
             for j in range(11, 20, 3):
-                if (
-                    (not line[j].isnumeric())
-                    or len(line[j]) > 1
-                    or int(line[j]) < 0
-                    or int(line[j]) > 6
-                ):
+                if (line[j].isnumeric() and (len(line[j]) > 1 or int(line[j]) < 0 or int(line[j]) > 6)) or ((not line[0].isnumeric) and line[j] != "#"):
                     print(
                         "Error: Line %d does not have a valid ordinary thief id!"
                         % (i + 1),
                         file=sys.stderr,
                     )
                     sys.exit(1)
-                if (
-                    not line[j + 1].isnumeric()
-                    or len(line[j + 1]) > 2
-                    or int(line[j + 1]) < 0
-                ):
+                if (line[j + 1].isnumeric() and (len(line[j + 1]) > 2 or int(line[j + 1]) < 0)) or ((not line[0].isnumeric) and line[j + 1] != "##"):
                     print(
                         "Error: Line %d does not have a valid ordinary thief position!"
                         % (i + 1),
@@ -174,9 +160,11 @@ def check_if_file_is_log(file):
                     )
                     sys.exit(1)
                 if (
-                    not line[j + 2].isnumeric()
-                    or len(line[j + 2]) > 1
-                    or (int(line[j + 2]) < 0 and int(line[j + 2]) > 1)
+                    (line[j + 2].isnumeric() and (
+                        len(line[j + 2]) > 1
+                        or int(line[j + 2]) < 0
+                        or int(line[j + 2]) > 1))
+                        or ((not line[0].isnumeric) and line[j + 2] != "#")
                 ):
                     print(
                         "Error: Line %d does not have a valid ordinary thief carrying canvas!"
@@ -205,7 +193,8 @@ def check_if_file_is_log(file):
                     or (int(line[j + 1]) < 15 and int(line[j + 1]) > 30)
                 ):
                     print(
-                        "Error: Line %d does not have a valid room distance!" % (i + 1),
+                        "Error: Line %d does not have a valid room distance!" % (
+                            i + 1),
                         file=sys.stderr,
                     )
                     sys.exit(1)
@@ -213,7 +202,8 @@ def check_if_file_is_log(file):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python check-log.py <file> [show_differences=True|False]")
+        print(
+            "Usage: python check-log.py <file> [show_differences=True|False]")
         sys.exit(1)
     check_if_file_is_log(sys.argv[1])
     print("File %s formatting correct!" % sys.argv[1])
