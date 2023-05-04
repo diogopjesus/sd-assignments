@@ -9,151 +9,135 @@ import sharedRegions.*;
  */
 public class OrdinaryThief extends Thread {
     /**
-     *
-     */
-    private GeneralRepository repos;
-
-    /**
-     *
+     * Reference to the control collection site.
      */
     private ControlCollectionSite contColSite;
 
     /**
-     *
+     * Reference to the concentration site.
      */
     private ConcentrationSite concentSite;
 
     /**
-     *
+     * Reference to the assault parties.
      */
     private AssaultParty[] assaultParties;
 
     /**
-     *
+     * Reference to the museum.
      */
     private Museum museum;
 
     /**
-     *
-     */
-    private int ordinaryThiefId;
-
-    /**
-     *
+     * Ordinary thief state.
      */
     private int ordinaryThiefState;
 
     /**
-     *
+     * Ordinary thief id.
      */
-    private int assaultPartyId;
+    private int ordinaryThiefId;
 
     /**
-     *
+     * Maximum displacement.
      */
     private int maximumDisplacement;
 
     /**
-     *
+     * Ordinary thief constructor.
+     * 
+     * @param contColSite control collection site.
+     * @param concentSite concentration site.
+     * @param assaultParties assault parties.
+     * @param museum museum.
+     * @param ordinaryThiefId ordinary thief id.
+     * @param maximumDisplacement maximum displacement.
      */
-    private boolean withCanvas;
-
-    /**
-     *
-     * @param repos
-     * @param contColSite
-     * @param concentSite
-     * @param assaultParties
-     * @param museum
-     * @param ordinaryThiefId
-     */
-    public OrdinaryThief(GeneralRepository repos, ControlCollectionSite contColSite,
-            ConcentrationSite concentSite, AssaultParty[] assaultParties, Museum museum,
-            int ordinaryThiefId, int maxDis) {
-        this.repos = repos;
+    public OrdinaryThief(ControlCollectionSite contColSite, ConcentrationSite concentSite,
+            AssaultParty[] assaultParties, Museum museum, int ordinaryThiefId,
+            int maximumDisplacement) {
         this.contColSite = contColSite;
         this.concentSite = concentSite;
         this.assaultParties = assaultParties;
         this.museum = museum;
-
+        this.ordinaryThiefState = OrdinaryThiefStates.CONCENTRATION_SITE;
         this.ordinaryThiefId = ordinaryThiefId;
-        this.ordinaryThiefState = OrdinaryThiefStates.COLLECTION_SITE;
-        this.maximumDisplacement = maxDis;
-        this.withCanvas = false;
+        this.maximumDisplacement = maximumDisplacement;
     }
 
     /**
-     *
-     * @return
-     */
-    public int getOrdinaryThiefId() {
-        return ordinaryThiefId;
-    }
-
-    /**
-     *
-     * @return
+     * Get the ordinary thief state.
+     * 
+     * @return ordinary thief state.
      */
     public int getOrdinaryThiefState() {
         return ordinaryThiefState;
     }
 
     /**
-     *
-     * @param ordinaryThiefState
+     * Set the ordinary thief state.
+     * 
+     * @param ordinaryThiefState ordinary thief state.
      */
     public void setOrdinaryThiefState(int ordinaryThiefState) {
         this.ordinaryThiefState = ordinaryThiefState;
-        repos.setOrdinaryThiefState(ordinaryThiefId, ordinaryThiefState);
     }
 
     /**
-     *
-     * @return
+     * Get the ordinary thief id.
+     * 
+     * @return ordinary thief id.
+     */
+    public int getOrdinaryThiefId() {
+        return ordinaryThiefId;
+    }
+
+    /**
+     * Set the ordinary thief id.
+     * 
+     * @param ordinaryThiefId ordinary thief id.
+     */
+    public void setOrdinaryThiefId(int ordinaryThiefId) {
+        this.ordinaryThiefId = ordinaryThiefId;
+    }
+
+    /**
+     * Get the maximum displacement.
+     * 
+     * @return maximum displacement.
      */
     public int getMaximumDisplacement() {
         return maximumDisplacement;
     }
 
     /**
-     *
+     * Set the maximum displacement.
+     * 
+     * @param maximumDisplacement maximum displacement.
      */
-    public boolean isHoldingCanvas() {
-        return withCanvas;
+    public void setMaximumDisplacement(int maximumDisplacement) {
+        this.maximumDisplacement = maximumDisplacement;
     }
 
     /**
-     *
+     * Ordinary thief life cycle.
      */
-    public void holdCanvas() {
-        withCanvas = true;
-    }
-
-    /**
-     *
-     */
-    public void dropCanvas() {
-        withCanvas = false;
-    }
-
     @Override
     public void run() {
-        int roomId;
+        int assaultPartyId;
 
-        while (concentSite.amINeeded() != 'E') {
+        while (concentSite.amINeeded()) {
             assaultPartyId = concentSite.prepareExcursion();
-
-            roomId = assaultParties[assaultPartyId].getTargetRoom();
 
             while (assaultParties[assaultPartyId].crawlIn());
 
-            museum.rollACanvas(assaultPartyId, roomId);
+            museum.rollACanvas(assaultPartyId);
 
             assaultParties[assaultPartyId].reverseDirection();
 
             while (assaultParties[assaultPartyId].crawlOut());
 
-            contColSite.handACanvas(assaultPartyId, roomId);
+            contColSite.handACanvas(assaultPartyId);
         }
     }
 }

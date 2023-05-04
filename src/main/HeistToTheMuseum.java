@@ -63,17 +63,17 @@ public class HeistToTheMuseum {
         for (int i = 0; i < (SimulPar.M - 1) / SimulPar.K; i++)
             assaultParties[i] = new AssaultParty(repos, i);
 
-        concentSite = new ConcentrationSite(repos, assaultParties);
+        museum = new Museum(repos, assaultParties, numPaint, roomDist);
 
         contColSite = new ControlCollectionSite(repos, assaultParties);
 
-        museum = new Museum(repos, numPaint, roomDist);
+        concentSite = new ConcentrationSite(repos, contColSite, assaultParties, museum);
 
-        masterThief = new MasterThief(repos, contColSite, concentSite, assaultParties, museum, 0);
+        masterThief = new MasterThief(contColSite, concentSite, assaultParties);
 
         for (int i = 0; i < SimulPar.M - 1; i++)
-            ordinaryThieves[i] = new OrdinaryThief(repos, contColSite, concentSite, assaultParties,
-                    museum, i, maxDis[i]);
+            ordinaryThieves[i] = new OrdinaryThief(contColSite, concentSite, assaultParties, museum,
+                    i, maxDis[i]);
 
         masterThief.start();
         for (int i = 0; i < SimulPar.M - 1; i++)

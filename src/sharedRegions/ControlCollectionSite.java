@@ -1,254 +1,203 @@
 package sharedRegions;
 
-import commInfra.*;
 import entities.*;
 import genclass.*;
-import main.*;
+import commInfra.*;
+import main.SimulPar;
 
 /**
- * Master thief control and collection site.
- *
- * It is responsible to (...) All public methods are executed in mutual exclusion. There are X
- * internal synchronization points: (...)
+ * Control Collection Site.
+ * 
+ * It is responsible to keep in count the number of canvas collected, the rooms that are empty known
+ * by the master thief and is implemented as an implicit monitor. All public methods are executed in
+ * mutual exclusion. There are two internal synchronization points: a single blocking point for the
+ * master thief, where he waits for the arrival of an ordinary thief from mission; an array of
+ * blocking points, one per each ordinary thief, where he is waits to hand canvas.
  */
-
 public class ControlCollectionSite {
+    /**
+     * Flag to indicate that there is not a party.
+     */
+    private static final int NOT_A_PARTY = -1;
+
+    /**
+     * Flag to indicate that there is not a room.
+     */
+    private static final int NOT_A_ROOM = -1;
+
+    /**
+     * Flag to indicate that there is not a thief.
+     */
+    private static final int NOT_A_THIEF = -1;
+
     /**
      * Reference to the general repository.
      */
-    private final GeneralRepository repos;
+    private GeneralRepository repos;
 
     /**
-     *
+     * Reference to the assault parties.
      */
     private AssaultParty[] assaultParties;
 
     /**
-     *
+     * Indicates the party where a thief belongs.
      */
-    private int numberOfCanvas;
+    private int[] thievesParties;
 
     /**
-     *
+     * Number of canvas collected.
      */
-    private boolean[] emptyRooms;
+    private int canvasCollected;
 
     /**
-     *
+     * Queue of thieves ready to hand canvas.
      */
-    private MemFIFO<Integer> waitingThieves;
+    private MemFIFO<Integer> handCanvasQueue;
 
     /**
-     *
+     * Indicates how many thieves are ready to hand canvas.
      */
-    private int numberOfWaitingThieves;
+    private int readyToHandCanvas;
 
     /**
-     *
+     * Indicates the thief id chosen to collect canvas.
      */
-    private int nextThiefInLine;
+    private boolean[] readyToCollectCanvas;
 
     /**
-     *
+     * Indicates if a room still has canvas inside.
      */
-    private int clearedOrdinaryThieves;
+    private boolean[] roomHasCanvas;
 
     /**
-     *
+     * Indication of a thief holding a canvas to be collected.
      */
-    private int activeAssaultParties;
+    private boolean[] holdingCanvas;
 
     /**
-     *
-     */
-    private boolean infoUpdated;
-
-    /**
-     *
-     * @param repos
+     * Control collection site constructor.
+     * 
+     * @param repos general repository.
+     * @param assaultParties assault parties.
      */
     public ControlCollectionSite(GeneralRepository repos, AssaultParty[] assaultParties) {
         this.repos = repos;
         this.assaultParties = assaultParties;
-
-        this.numberOfCanvas = 0;
-        this.emptyRooms = new boolean[SimulPar.N];
-        for (int i = 0; i < SimulPar.N; i++)
-            this.emptyRooms[i] = false;
-
+        this.thievesParties = new int[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            this.thievesParties[i] = NOT_A_PARTY;
         try {
-            this.waitingThieves = new MemFIFO<>(new Integer[SimulPar.M - 1]);
+            this.handCanvasQueue = new MemFIFO<>(new Integer[SimulPar.M - 1]);
         } catch (MemException e) {
             GenericIO.writelnString("Instance of waiting  FIFO failed: " + e.getMessage());
             System.exit(1);
         }
-        this.numberOfWaitingThieves = 0;
-
-        this.nextThiefInLine = -1;
-
-        this.clearedOrdinaryThieves = 6;
-        this.activeAssaultParties = 0;
-
-        this.infoUpdated = false;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getNumberOfCanvas() {
-        return numberOfCanvas;
-    }
-
-    /**
-     *
-     */
-    public int getAvailableAssaultParty() {
-        for (int i = 0; i < (SimulPar.M - 1) / SimulPar.K; i++)
-            if (!assaultParties[i].operationStatus())
-                return i;
-
-        return -1;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getAvailableRoom() {
+        this.readyToHandCanvas = 0;
+        this.readyToCollectCanvas = new boolean[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            this.readyToCollectCanvas[i] = false;
+        this.roomHasCanvas = new boolean[SimulPar.N];
         for (int i = 0; i < SimulPar.N; i++)
-            if (!emptyRooms[i]) {
-                int j;
-                for (j = 0; j < (SimulPar.M - 1) / SimulPar.K; j++)
-                    if (assaultParties[j].operationStatus()
-                            && (assaultParties[j].getTargetRoom() == i))
-                        break;
-                if (j == (SimulPar.M - 1) / SimulPar.K)
-                    return i;
-            }
-        return -1;
+            this.roomHasCanvas[i] = true;
+        this.holdingCanvas = new boolean[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            this.holdingCanvas[i] = false;
     }
 
     /**
-     *
-     */
-    private boolean allRoomsCleared() {
-        for (int i = 0; i < SimulPar.N; i++)
-            if (!emptyRooms[i])
-                return false;
-
-        return true;
-    }
-
-    /**
-     *
+     * Operation start operations.
+     * 
+     * It is called by the master thief to start the operations.
      */
     public synchronized void startOperations() {
         MasterThief mt = (MasterThief) Thread.currentThread();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        repos.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
     }
 
     /**
-     *
-     * @return
+     * Operation appraise situation.
+     * 
+     * It is called by the master thief to appraise the situation.
+     * 
+     * @return 'P' if we should prepare an assault party - 'R' if we should wait for the ordinary
+     *         thieves - 'E' if we should end the operation.
      */
     public synchronized char appraiseSit() {
-        // MasterThief mt = (MasterThief)Thread.currentThread();
-
-        /* Get Number of Empty Rooms and ID of a not empty room */
-        int numberOfEmptyRooms = 0;
-        int roomNotEmptyId = 0;
-        for (int i = 0; i < SimulPar.N; i++) {
-            if (emptyRooms[i])
-                numberOfEmptyRooms++;
-            else
-                roomNotEmptyId = i;
-        }
-
-        /* Get id of an assault party in operation */
-        int assaultPartyId = -1;
-        for (int i = 0; i < (SimulPar.M - 1) / SimulPar.K; i++)
-            if (assaultParties[i].operationStatus()) {
-                assaultPartyId = i;
-                break;
-            }
-
-        // Wait arrival of ordinary thieves
-        if ((activeAssaultParties == ((SimulPar.M - 1) / SimulPar.K))
-                || ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N - 1)
-                        && (assaultParties[assaultPartyId].getTargetRoom() == roomNotEmptyId))
-                || ((activeAssaultParties == 1) && (numberOfEmptyRooms == SimulPar.N)))
-
-        {
+        // Wait arrival of ordinary thieves if:
+        // - All assault parties are in mission;
+        // - there is one assault party in mission, the number of empty rooms is equal
+        // to N-1, and
+        // the assault party in mission is targeting the non-empty room;
+        // - There is one assault party in mission, and all rooms are empty.
+        if ((availableAssaultParties() == 0)
+                || ((availableAssaultParties() == ((SimulPar.M - 1) / SimulPar.K) - 1)
+                        && (availableRooms() == 1)
+                        && (assaultParties[getAssaultPartyOnMissionId()]
+                                .getTargetRoom() == getAvailableRoom()))
+                || ((availableAssaultParties() == ((SimulPar.M - 1) / SimulPar.K) - 1)
+                        && (availableRooms() == 0)))
             return 'R';
-        }
 
-        if (allRoomsCleared()) {
-            while (clearedOrdinaryThieves < SimulPar.M - 1) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
+        // End if all rooms are already cleared
+        if (availableRooms() == 0)
             return 'E';
-        }
 
-        while (clearedOrdinaryThieves < SimulPar.K || activeAssaultParties == 2) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        activeAssaultParties++;
-        clearedOrdinaryThieves -= 3;
-
+        // Prepare an assault party
         return 'P';
     }
 
     /**
-     *
+     * Operation take a rest.
+     * 
+     * It is called by the master thief to wait until a new thief has arrived the control collection
+     * site.
      */
     public synchronized void takeARest() {
         MasterThief mt = (MasterThief) Thread.currentThread();
 
         mt.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
+        repos.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
 
-        while (numberOfWaitingThieves == 0) {
+        while (readyToHandCanvas == 0) {
             try {
                 wait();
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
 
     /**
-     *
+     * Operation hand a canvas.
+     * 
+     * It is called by the ordinary thief to hand a canvas to the master thief. The ordinary thief
+     * blocks until he is called by the master thief, meaning his canvas was collected.
+     * 
+     * @param assaultPartyId assault party id.
      */
-    public synchronized void handACanvas(int assaultPartyId, int roomId) {
+    public synchronized void handACanvas(int assaultPartyId) {
         OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
 
-        ot.setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
-
-        // if(ot.isHoldingCanvas() || !emptyRooms[roomId])
-        // {
+        /* Add thief to the waiting queue */
         try {
-            waitingThieves.write(ot.getOrdinaryThiefId());
-            numberOfWaitingThieves++;
+            handCanvasQueue.write(ot.getOrdinaryThiefId());
         } catch (MemException e) {
-            GenericIO.writelnString(
-                    "Retrieval of customer id from waiting FIFO failed: " + e.getMessage());
+            GenericIO.writelnString("Instantiation of waiting FIFO failed: " + e.getMessage());
             System.exit(1);
         }
+        readyToHandCanvas++;
 
+        /* Signal if he is holding a canvas or not */
+        boolean canvas = assaultParties[assaultPartyId].isHoldingCanvas(ot.getOrdinaryThiefId());
+        setHoldingCanvas(ot.getOrdinaryThiefId(), canvas);
+
+        /* Notify master thief that is ready to hand a canvas */
         notifyAll();
 
-        while (nextThiefInLine != ot.getOrdinaryThiefId()) {
+        while (!readyToCollectCanvas[ot.getOrdinaryThiefId()]) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -256,55 +205,210 @@ public class ControlCollectionSite {
             }
         }
 
-        if (ot.isHoldingCanvas()) {
-            numberOfCanvas++;
-            repos.yieldAssaultPartyElementCanvas(assaultPartyId, ot.getOrdinaryThiefId());
-        } else
-            emptyRooms[roomId] = true;
-
-        infoUpdated = true;
-        // }
-
-        assaultParties[assaultPartyId].removeThief(ot.getOrdinaryThiefId());
-
-        repos.removeAssaultPartyElement(assaultPartyId, ot.getOrdinaryThiefId());
-
-        if (!assaultParties[assaultPartyId].operationStatus())
-            activeAssaultParties--;
-
-        clearedOrdinaryThieves++;
-
-        notifyAll();
+        readyToCollectCanvas[ot.getOrdinaryThiefId()] = false;
     }
 
     /**
-     *
+     * Operation collect a canvas.
+     * 
+     * It is called by the master thief to collect the canvas of the next ordinary thief in queue.
+     * After collecting the canvas, he wakes up the ordinary thief to proceed operations.
      */
     public synchronized void collectACanvas() {
         MasterThief mt = (MasterThief) Thread.currentThread();
 
+        int ordinaryThiefId = NOT_A_THIEF;
         try {
-            nextThiefInLine = waitingThieves.read();
-            numberOfWaitingThieves--;
+            ordinaryThiefId = handCanvasQueue.read();
         } catch (MemException e) {
-            GenericIO.writelnString("Instance of waiting  FIFO failed: " + e.getMessage());
+            GenericIO.writelnString("Instantiation of waiting FIFO failed: " + e.getMessage());
             System.exit(1);
         }
+        readyToHandCanvas--;
 
-        infoUpdated = false;
+        int assaultPartyId = getThiefParty(ordinaryThiefId);
 
-        notifyAll();
-
-        while (!infoUpdated) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        /* Collect canvas */
+        boolean canvas = false;
+        if (isHoldingCanvas(ordinaryThiefId)) {
+            canvasCollected++;
+            canvas = true;
+        } else {
+            setRoomEmpty(assaultParties[assaultPartyId].getTargetRoom());
         }
 
-        nextThiefInLine = -1;
+        int element = assaultParties[assaultPartyId].getThiefElement(ordinaryThiefId);
+
+        /* Disassociate thief to the assault party */
+        assaultParties[assaultPartyId].quitAssaultParty(ordinaryThiefId);
+        setThiefToParty(ordinaryThiefId, NOT_A_PARTY);
+
+        /* Notify thief that their canvas was colleted */
+        readyToCollectCanvas[ordinaryThiefId] = true;
+        notifyAll();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        repos.setCollectACanvas(canvas, assaultPartyId, element);
+    }
+
+    /**
+     * Get the id of an available assault party.
+     * 
+     * @return Id of an available assault party if there is one available, -1 otherwise.
+     */
+    public synchronized int getAvailableAssaultParty() {
+        int availableAssaultParty = NOT_A_PARTY;
+
+        for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
+            if (assaultParties[i].isAvailable()) {
+                availableAssaultParty = i;
+                break;
+            }
+
+        return availableAssaultParty;
+    }
+
+    /**
+     * Get the number of available assault parties.
+     * 
+     * @return Number of available assault parties.
+     */
+    protected int availableAssaultParties() {
+        int availableAssaultParties = 0;
+
+        for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
+            if (assaultParties[i].isAvailable())
+                availableAssaultParties++;
+
+        return availableAssaultParties;
+    }
+
+    /**
+     * Get the number of available rooms.
+     * 
+     * @return Number of available rooms.
+     */
+    protected int availableRooms() {
+        int availableRooms = 0;
+
+        for (int i = 0; i < SimulPar.N; i++)
+            if (roomHasCanvas[i])
+                availableRooms++;
+
+        return availableRooms;
+    }
+
+    /**
+     * Get the id of an available assault party.
+     * 
+     * @return Id of an available assault party if there is one available, -1 otherwise.
+     */
+    public synchronized int getAvailableRoom() {
+        int availableRoom = NOT_A_ROOM;
+
+        for (int i = 0; i < SimulPar.N; i++)
+            if (roomHasCanvas[i]) {
+                /* Check if any assault party is targeting that room */
+                int assPart = 0;
+                for (assPart = 0; assPart < (SimulPar.M - 1) / SimulPar.K; assPart++) {
+                    if (assaultParties[assPart].getTargetRoom() == i) {
+                        break;
+                    }
+                }
+
+                /* If no assault party is targeting that room, return it */
+                if (assPart == (SimulPar.M - 1) / SimulPar.K) {
+                    availableRoom = i;
+                    break;
+                }
+            }
+
+        /* if there is no other available room. WARNING: Should not happen! */
+        if (availableRoom == NOT_A_ROOM) {
+            /* Get the same room the other assault party is targeting */
+            for (int i = 0; i < SimulPar.N; i++)
+                if (roomHasCanvas[i]) {
+                    availableRoom = i;
+                    break;
+                }
+        }
+
+        return availableRoom;
+
+    }
+
+    /**
+     * Set a room as empty.
+     * 
+     * @param roomId room id.
+     */
+    protected void setRoomEmpty(int roomId) {
+        roomHasCanvas[roomId] = false;
+    }
+
+    /**
+     * Get the id of an assault party on mission.
+     * 
+     * @return Id of an assault party on mission if there is one available, -1 otherwise.
+     */
+    protected int getAssaultPartyOnMissionId() {
+        int assaultPartyOnMissionId = -1;
+
+        for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
+            if (!assaultParties[i].isAvailable()) {
+                assaultPartyOnMissionId = i;
+                break;
+            }
+
+        return assaultPartyOnMissionId;
+    }
+
+    /**
+     * Associate a thief to an assault party.
+     * 
+     * @param thiefId thief id.
+     * @param assaultPartyId assault party id.
+     */
+    protected void setThiefToParty(int thiefId, int assaultPartyId) {
+        this.thievesParties[thiefId] = assaultPartyId;
+    }
+
+    /**
+     * Get the assault party of a thief.
+     * 
+     * @param thiefId thief id.
+     * @return Assault party id.
+     */
+    protected int getThiefParty(int thiefId) {
+        return this.thievesParties[thiefId];
+    }
+
+    /**
+     * Set if a thief is holding a canvas or not.
+     * 
+     * @param thiefId thief id.
+     * @param canvas true if he is holding a canvas - false, otherwise.
+     */
+    protected void setHoldingCanvas(int thiefId, boolean canvas) {
+        this.holdingCanvas[thiefId] = canvas;
+    }
+
+    /**
+     * Get if a thief is holding a canvas or not.
+     * 
+     * @param thiefId thief id.
+     * @return True if the thief is holding a canvas, false otherwise.
+     */
+    protected boolean isHoldingCanvas(int thiefId) {
+        return this.holdingCanvas[thiefId];
+    }
+
+    /**
+     * Get the number of canvas collected.
+     * 
+     * @return Number of canvas collected.
+     */
+    protected int getCanvasCollected() {
+        return canvasCollected;
     }
 }
