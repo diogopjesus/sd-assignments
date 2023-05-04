@@ -35,94 +35,94 @@ if [ "$1" = "clean" ]; then
     exit 0;
 fi
 
-# run check-log.py script
-if [ "$1" = "check-log" ]; then
-    if [ "$2" = "" ]; then
-        echo "Error: No log file passed as an argument!" >&2;
-        exit 1
-    fi
-    if [ ! -f "$2" ]; then
-        echo "Error: $2 is not a file!" >&2;
-        exit 1;
-    fi
-    python3 utils/check-log.py $2
-    exit $?;
-fi
+# # run check-log.py script
+# if [ "$1" = "check-log" ]; then
+#     if [ "$2" = "" ]; then
+#         echo "Error: No log file passed as an argument!" >&2;
+#         exit 1
+#     fi
+#     if [ ! -f "$2" ]; then
+#         echo "Error: $2 is not a file!" >&2;
+#         exit 1;
+#     fi
+#     python3 utils/check-log.py $2
+#     exit $?;
+# fi
 
-# run check-logs.py script on log directory
-if [ "$1" = "check-log-dir" ]; then
-    if [ "$2" = "" ]; then
-        echo "Error: No log dir passed as an argument!" >&2;
-        exit 1
-    fi
-    if [ ! -d "$2" ]; then
-        echo "Error: $2 is not a directory!" >&2;
-        exit 1;
-    fi
-    FILES=$2/*.log
-    for f in $FILES
-    do
-        echo -n "Processing $f file..."
-        python3 utils/check-log.py $f > /dev/null
-        if [ "$?" -ne 0 ]; then
-            exit 1;
-        fi
-        echo "Done"
-    done
-    exit $?;
-fi
+# # run check-logs.py script on log directory
+# if [ "$1" = "check-log-dir" ]; then
+#     if [ "$2" = "" ]; then
+#         echo "Error: No log dir passed as an argument!" >&2;
+#         exit 1
+#     fi
+#     if [ ! -d "$2" ]; then
+#         echo "Error: $2 is not a directory!" >&2;
+#         exit 1;
+#     fi
+#     FILES=$2/*.log
+#     for f in $FILES
+#     do
+#         echo -n "Processing $f file..."
+#         python3 utils/check-log.py $f > /dev/null
+#         if [ "$?" -ne 0 ]; then
+#             exit 1;
+#         fi
+#         echo "Done"
+#     done
+#     exit $?;
+# fi
 
-# check if script is being run at root of project
-cd $(pwd)/src/ 2> /dev/null
-if [ "$?" -ne 0 ]; then
-    echo "Please run script at root of project!"
-    cd $PREVIOUS_DIR
-    exit 1;
-fi
+# # check if script is being run at root of project
+# cd $(pwd)/src/ 2> /dev/null
+# if [ "$?" -ne 0 ]; then
+#     echo "Please run script at root of project!"
+#     cd $PREVIOUS_DIR
+#     exit 1;
+# fi
 
-# generate javadoc
-if [ "$1" = "doc" ]; then
-    javadoc -cp .:$PREVIOUS_DIR/lib/genclass.jar -d ../doc/ **/*.java
-    exit 0;
-fi
+# # generate javadoc
+# if [ "$1" = "doc" ]; then
+#     javadoc -cp .:$PREVIOUS_DIR/lib/genclass.jar -d ../doc/ **/*.java
+#     exit 0;
+# fi
 
-# compile project
-javac -cp .:$PREVIOUS_DIR/lib/genclass.jar **/*.java
-if [ "$?" -ne 0 ]; then
-    echo "Something went wrong! Make sure you are at the root of the project"
-    exit 1;
-fi
+# # compile project
+# javac -cp .:$PREVIOUS_DIR/lib/genclass.jar **/*.java
+# if [ "$?" -ne 0 ]; then
+#     echo "Something went wrong! Make sure you are at the root of the project"
+#     exit 1;
+# fi
 
-# exit if complile only
-if [ "$1" = "compile" ]; then
-    exit 0;
-fi
+# # exit if complile only
+# if [ "$1" = "compile" ]; then
+#     exit 0;
+# fi
 
-# check if argument is a number
-re='^[0-9]+$'
-if ! [[ $1 =~ $re || "$1" =~ "" ]] ; then
-   echo "Error: Argument passed is not a number" >&2;
-   exit 1
-fi
+# # check if argument is a number
+# re='^[0-9]+$'
+# if ! [[ $1 =~ $re || "$1" =~ "" ]] ; then
+#    echo "Error: Argument passed is not a number" >&2;
+#    exit 1
+# fi
 
-# run project once
-if [[ "$1" = "" ]]; then
-    java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum
-    exit $?
-fi
+# # run project once
+# if [[ "$1" = "" ]]; then
+#     java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum
+#     exit $?
+# fi
 
-# run project multiple times
-rm -r ../log/run*.log 2> /dev/null
-mkdir ../log/ 2> /dev/null
-if [ "$1" -lt 1 ]; then
-    echo "Error: Argument passed must be a positive number" >&2;
-    exit 1
-fi
-for i in $(seq 1 $1)
-do
-    echo -e "Run n.o " $i
-    echo "../log/run$i.log" | java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum > /dev/null
-    if [ "$?" -ne "0" ]; then
-        exit 1;
-    fi
-done
+# # run project multiple times
+# rm -r ../log/run*.log 2> /dev/null
+# mkdir ../log/ 2> /dev/null
+# if [ "$1" -lt 1 ]; then
+#     echo "Error: Argument passed must be a positive number" >&2;
+#     exit 1
+# fi
+# for i in $(seq 1 $1)
+# do
+#     echo -e "Run n.o " $i
+#     echo "../log/run$i.log" | java -cp .:$PREVIOUS_DIR/lib/genclass.jar main.HeistToTheMuseum > /dev/null
+#     if [ "$?" -ne "0" ]; then
+#         exit 1;
+#     fi
+# done
