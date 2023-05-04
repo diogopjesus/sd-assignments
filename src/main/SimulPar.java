@@ -26,22 +26,22 @@ public final class SimulPar {
     public static final int md = 2;
 
     /**
-     * Maximum number of paitings hanging in each room.
+     * Maximum number of paintings hanging in each room.
      */
     public static final int P = 16;
 
     /**
-     * Minimum number of paitings hanging in each room.
+     * Minimum number of paintings hanging in each room.
      */
     public static final int p = 8;
 
     /**
-     * Maximum distance from outside concentretion site to each room.
+     * Maximum distance from outside concentration site to each room.
      */
     public static final int D = 30;
 
     /**
-     * Minimum distance from outside concentretion site to each room.
+     * Minimum distance from outside concentration site to each room.
      */
     public static final int d = 15;
 
