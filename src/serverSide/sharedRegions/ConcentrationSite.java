@@ -1,13 +1,13 @@
-package sharedRegions;
+package serverSide.sharedRegions;
 
-import entities.*;
 import genclass.*;
+import serverSide.main.SimulPar;
+import clientSide.entities.*;
 import commInfra.*;
-import main.SimulPar;
 
 /**
  * Concentration Site.
- * 
+ *
  * It is responsible to keep in count the number of thieves waiting to be assigned to an assault and
  * is implemented as an implicit monitor. All public methods are executed in mutual exclusion. There
  * are 3 synchronization points: an array of blocking points, one per each ordinary thief, where
@@ -68,7 +68,7 @@ public class ConcentrationSite {
 
     /**
      * Concentration site constructor.
-     * 
+     *
      * @param repos general repository.
      * @param contColSite control collection site.
      * @param assaultParties assault parties.
@@ -93,9 +93,9 @@ public class ConcentrationSite {
 
     /**
      * Operation am i needed.
-     * 
+     *
      * It is called by the ordinary thief to check if he is needed.
-     * 
+     *
      * @return true if he is needed - false otherwise (to end operations).
      */
     public synchronized boolean amINeeded() {
@@ -137,9 +137,9 @@ public class ConcentrationSite {
      */
     /**
      * Operation prepare assault party.
-     * 
+     *
      * It is called by the master thief to prepare an assault party.
-     * 
+     *
      * @param assaultPartyId assault party id.
      * @param roomId room id.
      */
@@ -198,9 +198,9 @@ public class ConcentrationSite {
 
     /**
      * Operation prepare excursion.
-     * 
+     *
      * It is called by an ordinary thief to prepare excursion.
-     * 
+     *
      * @return id of the assault party that the thief joined.
      */
     public synchronized int prepareExcursion() {
@@ -244,7 +244,7 @@ public class ConcentrationSite {
 
     /**
      * Operation sum up results.
-     * 
+     *
      * It is called by the master thief to sum up the results of the heist.
      */
     public synchronized void sumUpResults() {
@@ -271,7 +271,7 @@ public class ConcentrationSite {
 
     /**
      * Get the id of the thief that was called to join an assault party.
-     * 
+     *
      * @return called thief id.
      */
     protected int getCalledThiefId() {
@@ -280,7 +280,7 @@ public class ConcentrationSite {
 
     /**
      * Set the id of the thief that was called to join an assault party.
-     * 
+     *
      * @param calledThiefId called thief id.
      */
     protected void setCalledThiefId(int calledThiefId) {
@@ -289,7 +289,7 @@ public class ConcentrationSite {
 
     /**
      * Get the id of the available assault party.
-     * 
+     *
      * @return available assault party id.
      */
     protected int getAvailableAssaultPartyId() {
@@ -298,7 +298,7 @@ public class ConcentrationSite {
 
     /**
      * Set the id of the available assault party.
-     * 
+     *
      * @param availableAssaultPartyId available assault party id.
      */
     protected void setAvailableAssaultPartyId(int availableAssaultPartyId) {
@@ -307,7 +307,7 @@ public class ConcentrationSite {
 
     /**
      * Check the flag that indicates if the operation ended or not.
-     * 
+     *
      * @return true if operation has ended - false otherwise.
      */
     protected boolean getEndOfOperations() {

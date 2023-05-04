@@ -1,8 +1,8 @@
-package sharedRegions;
+package serverSide.sharedRegions;
 
-import main.*;
-import entities.*;
+import clientSide.entities.*;
 import genclass.*;
+import serverSide.main.*;
 
 /**
  * General repository.
@@ -77,7 +77,7 @@ public class GeneralRepository {
 
     /**
      * Instantiation of a general repository object.
-     * 
+     *
      * @param logFileName name of the logging file.
      * @param maxDis maximum displacement of the ordinary thieves.
      * @param numPaint number of paintings in each room.
@@ -244,7 +244,7 @@ public class GeneralRepository {
 
     /**
      * Set the current state of the master thief.
-     * 
+     *
      * @param masterThiefState the current state of the master thief.
      */
     public synchronized void setMasterThiefState(int masterThiefState) {
@@ -254,7 +254,7 @@ public class GeneralRepository {
 
     /**
      * Set the current state of an ordinary thief.
-     * 
+     *
      * @param thiefId the thief id.
      * @param ordinaryThiefState the ordinary thief state.
      */
@@ -265,7 +265,7 @@ public class GeneralRepository {
 
     /**
      * Set the current room id of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param assaultPartyRoomId the target room id of the assault party.
      */
@@ -276,7 +276,7 @@ public class GeneralRepository {
 
     /**
      * Set the current element id of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @param thiefId thief id.
@@ -299,7 +299,7 @@ public class GeneralRepository {
 
     /**
      * Set the current element position of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @param assaultPartyElementPosition the target element position of the assault party.
@@ -312,7 +312,7 @@ public class GeneralRepository {
 
     /**
      * Set the current element canvas of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @param assaultPartyElementCanvas the target element canvas of the assault party.
@@ -332,7 +332,7 @@ public class GeneralRepository {
     /**
      * Increment canvas stolen by a thief, if he has one and remove the thief from the assault
      * party.
-     * 
+     *
      * @param canvas true if the thief is holding a canvas - false, otherwise.
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief in the party).
@@ -353,7 +353,7 @@ public class GeneralRepository {
 
     /**
      * Get the current state of the master thief.
-     * 
+     *
      * @return the current state of the master thief.
      */
     private String getMasterThiefState() {
@@ -375,7 +375,7 @@ public class GeneralRepository {
 
     /**
      * Get the current state of an ordinary thief.
-     * 
+     *
      * @param thiefId the thief id.
      * @return the current state of the ordinary thief.
      */
@@ -398,7 +398,7 @@ public class GeneralRepository {
 
     /**
      * Get the current situation of an ordinary thief.
-     * 
+     *
      * @param thiefId the thief id.
      * @return the current situation of the ordinary thief.
      */
@@ -408,7 +408,7 @@ public class GeneralRepository {
 
     /**
      * Set the current situation of an ordinary thief.
-     * 
+     *
      * @param thiefId the thief id.
      * @param ordinaryThiefSituation the ordinary thief situation.
      */
@@ -418,7 +418,7 @@ public class GeneralRepository {
 
     /**
      * Get the current maximum displacement of an ordinary thief.
-     * 
+     *
      * @param thiefId the thief id.
      * @return the maximum displacement of the ordinary thief.
      */
@@ -428,7 +428,7 @@ public class GeneralRepository {
 
     /**
      * Get the current room id of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @return the target room id of the assault party.
      */
@@ -438,7 +438,7 @@ public class GeneralRepository {
 
     /**
      * Get the current element id of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @return the target element id of the assault party.
@@ -449,7 +449,7 @@ public class GeneralRepository {
 
     /**
      * Get the current element position of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @return the target element position of the assault party.
@@ -460,7 +460,7 @@ public class GeneralRepository {
 
     /**
      * Get the current element canvas of an assault party.
-     * 
+     *
      * @param assaultPartyId the assault party id.
      * @param elementId the element id.
      * @return the target element canvas of the assault party.
@@ -471,7 +471,7 @@ public class GeneralRepository {
 
     /**
      * Get the current number of paintings in a room.
-     * 
+     *
      * @param roomId the room id.
      * @return the number of paintings in the room.
      */
@@ -481,7 +481,7 @@ public class GeneralRepository {
 
     /**
      * Set the current number of paintings in a room.
-     * 
+     *
      * @param roomId the room id.
      * @param museumRoomNumberPaintings the number of paintings in the room.
      */
@@ -491,7 +491,7 @@ public class GeneralRepository {
 
     /**
      * Get the current distance to a room.
-     * 
+     *
      * @param roomId the room id.
      * @return the distance to the room.
      */
@@ -501,7 +501,7 @@ public class GeneralRepository {
 
     /**
      * Get the number of stolen paintings.
-     * 
+     *
      * @return the number of stolen paintings.
      */
     private int getStolenPaintings() {
@@ -517,7 +517,7 @@ public class GeneralRepository {
 
     /**
      * Remove the association of a thief to an assault party.
-     * 
+     *
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief inside the assault party).
      */

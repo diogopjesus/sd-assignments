@@ -1,6 +1,6 @@
-package entities;
+package clientSide.entities;
 
-import sharedRegions.*;
+import serverSide.sharedRegions.*;
 
 /**
  * Master thief thread.
@@ -31,7 +31,7 @@ public class MasterThief extends Thread {
 
     /**
      * Master thief constructor.
-     * 
+     *
      * @param contColSite control collection site.
      * @param concentSite concentration site.
      * @param assaultParties assault parties.
@@ -47,7 +47,7 @@ public class MasterThief extends Thread {
 
     /**
      * Get master thief state.
-     * 
+     *
      * @return Master thief state.
      */
     public int getMasterThiefState() {
@@ -56,7 +56,7 @@ public class MasterThief extends Thread {
 
     /**
      * Set master thief state.
-     * 
+     *
      * @param masterThiefState Master thief state.
      */
     public void setMasterThiefState(int masterThiefState) {

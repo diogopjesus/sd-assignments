@@ -1,12 +1,12 @@
-package sharedRegions;
+package serverSide.sharedRegions;
 
-import entities.*;
+import clientSide.entities.*;
 import genclass.*;
-import main.SimulPar;
+import serverSide.main.SimulPar;
 
 /**
  * Assault Party.
- * 
+ *
  * It is responsible to keep the members of the assault party and move them to inside the museum and
  * out and is implemented as an implicit monitor. All public methods are executed in mutual
  * exclusion. There are 2 internal synchronization points: an array of blocking points, one per each
@@ -99,7 +99,7 @@ public class AssaultParty {
 
     /**
      * Assault party constructor.
-     * 
+     *
      * @param repos general repository.
      * @param assaultPartyId assault party id.
      */
@@ -116,7 +116,7 @@ public class AssaultParty {
 
     /**
      * Operation send assault party.
-     * 
+     *
      * It is called by the master thief to send the assault party on mission
      */
     public synchronized void sendAssaultParty() {
@@ -136,9 +136,9 @@ public class AssaultParty {
 
     /**
      * Operation crawl in.
-     * 
+     *
      * It is called by the ordinary thief to crawl into the museum.
-     * 
+     *
      * @return true if can continue to crawl in - false otherwise.
      */
     public synchronized boolean crawlIn() {
@@ -247,7 +247,7 @@ public class AssaultParty {
 
     /**
      * Operation reverse direction.
-     * 
+     *
      * It is called by the ordinary thief to reverse the crawling direction from in to out.
      */
     public synchronized void reverseDirection() {
@@ -268,9 +268,9 @@ public class AssaultParty {
 
     /**
      * Operation crawl out.
-     * 
+     *
      * It is called by the ordinary thief to crawl out of the museum.
-     * 
+     *
      * @return true if can continue to crawl out - false otherwise.
      */
     public synchronized boolean crawlOut() {
@@ -380,7 +380,7 @@ public class AssaultParty {
 
     /**
      * Get assault party id.
-     * 
+     *
      * @return Assault party id.
      */
     protected int getAssaultPartyId() {
@@ -389,7 +389,7 @@ public class AssaultParty {
 
     /**
      * Set the assault party target room for mission.
-     * 
+     *
      * @param targetRoom target room id.
      */
     protected void setTargetRoom(int targetRoom) {
@@ -398,7 +398,7 @@ public class AssaultParty {
 
     /**
      * Get the assault party target room for mission.
-     * 
+     *
      * @return Target room.
      */
     protected int getTargetRoom() {
@@ -407,7 +407,7 @@ public class AssaultParty {
 
     /**
      * Set the assault party target room distance for mission.
-     * 
+     *
      * @param targetRoomDistance target room distance.
      */
     protected void setTargetRoomDistance(int targetRoomDistance) {
@@ -416,7 +416,7 @@ public class AssaultParty {
 
     /**
      * Get the assault party target room distance for mission.
-     * 
+     *
      * @return Target room distance.
      */
     protected int getTargetRoomDistance() {
@@ -425,7 +425,7 @@ public class AssaultParty {
 
     /**
      * Set the assault party state
-     * 
+     *
      * @param assaultPartyState assault party state.
      */
     protected void setAssaultPartyState(int assaultPartyState) {
@@ -434,7 +434,7 @@ public class AssaultParty {
 
     /**
      * Get the assault party state.
-     * 
+     *
      * @return Assault party state.
      */
     protected int getAssaultPartyState() {
@@ -443,7 +443,7 @@ public class AssaultParty {
 
     /**
      * Check if the assault party is available.
-     * 
+     *
      * @return true if the assault party is available, false otherwise.
      */
     protected boolean isAvailable() {
@@ -452,7 +452,7 @@ public class AssaultParty {
 
     /**
      * Check if the assault party is full.
-     * 
+     *
      * @return true if the assault party is full, false otherwise.
      */
     protected boolean isFull() {
@@ -461,7 +461,7 @@ public class AssaultParty {
 
     /**
      * Add new thief to the assault party.
-     * 
+     *
      * @param thiefId thief id.
      */
     protected void joinAssaultParty(int thiefId) {
@@ -479,7 +479,7 @@ public class AssaultParty {
 
     /**
      * Remove thief from the assault party.
-     * 
+     *
      * @param thiefId thief id.
      */
     protected void quitAssaultParty(int thiefId) {
@@ -523,7 +523,7 @@ public class AssaultParty {
 
     /**
      * Get the next thief in the crawling line.
-     * 
+     *
      * @return Thief id.
      */
     private int getNextThiefInLine() {
@@ -591,7 +591,7 @@ public class AssaultParty {
 
     /**
      * Update the position of a thief.
-     * 
+     *
      * @param thiefId thief id.
      * @param position thief position.
      */
@@ -611,7 +611,7 @@ public class AssaultParty {
 
     /**
      * Get the thief position based on his id.
-     * 
+     *
      * @param thiefId
      * @return Thief position.
      */
@@ -630,7 +630,7 @@ public class AssaultParty {
 
     /**
      * Set thief canvas state.
-     * 
+     *
      * @param thiefId thief id.
      * @param canvas true if is holding a canvas - false, otherwise.
      */
@@ -649,7 +649,7 @@ public class AssaultParty {
 
     /**
      * Check wether a thief is holding a canvas.
-     * 
+     *
      * @param thiefId thief id.
      * @return True if is holding a canvas, false otherwise.
      */
@@ -668,7 +668,7 @@ public class AssaultParty {
 
     /**
      * Get the thief id that is in front.
-     * 
+     *
      * @return thief id.
      */
     protected int thiefAtFront() {
@@ -698,7 +698,7 @@ public class AssaultParty {
 
     /**
      * Get the thief id that is in the back.
-     * 
+     *
      * @return thief id.
      */
     protected int thiefAtBack() {
@@ -728,7 +728,7 @@ public class AssaultParty {
 
     /**
      * Get the thief id that is behind the thief with the given id.
-     * 
+     *
      * @param thiefId thief id.
      * @return thief behind id.
      */
@@ -758,7 +758,7 @@ public class AssaultParty {
 
     /**
      * Get the thief id that is in front of the thief with the given id.
-     * 
+     *
      * @param thiefId thief id.
      * @return thief ahead id.
      */
@@ -787,7 +787,7 @@ public class AssaultParty {
 
     /**
      * Check if a thief is in the given position.
-     * 
+     *
      * @param position position to be checked.
      * @return true if there's a thief in position - false, otherwise.
      */
@@ -807,7 +807,7 @@ public class AssaultParty {
 
     /**
      * Get the element (position inside the assault party) of the thief with the given id.
-     * 
+     *
      * @param thiefId thief id.
      * @return thief element.
      */

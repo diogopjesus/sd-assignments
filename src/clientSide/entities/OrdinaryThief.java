@@ -1,6 +1,6 @@
-package entities;
+package clientSide.entities;
 
-import sharedRegions.*;
+import serverSide.sharedRegions.*;
 
 /**
  * Ordinary thief thread.
@@ -45,7 +45,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Ordinary thief constructor.
-     * 
+     *
      * @param contColSite control collection site.
      * @param concentSite concentration site.
      * @param assaultParties assault parties.
@@ -67,7 +67,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Get the ordinary thief state.
-     * 
+     *
      * @return ordinary thief state.
      */
     public int getOrdinaryThiefState() {
@@ -76,7 +76,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Set the ordinary thief state.
-     * 
+     *
      * @param ordinaryThiefState ordinary thief state.
      */
     public void setOrdinaryThiefState(int ordinaryThiefState) {
@@ -85,7 +85,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Get the ordinary thief id.
-     * 
+     *
      * @return ordinary thief id.
      */
     public int getOrdinaryThiefId() {
@@ -94,7 +94,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Set the ordinary thief id.
-     * 
+     *
      * @param ordinaryThiefId ordinary thief id.
      */
     public void setOrdinaryThiefId(int ordinaryThiefId) {
@@ -103,7 +103,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Get the maximum displacement.
-     * 
+     *
      * @return maximum displacement.
      */
     public int getMaximumDisplacement() {
@@ -112,7 +112,7 @@ public class OrdinaryThief extends Thread {
 
     /**
      * Set the maximum displacement.
-     * 
+     *
      * @param maximumDisplacement maximum displacement.
      */
     public void setMaximumDisplacement(int maximumDisplacement) {

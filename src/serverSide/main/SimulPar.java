@@ -1,4 +1,4 @@
-package main;
+package serverSide.main;
 
 /**
  * Definition of the simulation parameters.

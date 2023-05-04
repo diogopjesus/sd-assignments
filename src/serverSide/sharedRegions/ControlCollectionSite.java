@@ -1,13 +1,13 @@
-package sharedRegions;
+package serverSide.sharedRegions;
 
-import entities.*;
 import genclass.*;
+import serverSide.main.SimulPar;
+import clientSide.entities.*;
 import commInfra.*;
-import main.SimulPar;
 
 /**
  * Control Collection Site.
- * 
+ *
  * It is responsible to keep in count the number of canvas collected, the rooms that are empty known
  * by the master thief and is implemented as an implicit monitor. All public methods are executed in
  * mutual exclusion. There are two internal synchronization points: a single blocking point for the
@@ -77,7 +77,7 @@ public class ControlCollectionSite {
 
     /**
      * Control collection site constructor.
-     * 
+     *
      * @param repos general repository.
      * @param assaultParties assault parties.
      */
@@ -107,7 +107,7 @@ public class ControlCollectionSite {
 
     /**
      * Operation start operations.
-     * 
+     *
      * It is called by the master thief to start the operations.
      */
     public synchronized void startOperations() {
@@ -119,9 +119,9 @@ public class ControlCollectionSite {
 
     /**
      * Operation appraise situation.
-     * 
+     *
      * It is called by the master thief to appraise the situation.
-     * 
+     *
      * @return 'P' if we should prepare an assault party - 'R' if we should wait for the ordinary
      *         thieves - 'E' if we should end the operation.
      */
@@ -151,7 +151,7 @@ public class ControlCollectionSite {
 
     /**
      * Operation take a rest.
-     * 
+     *
      * It is called by the master thief to wait until a new thief has arrived the control collection
      * site.
      */
@@ -172,10 +172,10 @@ public class ControlCollectionSite {
 
     /**
      * Operation hand a canvas.
-     * 
+     *
      * It is called by the ordinary thief to hand a canvas to the master thief. The ordinary thief
      * blocks until he is called by the master thief, meaning his canvas was collected.
-     * 
+     *
      * @param assaultPartyId assault party id.
      */
     public synchronized void handACanvas(int assaultPartyId) {
@@ -210,7 +210,7 @@ public class ControlCollectionSite {
 
     /**
      * Operation collect a canvas.
-     * 
+     *
      * It is called by the master thief to collect the canvas of the next ordinary thief in queue.
      * After collecting the canvas, he wakes up the ordinary thief to proceed operations.
      */
@@ -253,7 +253,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the id of an available assault party.
-     * 
+     *
      * @return Id of an available assault party if there is one available, -1 otherwise.
      */
     public synchronized int getAvailableAssaultParty() {
@@ -270,7 +270,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the number of available assault parties.
-     * 
+     *
      * @return Number of available assault parties.
      */
     protected int availableAssaultParties() {
@@ -285,7 +285,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the number of available rooms.
-     * 
+     *
      * @return Number of available rooms.
      */
     protected int availableRooms() {
@@ -300,7 +300,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the id of an available assault party.
-     * 
+     *
      * @return Id of an available assault party if there is one available, -1 otherwise.
      */
     public synchronized int getAvailableRoom() {
@@ -339,7 +339,7 @@ public class ControlCollectionSite {
 
     /**
      * Set a room as empty.
-     * 
+     *
      * @param roomId room id.
      */
     protected void setRoomEmpty(int roomId) {
@@ -348,7 +348,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the id of an assault party on mission.
-     * 
+     *
      * @return Id of an assault party on mission if there is one available, -1 otherwise.
      */
     protected int getAssaultPartyOnMissionId() {
@@ -365,7 +365,7 @@ public class ControlCollectionSite {
 
     /**
      * Associate a thief to an assault party.
-     * 
+     *
      * @param thiefId thief id.
      * @param assaultPartyId assault party id.
      */
@@ -375,7 +375,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the assault party of a thief.
-     * 
+     *
      * @param thiefId thief id.
      * @return Assault party id.
      */
@@ -385,7 +385,7 @@ public class ControlCollectionSite {
 
     /**
      * Set if a thief is holding a canvas or not.
-     * 
+     *
      * @param thiefId thief id.
      * @param canvas true if he is holding a canvas - false, otherwise.
      */
@@ -395,7 +395,7 @@ public class ControlCollectionSite {
 
     /**
      * Get if a thief is holding a canvas or not.
-     * 
+     *
      * @param thiefId thief id.
      * @return True if the thief is holding a canvas, false otherwise.
      */
@@ -405,7 +405,7 @@ public class ControlCollectionSite {
 
     /**
      * Get the number of canvas collected.
-     * 
+     *
      * @return Number of canvas collected.
      */
     protected int getCanvasCollected() {

@@ -1,11 +1,11 @@
-package sharedRegions;
+package serverSide.sharedRegions;
 
-import entities.*;
-import main.SimulPar;
+import clientSide.entities.*;
+import serverSide.main.SimulPar;
 
 /**
  * Museum.
- * 
+ *
  * It is responsible to keep in count the number of paintings in each room and is implemented as an
  * implicit monitor. All public methods are executed in mutual exclusion. There are no internal
  * synchronization points.
@@ -33,7 +33,7 @@ public class Museum {
 
     /**
      * Museum constructor.
-     * 
+     *
      * @param repos general repository.
      * @param assaultParties assault parties.
      * @param canvasInRoom number of canvas in each room.
@@ -49,9 +49,9 @@ public class Museum {
 
     /**
      * Operation roll a canvas.
-     * 
+     *
      * It is called by an ordinary thief to roll a canvas from a room.
-     * 
+     *
      * @param assaultPartyId assault party id.
      */
     public synchronized void rollACanvas(int assaultPartyId) {
@@ -76,7 +76,7 @@ public class Museum {
 
     /**
      * Get the distance to a room.
-     * 
+     *
      * @param roomId room id.
      * @return distance to a room.
      */

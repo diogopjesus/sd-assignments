@@ -1,4 +1,4 @@
-package entities;
+package clientSide.entities;
 
 /**
  * Definition of the internal states of the CommonThief during his life cycle.
