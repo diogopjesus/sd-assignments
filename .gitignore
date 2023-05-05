@@ -9,6 +9,14 @@ log/
 
 doc/
 
+build/
+
+test/
+
+password
+
+.env
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
