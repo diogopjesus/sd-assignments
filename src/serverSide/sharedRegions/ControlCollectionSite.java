@@ -242,7 +242,7 @@ public class ControlCollectionSite {
         notifyAll();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        repos.setCollectACanvas(canvas, assaultPartyId, element);
+        repos.endAssaultPartyElementMission(canvas, assaultPartyId, element);
     }
 
     /**
@@ -383,7 +383,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @param canvas true if he is holding a canvas - false, otherwise.
      */
-    public synchronized void setHoldingCanvas(int thiefId, boolean canvas) {
+    private void setHoldingCanvas(int thiefId, boolean canvas) {
         this.holdingCanvas[thiefId] = canvas;
     }
 
@@ -393,7 +393,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @return True if the thief is holding a canvas, false otherwise.
      */
-    public synchronized boolean isHoldingCanvas(int thiefId) {
+    private boolean isHoldingCanvas(int thiefId) {
         return this.holdingCanvas[thiefId];
     }
 }

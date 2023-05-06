@@ -337,7 +337,8 @@ public class GeneralRepository {
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief in the party).
      */
-    public synchronized void setCollectACanvas(boolean canvas, int assaultPartyId, int elementId) {
+    public synchronized void endAssaultPartyElementMission(boolean canvas, int assaultPartyId,
+            int elementId) {
         /* Increment number of paintings stolen if there's a canvas */
         if (canvas)
             incrementStolenPaintings();
