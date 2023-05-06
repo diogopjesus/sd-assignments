@@ -269,36 +269,6 @@ public class ControlCollectionSite {
     }
 
     /**
-     * Get the number of available assault parties.
-     *
-     * @return Number of available assault parties.
-     */
-    protected int availableAssaultParties() {
-        int availableAssaultParties = 0;
-
-        for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
-            if (assaultParties[i].isAvailable())
-                availableAssaultParties++;
-
-        return availableAssaultParties;
-    }
-
-    /**
-     * Get the number of available rooms.
-     *
-     * @return Number of available rooms.
-     */
-    protected int availableRooms() {
-        int availableRooms = 0;
-
-        for (int i = 0; i < SimulPar.N; i++)
-            if (roomHasCanvas[i])
-                availableRooms++;
-
-        return availableRooms;
-    }
-
-    /**
      * Get the id of an available assault party.
      *
      * @return Id of an available assault party if there is one available, -1 otherwise.
@@ -335,6 +305,36 @@ public class ControlCollectionSite {
 
         return availableRoom;
 
+    }
+
+    /**
+     * Get the number of available assault parties.
+     *
+     * @return Number of available assault parties.
+     */
+    protected int availableAssaultParties() {
+        int availableAssaultParties = 0;
+
+        for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
+            if (assaultParties[i].isAvailable())
+                availableAssaultParties++;
+
+        return availableAssaultParties;
+    }
+
+    /**
+     * Get the number of available rooms.
+     *
+     * @return Number of available rooms.
+     */
+    protected int availableRooms() {
+        int availableRooms = 0;
+
+        for (int i = 0; i < SimulPar.N; i++)
+            if (roomHasCanvas[i])
+                availableRooms++;
+
+        return availableRooms;
     }
 
     /**

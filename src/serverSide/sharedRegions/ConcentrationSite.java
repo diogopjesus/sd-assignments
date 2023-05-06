@@ -133,9 +133,6 @@ public class ConcentrationSite {
     }
 
     /**
-    
-     */
-    /**
      * Operation prepare assault party.
      *
      * It is called by the master thief to prepare an assault party.
