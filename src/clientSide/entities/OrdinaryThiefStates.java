@@ -3,7 +3,7 @@ package clientSide.entities;
 /**
  * Definition of the internal states of the CommonThief during his life cycle.
  */
-public class OrdinaryThiefStates {
+public final class OrdinaryThiefStates {
     /**
      * The ordinary thief is at the concentration site.
      */

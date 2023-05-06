@@ -1,6 +1,6 @@
 package clientSide.entities;
 
-import serverSide.sharedRegions.*;
+import clientSide.stubs.*;
 
 /**
  * Master thief thread.
@@ -9,39 +9,40 @@ import serverSide.sharedRegions.*;
  */
 public class MasterThief extends Thread {
     /**
-     * Reference to the control collection site.
-     */
-    private ControlCollectionSite contColSite;
-
-    /**
-     * Reference to the concentration site.
-     */
-    private ConcentrationSite concentSite;
-
-    /**
-     * Reference to the assault parties.
-     */
-    private AssaultParty[] assaultParties;
-
-    /**
      * Master thief state.
      */
     private int masterThiefState;
 
+    /**
+     * Reference to the control collection site.
+     */
+    private final ControlCollectionSiteStub contColSiteStub;
+
+    /**
+     * Reference to the concentration site.
+     */
+    private final ConcentrationSiteStub concentSiteStub;
+
+    /**
+     * Reference to the assault parties.
+     */
+    private final AssaultPartyStub[] assPartStub;
 
     /**
      * Master thief constructor.
      *
-     * @param contColSite control collection site.
-     * @param concentSite concentration site.
-     * @param assaultParties assault parties.
+     * @param name thread name.
+     * @param contColSiteStub reference to the control collection site.
+     * @param concentSiteStub reference to the concentration site.
+     * @param assPartStub reference to the assault parties.
      */
-    public MasterThief(ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties) {
-        this.contColSite = contColSite;
-        this.concentSite = concentSite;
-        this.assaultParties = assaultParties;
+    public MasterThief(String name, ControlCollectionSiteStub contColSiteStub,
+            ConcentrationSiteStub concentSiteStub, AssaultPartyStub[] assPartStub) {
+        super(name);
         this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
+        this.contColSiteStub = contColSiteStub;
+        this.concentSiteStub = concentSiteStub;
+        this.assPartStub = assPartStub;
     }
 
 
@@ -71,29 +72,29 @@ public class MasterThief extends Thread {
         char oper;
         int assaultPartyId, roomId;
 
-        contColSite.startOperations();
+        contColSiteStub.startOperations();
 
-        while ((oper = contColSite.appraiseSit()) != 'E') {
+        while ((oper = contColSiteStub.appraiseSit()) != 'E') {
             switch (oper) {
                 case 'P':
-                    assaultPartyId = contColSite.getAvailableAssaultParty();
-                    roomId = contColSite.getAvailableRoom();
+                    assaultPartyId = contColSiteStub.getAvailableAssaultParty();
+                    roomId = contColSiteStub.getAvailableRoom();
 
-                    concentSite.prepareAssaultParty(assaultPartyId, roomId);
+                    concentSiteStub.prepareAssaultParty(assaultPartyId, roomId);
 
-                    assaultParties[assaultPartyId].sendAssaultParty();
+                    assPartStub[assaultPartyId].sendAssaultParty();
 
                     break;
 
                 case 'R':
-                    contColSite.takeARest();
+                    contColSiteStub.takeARest();
 
-                    contColSite.collectACanvas();
+                    contColSiteStub.collectACanvas();
 
                     break;
             }
         }
 
-        concentSite.sumUpResults();
+        concentSiteStub.sumUpResults();
     }
 }

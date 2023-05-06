@@ -1,6 +1,6 @@
 package clientSide.entities;
 
-import serverSide.sharedRegions.*;
+import clientSide.stubs.*;
 
 /**
  * Ordinary thief thread.
@@ -8,31 +8,6 @@ import serverSide.sharedRegions.*;
  * It simulates the ordinary thief life cycle.
  */
 public class OrdinaryThief extends Thread {
-    /**
-     * Reference to the control collection site.
-     */
-    private ControlCollectionSite contColSite;
-
-    /**
-     * Reference to the concentration site.
-     */
-    private ConcentrationSite concentSite;
-
-    /**
-     * Reference to the assault parties.
-     */
-    private AssaultParty[] assaultParties;
-
-    /**
-     * Reference to the museum.
-     */
-    private Museum museum;
-
-    /**
-     * Ordinary thief state.
-     */
-    private int ordinaryThiefState;
-
     /**
      * Ordinary thief id.
      */
@@ -44,43 +19,52 @@ public class OrdinaryThief extends Thread {
     private int maximumDisplacement;
 
     /**
+     * Ordinary thief state.
+     */
+    private int ordinaryThiefState;
+
+    /**
+     * Reference to the control collection site.
+     */
+    private ControlCollectionSiteStub contColSiteStub;
+
+    /**
+     * Reference to the concentration site.
+     */
+    private ConcentrationSiteStub concentSiteStub;
+
+    /**
+     * Reference to the assault parties.
+     */
+    private AssaultPartyStub[] assPartStub;
+
+    /**
+     * Reference to the museum.
+     */
+    private MuseumStub museumStub;
+
+    /**
      * Ordinary thief constructor.
      *
-     * @param contColSite control collection site.
-     * @param concentSite concentration site.
-     * @param assaultParties assault parties.
-     * @param museum museum.
+     * @param name thread name.
      * @param ordinaryThiefId ordinary thief id.
      * @param maximumDisplacement maximum displacement.
+     * @param contColSiteStub reference to the control collection site.
+     * @param concentSiteStub reference to the concentration site.
+     * @param assPartStub reference to the assault parties.
+     * @param museumStub reference to the museum.
      */
-    public OrdinaryThief(ControlCollectionSite contColSite, ConcentrationSite concentSite,
-            AssaultParty[] assaultParties, Museum museum, int ordinaryThiefId,
-            int maximumDisplacement) {
-        this.contColSite = contColSite;
-        this.concentSite = concentSite;
-        this.assaultParties = assaultParties;
-        this.museum = museum;
-        this.ordinaryThiefState = OrdinaryThiefStates.CONCENTRATION_SITE;
+    public OrdinaryThief(String name, int ordinaryThiefId, int maximumDisplacement,
+            ControlCollectionSiteStub contColSiteStub, ConcentrationSiteStub concentSiteStub,
+            AssaultPartyStub[] assPartStub, MuseumStub museumStub) {
+        super(name);
         this.ordinaryThiefId = ordinaryThiefId;
         this.maximumDisplacement = maximumDisplacement;
-    }
-
-    /**
-     * Get the ordinary thief state.
-     *
-     * @return ordinary thief state.
-     */
-    public int getOrdinaryThiefState() {
-        return ordinaryThiefState;
-    }
-
-    /**
-     * Set the ordinary thief state.
-     *
-     * @param ordinaryThiefState ordinary thief state.
-     */
-    public void setOrdinaryThiefState(int ordinaryThiefState) {
-        this.ordinaryThiefState = ordinaryThiefState;
+        this.ordinaryThiefState = OrdinaryThiefStates.CONCENTRATION_SITE;
+        this.contColSiteStub = contColSiteStub;
+        this.concentSiteStub = concentSiteStub;
+        this.assPartStub = assPartStub;
+        this.museumStub = museumStub;
     }
 
     /**
@@ -120,24 +104,42 @@ public class OrdinaryThief extends Thread {
     }
 
     /**
+     * Get the ordinary thief state.
+     *
+     * @return ordinary thief state.
+     */
+    public int getOrdinaryThiefState() {
+        return ordinaryThiefState;
+    }
+
+    /**
+     * Set the ordinary thief state.
+     *
+     * @param ordinaryThiefState ordinary thief state.
+     */
+    public void setOrdinaryThiefState(int ordinaryThiefState) {
+        this.ordinaryThiefState = ordinaryThiefState;
+    }
+
+    /**
      * Ordinary thief life cycle.
      */
     @Override
     public void run() {
         int assaultPartyId;
 
-        while (concentSite.amINeeded()) {
-            assaultPartyId = concentSite.prepareExcursion();
+        while (concentSiteStub.amINeeded()) {
+            assaultPartyId = concentSiteStub.prepareExcursion();
 
-            while (assaultParties[assaultPartyId].crawlIn());
+            while (assPartStub[assaultPartyId].crawlIn());
 
-            museum.rollACanvas(assaultPartyId);
+            museumStub.rollACanvas(assaultPartyId);
 
-            assaultParties[assaultPartyId].reverseDirection();
+            assPartStub[assaultPartyId].reverseDirection();
 
-            while (assaultParties[assaultPartyId].crawlOut());
+            while (assPartStub[assaultPartyId].crawlOut());
 
-            contColSite.handACanvas(assaultPartyId);
+            contColSiteStub.handACanvas(assaultPartyId);
         }
     }
 }
