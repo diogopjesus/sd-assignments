@@ -80,7 +80,7 @@ public class Museum {
      * @param roomId room id.
      * @return distance to a room.
      */
-    protected int getRoomDistance(int roomId) {
+    public synchronized int getRoomDistance(int roomId) {
         return roomDistances[roomId];
     }
 }

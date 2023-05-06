@@ -271,7 +271,7 @@ public class ConcentrationSite {
      *
      * @return called thief id.
      */
-    protected int getCalledThiefId() {
+    private int getCalledThiefId() {
         return calledThiefId;
     }
 
@@ -280,7 +280,7 @@ public class ConcentrationSite {
      *
      * @param calledThiefId called thief id.
      */
-    protected void setCalledThiefId(int calledThiefId) {
+    private void setCalledThiefId(int calledThiefId) {
         this.calledThiefId = calledThiefId;
     }
 
@@ -289,7 +289,7 @@ public class ConcentrationSite {
      *
      * @return available assault party id.
      */
-    protected int getAvailableAssaultPartyId() {
+    private int getAvailableAssaultPartyId() {
         return availableAssaultPartyId;
     }
 
@@ -298,7 +298,7 @@ public class ConcentrationSite {
      *
      * @param availableAssaultPartyId available assault party id.
      */
-    protected void setAvailableAssaultPartyId(int availableAssaultPartyId) {
+    private void setAvailableAssaultPartyId(int availableAssaultPartyId) {
         this.availableAssaultPartyId = availableAssaultPartyId;
     }
 
@@ -307,14 +307,14 @@ public class ConcentrationSite {
      *
      * @return true if operation has ended - false otherwise.
      */
-    protected boolean getEndOfOperations() {
+    private boolean getEndOfOperations() {
         return endOfOperations;
     }
 
     /**
      * Set the flag to indicate the operation ended.
      */
-    protected void setEndOfOperations() {
+    private void setEndOfOperations() {
         this.endOfOperations = true;
     }
 }

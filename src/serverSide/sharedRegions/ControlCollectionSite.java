@@ -46,11 +46,6 @@ public class ControlCollectionSite {
     private int[] thievesParties;
 
     /**
-     * Number of canvas collected.
-     */
-    private int canvasCollected;
-
-    /**
      * Queue of thieves ready to hand canvas.
      */
     private MemFIFO<Integer> handCanvasQueue;
@@ -231,7 +226,6 @@ public class ControlCollectionSite {
         /* Collect canvas */
         boolean canvas = false;
         if (isHoldingCanvas(ordinaryThiefId)) {
-            canvasCollected++;
             canvas = true;
         } else {
             setRoomEmpty(assaultParties[assaultPartyId].getTargetRoom());
@@ -312,7 +306,7 @@ public class ControlCollectionSite {
      *
      * @return Number of available assault parties.
      */
-    protected int availableAssaultParties() {
+    private int availableAssaultParties() {
         int availableAssaultParties = 0;
 
         for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
@@ -327,7 +321,7 @@ public class ControlCollectionSite {
      *
      * @return Number of available rooms.
      */
-    protected int availableRooms() {
+    private int availableRooms() {
         int availableRooms = 0;
 
         for (int i = 0; i < SimulPar.N; i++)
@@ -342,7 +336,7 @@ public class ControlCollectionSite {
      *
      * @param roomId room id.
      */
-    protected void setRoomEmpty(int roomId) {
+    private void setRoomEmpty(int roomId) {
         roomHasCanvas[roomId] = false;
     }
 
@@ -351,7 +345,7 @@ public class ControlCollectionSite {
      *
      * @return Id of an assault party on mission if there is one available, -1 otherwise.
      */
-    protected int getAssaultPartyOnMissionId() {
+    private int getAssaultPartyOnMissionId() {
         int assaultPartyOnMissionId = -1;
 
         for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
@@ -369,7 +363,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @param assaultPartyId assault party id.
      */
-    protected void setThiefToParty(int thiefId, int assaultPartyId) {
+    public synchronized void setThiefToParty(int thiefId, int assaultPartyId) {
         this.thievesParties[thiefId] = assaultPartyId;
     }
 
@@ -379,7 +373,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @return Assault party id.
      */
-    protected int getThiefParty(int thiefId) {
+    private int getThiefParty(int thiefId) {
         return this.thievesParties[thiefId];
     }
 
@@ -389,7 +383,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @param canvas true if he is holding a canvas - false, otherwise.
      */
-    protected void setHoldingCanvas(int thiefId, boolean canvas) {
+    public synchronized void setHoldingCanvas(int thiefId, boolean canvas) {
         this.holdingCanvas[thiefId] = canvas;
     }
 
@@ -399,16 +393,7 @@ public class ControlCollectionSite {
      * @param thiefId thief id.
      * @return True if the thief is holding a canvas, false otherwise.
      */
-    protected boolean isHoldingCanvas(int thiefId) {
+    public synchronized boolean isHoldingCanvas(int thiefId) {
         return this.holdingCanvas[thiefId];
-    }
-
-    /**
-     * Get the number of canvas collected.
-     *
-     * @return Number of canvas collected.
-     */
-    protected int getCanvasCollected() {
-        return canvasCollected;
     }
 }

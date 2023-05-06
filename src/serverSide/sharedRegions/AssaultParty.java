@@ -379,20 +379,11 @@ public class AssaultParty {
     }
 
     /**
-     * Get assault party id.
-     *
-     * @return Assault party id.
-     */
-    protected int getAssaultPartyId() {
-        return assaultPartyId;
-    }
-
-    /**
      * Set the assault party target room for mission.
      *
      * @param targetRoom target room id.
      */
-    protected void setTargetRoom(int targetRoom) {
+    public synchronized void setTargetRoom(int targetRoom) {
         this.targetRoom = targetRoom;
     }
 
@@ -401,7 +392,7 @@ public class AssaultParty {
      *
      * @return Target room.
      */
-    protected int getTargetRoom() {
+    public synchronized int getTargetRoom() {
         return targetRoom;
     }
 
@@ -410,7 +401,7 @@ public class AssaultParty {
      *
      * @param targetRoomDistance target room distance.
      */
-    protected void setTargetRoomDistance(int targetRoomDistance) {
+    public synchronized void setTargetRoomDistance(int targetRoomDistance) {
         this.targetRoomDistance = targetRoomDistance;
     }
 
@@ -419,7 +410,7 @@ public class AssaultParty {
      *
      * @return Target room distance.
      */
-    protected int getTargetRoomDistance() {
+    private int getTargetRoomDistance() {
         return targetRoomDistance;
     }
 
@@ -428,7 +419,7 @@ public class AssaultParty {
      *
      * @param assaultPartyState assault party state.
      */
-    protected void setAssaultPartyState(int assaultPartyState) {
+    private void setAssaultPartyState(int assaultPartyState) {
         this.assaultPartyState = assaultPartyState;
     }
 
@@ -437,7 +428,7 @@ public class AssaultParty {
      *
      * @return Assault party state.
      */
-    protected int getAssaultPartyState() {
+    private int getAssaultPartyState() {
         return assaultPartyState;
     }
 
@@ -446,7 +437,7 @@ public class AssaultParty {
      *
      * @return true if the assault party is available, false otherwise.
      */
-    protected boolean isAvailable() {
+    public synchronized boolean isAvailable() {
         return assaultPartyState == ON_HOLD;
     }
 
@@ -455,7 +446,7 @@ public class AssaultParty {
      *
      * @return true if the assault party is full, false otherwise.
      */
-    protected boolean isFull() {
+    public synchronized boolean isFull() {
         return numberOfAssaultPartyMembers == SimulPar.K;
     }
 
@@ -464,7 +455,7 @@ public class AssaultParty {
      *
      * @param thiefId thief id.
      */
-    protected void joinAssaultParty(int thiefId) {
+    public synchronized void joinAssaultParty(int thiefId) {
         try {
             /* Store thief id */
             assaultPartyMembers[numberOfAssaultPartyMembers][0] = thiefId;
@@ -482,7 +473,7 @@ public class AssaultParty {
      *
      * @param thiefId thief id.
      */
-    protected void quitAssaultParty(int thiefId) {
+    public synchronized void quitAssaultParty(int thiefId) {
         numberOfAssaultPartyMembers--;
         if (numberOfAssaultPartyMembers == 0)
             cleanAssaultParty();
@@ -491,7 +482,7 @@ public class AssaultParty {
     /**
      * Clean all the assault party data related to the concluded mission.
      */
-    protected void cleanAssaultParty() {
+    private void cleanAssaultParty() {
         this.assaultPartyState = ON_HOLD;
         this.targetRoom = NOT_A_ROOM;
         this.nextToMove = NOT_A_THIEF;
@@ -503,7 +494,7 @@ public class AssaultParty {
     /**
      * Update the next thief to move.
      */
-    protected void updateNextToMove() {
+    private void updateNextToMove() {
         /* If it is the first movement */
         if (nextToMove == NOT_A_THIEF)
             nextToMove = assaultPartyMembers[0][0];
@@ -634,7 +625,7 @@ public class AssaultParty {
      * @param thiefId thief id.
      * @param canvas true if is holding a canvas - false, otherwise.
      */
-    protected void setHoldingCanvas(int thiefId, boolean canvas) {
+    public synchronized void setHoldingCanvas(int thiefId, boolean canvas) {
         int thiefPlace = 0;
         try {
             while (assaultPartyMembers[thiefPlace][0] != thiefId)
@@ -653,7 +644,7 @@ public class AssaultParty {
      * @param thiefId thief id.
      * @return True if is holding a canvas, false otherwise.
      */
-    protected boolean isHoldingCanvas(int thiefId) {
+    public synchronized boolean isHoldingCanvas(int thiefId) {
         int thiefPlace = 0;
         try {
             while (assaultPartyMembers[thiefPlace][0] != thiefId)
@@ -671,7 +662,7 @@ public class AssaultParty {
      *
      * @return thief id.
      */
-    protected int thiefAtFront() {
+    private int thiefAtFront() {
         int thiefId = NOT_A_THIEF;
         int thiefPosition;
         if (getAssaultPartyState() == CRAWLING_IN) {
@@ -701,7 +692,7 @@ public class AssaultParty {
      *
      * @return thief id.
      */
-    protected int thiefAtBack() {
+    private int thiefAtBack() {
         int thiefId = NOT_A_THIEF;
         int thiefPosition;
         if (getAssaultPartyState() == CRAWLING_IN) {
@@ -732,7 +723,7 @@ public class AssaultParty {
      * @param thiefId thief id.
      * @return thief behind id.
      */
-    protected int thiefBehind(int thiefId) {
+    private int thiefBehind(int thiefId) {
         int thiefBehind = NOT_A_THIEF;
         int thiefBehindPosition;
         if (getAssaultPartyState() == CRAWLING_IN) {
@@ -762,7 +753,7 @@ public class AssaultParty {
      * @param thiefId thief id.
      * @return thief ahead id.
      */
-    protected int thiefAhead(int thiefId) {
+    private int thiefAhead(int thiefId) {
         int thiefAhead = NOT_A_THIEF;
         int thiefAheadPosition;
         if (getAssaultPartyState() == CRAWLING_IN) {
@@ -791,7 +782,7 @@ public class AssaultParty {
      * @param position position to be checked.
      * @return true if there's a thief in position - false, otherwise.
      */
-    protected boolean thiefInPosition(int position) {
+    private boolean thiefInPosition(int position) {
         if (position < 0 || position > getTargetRoomDistance())
             return true;
 
@@ -811,7 +802,7 @@ public class AssaultParty {
      * @param thiefId thief id.
      * @return thief element.
      */
-    protected int getThiefElement(int thiefId) {
+    public synchronized int getThiefElement(int thiefId) {
         int thiefElement = -1;
         for (int i = 0; i < SimulPar.K; i++)
             if (assaultPartyMembers[i][0] == thiefId) {
