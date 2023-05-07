@@ -11,4 +11,4 @@ echo "Decompressing data sent to the client node."
 sshpass -f password ssh $LOGIN@$NODE07 'cd test/HeistToTheMuseum ; unzip -uq dirClient.zip'
 
 echo "Executing program at the client node."
-sshpass -f password ssh $LOGIN@$NODE07 "cd test/HeistToTheMuseum/dirClient ; java clientSide.main.ClientHeistToTheMuseum $NODE01 $PORT2 $NODE02 $PORT2 $NODE03 $PORT2 $NODE04 $PORT2 $NODE05 $PORT2 $NODE06 $PORT2 stat"
+sshpass -f password ssh $LOGIN@$NODE07 "cd test/HeistToTheMuseum/dirClient ; java clientSide.main.ClientHeistToTheMuseum $NODE01 $PORT0 $NODE02 $PORT0 $NODE03 $PORT0 $NODE04 $PORT0 $NODE05 $PORT0 $NODE06 $PORT0 stat"

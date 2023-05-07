@@ -11,4 +11,4 @@ echo "Decompressing data sent to the assault party node."
 sshpass -f password ssh $LOGIN@$NODE02 'cd test/HeistToTheMuseum ; unzip -uq dirAssaultParty.zip'
 
 echo "Executing program at the server assault party."
-sshpass -f password ssh $LOGIN@$NODE02 "cd test/HeistToTheMuseum/dirAssaultParty ; java serverSide.main.ServerHeistToTheMuseumAssaultParty 1 $PORT2 $NODE06 $PORT2"
+sshpass -f password ssh $LOGIN@$NODE02 "cd test/HeistToTheMuseum/dirAssaultParty ; java serverSide.main.ServerHeistToTheMuseumAssaultParty 1 $PORT0 $NODE06 $PORT0"
