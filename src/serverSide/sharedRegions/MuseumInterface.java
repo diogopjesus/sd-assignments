@@ -42,21 +42,19 @@ public class MuseumInterface {
         /* validation of the incoming message */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.ROLACAN:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.ROLL_A_CANVAS:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= SimulPar.N))
+                if ((inMessage.getAssPartId() < 0) || (inMessage.getAssPartId() >= SimulPar.N))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
                 break;
 
-            case MessageType.GETROODIS:
+            case MessageType.GET_ROOM_DISTANCE:
                 if (inMessage.getRoomId() < 0 || inMessage.getRoomId() >= SimulPar.N)
                     throw new MessageException("Invalid Room Id!", inMessage);
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.SHUTDOWN:
                 break;
 
             default:
@@ -66,22 +64,22 @@ public class MuseumInterface {
         /* processing */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.ROLACAN:
+            case MessageType.ROLL_A_CANVAS:
                 ((MuseumClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
-                museum.rollACanvas(inMessage.getAssaultPartyId());
-                outMessage = new Message(MessageType.ROLACANDONE,
+                        .setOrdinaryThiefId(inMessage.getOtId());
+                museum.rollACanvas(inMessage.getAssPartId());
+                outMessage = new Message(MessageType.ROLL_A_CANVAS_DONE,
                         ((MuseumClientProxy) Thread.currentThread()).getOrdinaryThiefId());
                 break;
 
-            case MessageType.GETROODIS:
+            case MessageType.GET_ROOM_DISTANCE:
                 int roomDis = museum.getRoomDistance(inMessage.getRoomId());
-                outMessage = new Message(MessageType.GETROODISDONE, roomDis);
+                outMessage = new Message(MessageType.GET_ROOM_DISTANCE_DONE, roomDis);
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.SHUTDOWN:
                 museum.shutdown();
-                outMessage = new Message(MessageType.SHUTDONE);
+                outMessage = new Message(MessageType.SHUTDOWN_DONE);
                 break;
         }
 

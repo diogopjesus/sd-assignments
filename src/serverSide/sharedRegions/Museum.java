@@ -1,7 +1,8 @@
 package serverSide.sharedRegions;
 
-import clientSide.entities.*;
-import serverSide.main.SimulPar;
+import serverSide.entities.*;
+import serverSide.main.*;
+import clientSide.stubs.*;
 
 /**
  * Museum.
@@ -22,14 +23,25 @@ public class Museum {
     private int[] roomDistances = new int[SimulPar.N];
 
     /**
+     * Number of entity groups requesting the shutdown.
+     */
+    private int nEntities;
+
+    /**
+     * Reference to customer threads.
+     */
+
+    private final MuseumClientProxy[] ord;
+
+    /**
      * Reference to the general repository.
      */
-    private final GeneralRepository repos;
+    private final GeneralRepositoryStub reposStub;
 
     /**
      * Reference to the assault parties.
      */
-    private final AssaultParty[] assaultParties;
+    private final AssaultPartyStub[] assaultPartiesStub;
 
     /**
      * Museum constructor.
@@ -39,12 +51,22 @@ public class Museum {
      * @param canvasInRoom number of canvas in each room.
      * @param roomDistances distance to each room.
      */
-    public Museum(GeneralRepository repos, AssaultParty[] assaultParties, int[] canvasInRoom,
-            int[] roomDistances) {
-        this.repos = repos;
-        this.assaultParties = assaultParties;
-        this.canvasInRoom = canvasInRoom;
-        this.roomDistances = roomDistances;
+    public Museum(GeneralRepositoryStub reposStub, AssaultPartyStub[] assaultPartiesStub) {
+        ord = new MuseumClientProxy[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            ord[i] = null;
+        this.nEntities = 0;
+        this.reposStub = reposStub;
+        this.assaultPartiesStub = assaultPartiesStub;
+        canvasInRoom = new int[SimulPar.N];
+        for (int i = 0; i < SimulPar.N; i++)
+            canvasInRoom[i] =
+                    SimulPar.p + (int) Math.round(Math.random() * (SimulPar.P - SimulPar.p));
+        roomDistances = new int[SimulPar.N];
+        for (int i = 0; i < SimulPar.N; i++)
+            roomDistances[i] =
+                    SimulPar.d + (int) Math.round(Math.random() * (SimulPar.D - SimulPar.d));
+        reposStub.setRoomInfo(canvasInRoom, roomDistances);
     }
 
     /**
@@ -55,22 +77,25 @@ public class Museum {
      * @param assaultPartyId assault party id.
      */
     public synchronized void rollACanvas(int assaultPartyId) {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+        int ordId;
+        ordId = ((MuseumClientProxy) Thread.currentThread()).getOrdinaryThiefId();
+        ord[ordId] = (MuseumClientProxy) Thread.currentThread();
 
         /* Get target room from assault party */
-        int targetRoom = assaultParties[assaultPartyId].getTargetRoom();
+        int targetRoom = assaultPartiesStub[assaultPartyId].getTargetRoom();
 
         /* Define if thief is holding a canvas */
-        assaultParties[assaultPartyId].setHoldingCanvas(ot.getOrdinaryThiefId(),
+        assaultPartiesStub[assaultPartyId].setHoldingCanvas(ord[ordId].getOrdinaryThiefId(),
                 canvasInRoom[targetRoom] > 0);
 
         if (canvasInRoom[targetRoom] > 0) {
             canvasInRoom[targetRoom]--;
 
             /* Get ordinary thief element (position inside the assault party) */
-            int elementId = assaultParties[assaultPartyId].getThiefElement(ot.getOrdinaryThiefId());
+            int elementId = assaultPartiesStub[assaultPartyId]
+                    .getThiefElement(ord[ordId].getOrdinaryThiefId());
             /* Set thief holding a canvas */
-            repos.setAssaultPartyElementCanvas(assaultPartyId, elementId, true);
+            reposStub.setAssaultPartyElementCanvas(assaultPartyId, elementId, true);
         }
     }
 
@@ -90,7 +115,9 @@ public class Museum {
      * New operation.
      */
     public synchronized void shutdown() {
-        // TODO: 6/05/23
-        notifyAll(); // the barber may now terminate
+        nEntities += 1;
+        if (nEntities >= SimulPar.E)
+            ServerHeistToTheMuseumMuseum.waitConnection = false;
+        notifyAll();
     }
 }

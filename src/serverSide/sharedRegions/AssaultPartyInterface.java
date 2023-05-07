@@ -43,85 +43,75 @@ public class AssaultPartyInterface {
         /* validation of the incoming message */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.SENASSPAR:
+            case MessageType.SEND_ASSAULT_PARTY:
                 break;
 
-            case MessageType.CRAWIN:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.CRAWL_IN:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
-                if ((inMessage.getMaximumDisplacement() < SimulPar.md)
-                        || (inMessage.getMaximumDisplacement() > SimulPar.MD))
+                if ((inMessage.getMaxDis() < SimulPar.md) || (inMessage.getMaxDis() > SimulPar.MD))
                     throw new MessageException("Invalid maximum displacement!", inMessage);
                 break;
 
-            case MessageType.REVDIR:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.REVERSE_DIRECTION:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.CRAWOUT:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.CRAWL_OUT:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
-                if ((inMessage.getMaximumDisplacement() < SimulPar.md)
-                        || (inMessage.getMaximumDisplacement() > SimulPar.MD))
+                if ((inMessage.getMaxDis() < SimulPar.md) || (inMessage.getMaxDis() > SimulPar.MD))
                     throw new MessageException("Invalid maximum displacement!", inMessage);
                 break;
 
-            case MessageType.SETASSPARTARROO:
+            case MessageType.SET_TARGET_ROOM:
                 if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N))
                     throw new MessageException("Invalid room id!", inMessage);
                 break;
 
-            case MessageType.GETASSPARTARROO:
+            case MessageType.GET_TARGET_ROOM:
                 break;
 
-            case MessageType.SETASSPARTARROODIS:
+            case MessageType.SET_TARGET_ROOM_DISTANCE:
                 if ((inMessage.getDistance() < SimulPar.d)
                         || (inMessage.getDistance() > SimulPar.D)) {
                     throw new MessageException("Invalid distance!", inMessage);
                 }
                 break;
 
-            case MessageType.ASSPARISAVA:
+            case MessageType.IS_AVAILABLE:
                 break;
 
-            case MessageType.ASSPARISFUL:
+            case MessageType.IS_FULL:
                 break;
 
-            case MessageType.JOIASSPAR:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.JOIN_ASSAULT_PARTY:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.QUIASSPAR:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.QUIT_ASSAULT_PARTY:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.SETHOLCAN:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.SET_HOLDING_CANVAS:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.ISHOLCAN:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.IS_HOLDING_CANVAS:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.GETTHIELEINASSPAR:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= (SimulPar.M - 1)))
+            case MessageType.GET_THIEF_ELEMENT:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= (SimulPar.M - 1)))
                     throw new MessageException("Invalid ordinary thief id!", inMessage);
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.SHUTDOWN:
                 break;
 
             default:
@@ -132,25 +122,25 @@ public class AssaultPartyInterface {
         int thiefId;
 
         switch (inMessage.getMsgType()) {
-            case MessageType.SENASSPAR:
+            case MessageType.SEND_ASSAULT_PARTY:
                 assaultParty.sendAssaultParty();
-                outMessage = new Message(MessageType.SENASSPARDONE,
+                outMessage = new Message(MessageType.SEND_ASSAULT_PARTY_DONE,
                         ((AssaultPartyClientProxy) Thread.currentThread()).getMasterThiefState());
                 break;
 
-            case MessageType.CRAWIN:
+            case MessageType.CRAWL_IN:
                 ((AssaultPartyClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                        .setOrdinaryThiefId(inMessage.getOtId());
                 ((AssaultPartyClientProxy) Thread.currentThread())
-                        .setMaximumDisplacement(inMessage.getMaximumDisplacement());
+                        .setMaximumDisplacement(inMessage.getMaxDis());
                 if (assaultParty.crawlIn()) {
-                    outMessage = new Message(MessageType.CRAWINDONE,
+                    outMessage = new Message(MessageType.CRAWL_IN_DONE,
                             ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId(),
                             ((AssaultPartyClientProxy) Thread.currentThread())
                                     .getOrdinaryThiefState(),
                             true);
                 } else {
-                    outMessage = new Message(MessageType.CRAWINDONE,
+                    outMessage = new Message(MessageType.CRAWL_IN_DONE,
                             ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId(),
                             ((AssaultPartyClientProxy) Thread.currentThread())
                                     .getOrdinaryThiefState(),
@@ -158,28 +148,28 @@ public class AssaultPartyInterface {
                 }
                 break;
 
-            case MessageType.REVDIR:
+            case MessageType.REVERSE_DIRECTION:
                 ((AssaultPartyClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                        .setOrdinaryThiefId(inMessage.getOtId());
                 assaultParty.reverseDirection();
-                outMessage = new Message(MessageType.REVDIRDONE,
+                outMessage = new Message(MessageType.REVERSE_DIRECTION_DONE,
                         ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId(),
                         ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefState());
                 break;
 
-            case MessageType.CRAWOUT:
+            case MessageType.CRAWL_OUT:
                 ((AssaultPartyClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                        .setOrdinaryThiefId(inMessage.getOtId());
                 ((AssaultPartyClientProxy) Thread.currentThread())
-                        .setMaximumDisplacement(inMessage.getMaximumDisplacement());
+                        .setMaximumDisplacement(inMessage.getMaxDis());
                 if (assaultParty.crawlOut()) {
-                    outMessage = new Message(MessageType.CRAWOUTDONE,
+                    outMessage = new Message(MessageType.CRAWL_OUT_DONE,
                             ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId(),
                             ((AssaultPartyClientProxy) Thread.currentThread())
                                     .getOrdinaryThiefState(),
                             true);
                 } else {
-                    outMessage = new Message(MessageType.CRAWOUTDONE,
+                    outMessage = new Message(MessageType.CRAWL_OUT_DONE,
                             ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId(),
                             ((AssaultPartyClientProxy) Thread.currentThread())
                                     .getOrdinaryThiefState(),
@@ -187,63 +177,64 @@ public class AssaultPartyInterface {
                 }
                 break;
 
-            case MessageType.SETASSPARTARROO:
+            case MessageType.SET_TARGET_ROOM:
                 assaultParty.setTargetRoom(inMessage.getRoomId());
-                outMessage = new Message(MessageType.SETASSPARTARROODONE);
+                outMessage = new Message(MessageType.SET_TARGET_ROOM_DONE);
                 break;
 
-            case MessageType.GETASSPARTARROO:
+            case MessageType.GET_TARGET_ROOM:
                 int roomId = assaultParty.getTargetRoom();
-                outMessage = new Message(MessageType.GETASSPARTARROODONE, roomId);
+                outMessage = new Message(MessageType.GET_TARGET_ROOM_DONE, roomId);
                 break;
 
-            case MessageType.SETASSPARTARROODIS:
+            case MessageType.SET_TARGET_ROOM_DISTANCE:
                 assaultParty.setTargetRoomDistance(inMessage.getDistance());
-                outMessage = new Message(MessageType.SETASSPARTARROODISDONE);
+                outMessage = new Message(MessageType.SET_TARGET_ROOM_DISTANCE_DONE);
                 break;
 
-            case MessageType.ASSPARISAVA:
+            case MessageType.IS_AVAILABLE:
                 boolean isAvailable = assaultParty.isAvailable();
-                outMessage = new Message(MessageType.ASSPARISAVADONE, isAvailable);
+                outMessage = new Message(MessageType.IS_AVAILABLE_DONE, isAvailable);
                 break;
 
-            case MessageType.ASSPARISFUL:
+            case MessageType.IS_FULL:
                 boolean isFull = assaultParty.isFull();
-                outMessage = new Message(MessageType.ASSPARISFULDONE, isFull);
+                outMessage = new Message(MessageType.IS_FULL_DONE, isFull);
                 break;
 
-            case MessageType.JOIASSPAR:
-                thiefId = inMessage.getOrdinaryThiefId();
+            case MessageType.JOIN_ASSAULT_PARTY:
+                thiefId = inMessage.getOtId();
                 assaultParty.joinAssaultParty(thiefId);
-                outMessage = new Message(MessageType.JOIASSPARDONE);
+                outMessage = new Message(MessageType.JOIN_ASSAULT_PARTY_DONE);
                 break;
 
-            case MessageType.QUIASSPAR:
-                thiefId = inMessage.getOrdinaryThiefId();
+            case MessageType.QUIT_ASSAULT_PARTY:
+                thiefId = inMessage.getOtId();
                 assaultParty.quitAssaultParty(thiefId);
-                outMessage = new Message(MessageType.QUIASSPARDONE);
+                outMessage = new Message(MessageType.QUIT_ASSAULT_PARTY_DONE);
                 break;
 
-            case MessageType.SETHOLCAN:
-                thiefId = inMessage.getOrdinaryThiefId();
+            case MessageType.SET_HOLDING_CANVAS:
+                thiefId = inMessage.getOtId();
                 assaultParty.setHoldingCanvas(thiefId, inMessage.isCanvas());
-                outMessage = new Message(MessageType.SETHOLCANDONE);
+                outMessage = new Message(MessageType.SET_HOLDING_CANVAS_DONE);
                 break;
 
-            case MessageType.ISHOLCAN:
-                thiefId = inMessage.getOrdinaryThiefId();
+            case MessageType.IS_HOLDING_CANVAS:
+                thiefId = inMessage.getOtId();
                 boolean holdingCanvas = assaultParty.isHoldingCanvas(thiefId);
-                outMessage = new Message(MessageType.ISHOLCANDONE, holdingCanvas);
+                outMessage = new Message(MessageType.IS_HOLDING_CANVAS_DONE, holdingCanvas);
                 break;
 
-            case MessageType.GETTHIELEINASSPAR:
-                thiefId = inMessage.getOrdinaryThiefId();
+            case MessageType.GET_THIEF_ELEMENT:
+                thiefId = inMessage.getOtId();
                 int element = assaultParty.getThiefElement(thiefId);
-                outMessage = new Message(MessageType.GETTHIELEINASSPARDONE, element);
+                outMessage = new Message(MessageType.GET_THIEF_ELEMENT_DONE, element);
+                break;
 
-            case MessageType.SHUT:
+            case MessageType.SHUTDOWN:
                 assaultParty.shutdown();
-                outMessage = new Message(MessageType.SHUTDONE);
+                outMessage = new Message(MessageType.SHUTDOWN_DONE);
                 break;
         }
 

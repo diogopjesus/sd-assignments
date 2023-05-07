@@ -1,9 +1,11 @@
 package serverSide.sharedRegions;
 
-import genclass.*;
-import serverSide.main.SimulPar;
+import serverSide.entities.ControlCollectionSiteClientProxy;
+import serverSide.main.*;
 import clientSide.entities.*;
+import clientSide.stubs.*;
 import commInfra.*;
+import genclass.GenericIO;
 
 /**
  * Control Collection Site.
@@ -15,6 +17,21 @@ import commInfra.*;
  * blocking points, one per each ordinary thief, where he is waits to hand canvas.
  */
 public class ControlCollectionSite {
+    /**
+     * Reference to barber threads.
+     */
+    private ControlCollectionSiteClientProxy mas;
+
+    /**
+     * Reference to customer threads.
+     */
+    private final ControlCollectionSiteClientProxy[] ord;
+
+    /**
+     * Number of entity groups requesting the shutdown.
+     */
+    private int nEntities;
+
     /**
      * Flag to indicate that there is not a party.
      */
@@ -33,12 +50,12 @@ public class ControlCollectionSite {
     /**
      * Reference to the general repository.
      */
-    private GeneralRepository repos;
+    private GeneralRepositoryStub reposStub;
 
     /**
      * Reference to the assault parties.
      */
-    private AssaultParty[] assaultParties;
+    private AssaultPartyStub[] assaultPartiesStub;
 
     /**
      * Indicates the party where a thief belongs.
@@ -76,9 +93,15 @@ public class ControlCollectionSite {
      * @param repos general repository.
      * @param assaultParties assault parties.
      */
-    public ControlCollectionSite(GeneralRepository repos, AssaultParty[] assaultParties) {
-        this.repos = repos;
-        this.assaultParties = assaultParties;
+    public ControlCollectionSite(GeneralRepositoryStub reposStub,
+            AssaultPartyStub[] assaultPartiesStub) {
+        mas = null;
+        ord = new ControlCollectionSiteClientProxy[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            ord[i] = null;
+        this.nEntities = 0;
+        this.reposStub = reposStub;
+        this.assaultPartiesStub = assaultPartiesStub;
         this.thievesParties = new int[SimulPar.M - 1];
         for (int i = 0; i < SimulPar.M - 1; i++)
             this.thievesParties[i] = NOT_A_PARTY;
@@ -106,10 +129,10 @@ public class ControlCollectionSite {
      * It is called by the master thief to start the operations.
      */
     public synchronized void startOperations() {
-        MasterThief mt = (MasterThief) Thread.currentThread();
+        mas = (ControlCollectionSiteClientProxy) Thread.currentThread();
 
-        mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        repos.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        mas.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        reposStub.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
     }
 
     /**
@@ -130,7 +153,7 @@ public class ControlCollectionSite {
         if ((availableAssaultParties() == 0)
                 || ((availableAssaultParties() == ((SimulPar.M - 1) / SimulPar.K) - 1)
                         && (availableRooms() == 1)
-                        && (assaultParties[getAssaultPartyOnMissionId()]
+                        && (assaultPartiesStub[getAssaultPartyOnMissionId()]
                                 .getTargetRoom() == getAvailableRoom()))
                 || ((availableAssaultParties() == ((SimulPar.M - 1) / SimulPar.K) - 1)
                         && (availableRooms() == 0)))
@@ -151,10 +174,10 @@ public class ControlCollectionSite {
      * site.
      */
     public synchronized void takeARest() {
-        MasterThief mt = (MasterThief) Thread.currentThread();
+        mas = (ControlCollectionSiteClientProxy) Thread.currentThread();
 
-        mt.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
-        repos.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
+        mas.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
+        reposStub.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
 
         while (readyToHandCanvas == 0) {
             try {
@@ -174,11 +197,13 @@ public class ControlCollectionSite {
      * @param assaultPartyId assault party id.
      */
     public synchronized void handACanvas(int assaultPartyId) {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+        int ordId;
+        ordId = ((ControlCollectionSiteClientProxy) Thread.currentThread()).getOrdinaryThiefId();
+        ord[ordId] = (ControlCollectionSiteClientProxy) Thread.currentThread();
 
         /* Add thief to the waiting queue */
         try {
-            handCanvasQueue.write(ot.getOrdinaryThiefId());
+            handCanvasQueue.write(ord[ordId].getOrdinaryThiefId());
         } catch (MemException e) {
             GenericIO.writelnString("Instantiation of waiting FIFO failed: " + e.getMessage());
             System.exit(1);
@@ -186,13 +211,14 @@ public class ControlCollectionSite {
         readyToHandCanvas++;
 
         /* Signal if he is holding a canvas or not */
-        boolean canvas = assaultParties[assaultPartyId].isHoldingCanvas(ot.getOrdinaryThiefId());
-        setHoldingCanvas(ot.getOrdinaryThiefId(), canvas);
+        boolean canvas =
+                assaultPartiesStub[assaultPartyId].isHoldingCanvas(ord[ordId].getOrdinaryThiefId());
+        setHoldingCanvas(ord[ordId].getOrdinaryThiefId(), canvas);
 
         /* Notify master thief that is ready to hand a canvas */
         notifyAll();
 
-        while (!readyToCollectCanvas[ot.getOrdinaryThiefId()]) {
+        while (!readyToCollectCanvas[ord[ordId].getOrdinaryThiefId()]) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -200,7 +226,7 @@ public class ControlCollectionSite {
             }
         }
 
-        readyToCollectCanvas[ot.getOrdinaryThiefId()] = false;
+        readyToCollectCanvas[ord[ordId].getOrdinaryThiefId()] = false;
     }
 
     /**
@@ -210,7 +236,7 @@ public class ControlCollectionSite {
      * After collecting the canvas, he wakes up the ordinary thief to proceed operations.
      */
     public synchronized void collectACanvas() {
-        MasterThief mt = (MasterThief) Thread.currentThread();
+        mas = (ControlCollectionSiteClientProxy) Thread.currentThread();
 
         int ordinaryThiefId = NOT_A_THIEF;
         try {
@@ -225,21 +251,21 @@ public class ControlCollectionSite {
 
         /* Collect canvas */
         if (!isHoldingCanvas(ordinaryThiefId)) {
-            setRoomEmpty(assaultParties[assaultPartyId].getTargetRoom());
+            setRoomEmpty(assaultPartiesStub[assaultPartyId].getTargetRoom());
         }
 
-        int element = assaultParties[assaultPartyId].getThiefElement(ordinaryThiefId);
+        int element = assaultPartiesStub[assaultPartyId].getThiefElement(ordinaryThiefId);
 
         /* Disassociate thief to the assault party */
-        assaultParties[assaultPartyId].quitAssaultParty(ordinaryThiefId);
+        assaultPartiesStub[assaultPartyId].quitAssaultParty(ordinaryThiefId);
         setThiefToParty(ordinaryThiefId, NOT_A_PARTY);
 
         /* Notify thief that their canvas was colleted */
         readyToCollectCanvas[ordinaryThiefId] = true;
         notifyAll();
 
-        mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        repos.endAssaultPartyElementMission(assaultPartyId, element);
+        mas.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        reposStub.endAssaultPartyElementMission(assaultPartyId, element);
     }
 
     /**
@@ -251,7 +277,7 @@ public class ControlCollectionSite {
         int availableAssaultParty = NOT_A_PARTY;
 
         for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
-            if (assaultParties[i].isAvailable()) {
+            if (assaultPartiesStub[i].isAvailable()) {
                 availableAssaultParty = i;
                 break;
             }
@@ -272,7 +298,7 @@ public class ControlCollectionSite {
                 /* Check if any assault party is targeting that room */
                 int assPart = 0;
                 for (assPart = 0; assPart < (SimulPar.M - 1) / SimulPar.K; assPart++) {
-                    if (assaultParties[assPart].getTargetRoom() == i) {
+                    if (assaultPartiesStub[assPart].getTargetRoom() == i) {
                         break;
                     }
                 }
@@ -298,6 +324,20 @@ public class ControlCollectionSite {
     }
 
     /**
+     * Operation end of work.
+     */
+    public synchronized void endOperation() {
+        while (nEntities == 0) { /* the master thief waits for the termination of the customers */
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+        if (mas != null)
+            mas.interrupt();
+    }
+
+    /**
      * Get the number of available assault parties.
      *
      * @return Number of available assault parties.
@@ -306,7 +346,7 @@ public class ControlCollectionSite {
         int availableAssaultParties = 0;
 
         for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
-            if (assaultParties[i].isAvailable())
+            if (assaultPartiesStub[i].isAvailable())
                 availableAssaultParties++;
 
         return availableAssaultParties;
@@ -345,7 +385,7 @@ public class ControlCollectionSite {
         int assaultPartyOnMissionId = -1;
 
         for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
-            if (!assaultParties[i].isAvailable()) {
+            if (!assaultPartiesStub[i].isAvailable()) {
                 assaultPartyOnMissionId = i;
                 break;
             }
@@ -369,8 +409,10 @@ public class ControlCollectionSite {
      * New operation.
      */
     public synchronized void shutdown() {
-        // TODO: 6/05/23
-        notifyAll(); // the barber may now terminate
+        nEntities += 1;
+        if (nEntities >= SimulPar.E)
+            ServerHeistToTheMuseumControlCollectionSite.waitConnection = false;
+        notifyAll();
     }
 
     /**

@@ -45,69 +45,65 @@ public class GeneralRepositoryInterface {
 
         /* validation of the incoming message */
         switch (inMessage.getMsgType()) {
-            case MessageType.SETMASTHISTA:
-                if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST)
-                        || (inMessage
-                                .getMasterThiefState() >= MasterThiefStates.PRESENTING_THE_REPORT))
+            case MessageType.SET_MASTER_THIEF_STATE:
+                if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST)
+                        || (inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT))
                     throw new MessageException("Invalid Master Thief State!", inMessage);
                 break;
 
-            case MessageType.SETORDTHISTA:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.SET_ORDINARY_THIEF_STATE:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                        || (inMessage
-                                .getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE))
+                if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                        || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE))
                     throw new MessageException("Invalid Ordinary Thief State!", inMessage);
                 break;
 
-            case MessageType.SETASSPARROOID:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+            case MessageType.SET_ASSAULT_PARTY_ROOM_ID:
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
                 if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N))
                     throw new MessageException("Invalid Room Id!", inMessage);
                 break;
 
-            case MessageType.SETASSPARELEID:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_ID:
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElementId() < 0) || (inMessage.getElementId() >= SimulPar.K))
+                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
                     throw new MessageException("Invalid Element Id!", inMessage);
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
                 break;
 
-            case MessageType.SETASSPARELEPOS:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_POSITION:
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElementId() < 0) || (inMessage.getElementId() >= SimulPar.K))
+                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
                     throw new MessageException("Invalid Element Id!", inMessage);
-                if ((inMessage.getPosition() < 0) || (inMessage.getPosition() > SimulPar.D))
+                if ((inMessage.getPos() < 0) || (inMessage.getPos() > SimulPar.D))
                     throw new MessageException("Invalid Position!", inMessage);
                 break;
 
-            case MessageType.SETASSPARELECAN:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_CANVAS:
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElementId() < 0) || (inMessage.getElementId() >= SimulPar.K))
+                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
                     throw new MessageException("Invalid Element Id!", inMessage);
                 break;
 
-            case MessageType.ENDASSPARELEMIS:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+            case MessageType.END_ASSAULT_PARTY_ELEMENT_MISSION:
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElementId() < 0) || (inMessage.getElementId() >= SimulPar.K))
+                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
                     throw new MessageException("Invalid Element Id!", inMessage);
                 break;
 
-            case MessageType.SETROOINF:
+            case MessageType.SET_ROOM_INFO:
                 int[] numPaint = inMessage.getNumPaint();
                 int[] roomDist = inMessage.getRoomDist();
                 for (int i = 0; i < SimulPar.N; i++) {
@@ -118,60 +114,78 @@ public class GeneralRepositoryInterface {
                 }
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.INIT_SIMULATION:
+                String logFileName = inMessage.getfName();
+                if ((logFileName == null))
+                    throw new MessageException("Invalid Log File Name!", inMessage);
+                int[] maxDis = inMessage.getMaxDisArray();
+                for (int i = 0; i < SimulPar.M - 1; i++) {
+                    if ((maxDis[i] < SimulPar.md) || (maxDis[i] > SimulPar.MD))
+                        throw new MessageException("Invalid Maximum Displacement!", inMessage);
+                }
                 break;
+
+            case MessageType.SHUTDOWN:
+                break;
+
+            default:
+                throw new MessageException("Invalid message type!", inMessage);
         }
 
         /* processing */
         switch (inMessage.getMsgType()) {
-            case MessageType.SETMASTHISTA:
-                repos.setMasterThiefState(inMessage.getMasterThiefState());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_MASTER_THIEF_STATE:
+                repos.setMasterThiefState(inMessage.getMtState());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETORDTHISTA:
-                repos.setOrdinaryThiefState(inMessage.getOrdinaryThiefId(),
-                        inMessage.getOrdinaryThiefState());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_ORDINARY_THIEF_STATE:
+                repos.setOrdinaryThiefState(inMessage.getOtId(), inMessage.getOtState());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETASSPARROOID:
-                repos.setAssaultPartyRoomId(inMessage.getAssaultPartyId(), inMessage.getRoomId());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_ASSAULT_PARTY_ROOM_ID:
+                repos.setAssaultPartyRoomId(inMessage.getAssPartId(), inMessage.getRoomId());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETASSPARELEID:
-                repos.setAssaultPartyElementId(inMessage.getAssaultPartyId(),
-                        inMessage.getElementId(), inMessage.getOrdinaryThiefId());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_ID:
+                repos.setAssaultPartyElementId(inMessage.getAssPartId(), inMessage.getElemId(),
+                        inMessage.getOtId());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETASSPARELEPOS:
-                repos.setAssaultPartyElementPosition(inMessage.getAssaultPartyId(),
-                        inMessage.getElementId(), inMessage.getPosition());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_POSITION:
+                repos.setAssaultPartyElementPosition(inMessage.getAssPartId(),
+                        inMessage.getElemId(), inMessage.getPos());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETASSPARELECAN:
-                repos.setAssaultPartyElementCanvas(inMessage.getAssaultPartyId(),
-                        inMessage.getElementId(), inMessage.isCanvas());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.SET_ASSAULT_PARTY_ELEMENT_CANVAS:
+                repos.setAssaultPartyElementCanvas(inMessage.getAssPartId(), inMessage.getElemId(),
+                        inMessage.isCanvas());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.ENDASSPARELEMIS:
-                repos.endAssaultPartyElementMission(inMessage.getAssaultPartyId(),
-                        inMessage.getElementId());
-                outMessage = new Message(MessageType.SACK);
+            case MessageType.END_ASSAULT_PARTY_ELEMENT_MISSION:
+                repos.endAssaultPartyElementMission(inMessage.getAssPartId(),
+                        inMessage.getElemId());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SETROOINF:
+            case MessageType.SET_ROOM_INFO:
                 repos.setRoomInfo(inMessage.getNumPaint(), inMessage.getRoomDist());
-                outMessage = new Message(MessageType.SACK);
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.INIT_SIMULATION:
+                repos.initSimul(inMessage.getfName(), inMessage.getMaxDisArray());
+                outMessage = new Message(MessageType.INIT_SIMULATION_DONE);
+                break;
+
+            case MessageType.SHUTDOWN:
                 repos.shutdown();
-                outMessage = new Message(MessageType.SHUTDONE);
+                outMessage = new Message(MessageType.SHUTDOWN_DONE);
                 break;
         }
 

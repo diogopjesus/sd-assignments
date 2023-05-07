@@ -14,6 +14,11 @@ import java.util.Objects;
  */
 public class GeneralRepository {
     /**
+     * Number of entity groups requesting the shutdown.
+     */
+    private int nEntities;
+
+    /**
      * Name of the logging file.
      */
     private String logFileName;
@@ -80,6 +85,8 @@ public class GeneralRepository {
      * Instantiation of a general repository object.
      */
     public GeneralRepository() {
+        this.nEntities = 0;
+
         logFileName = "logger";
 
         /* Store master thief initial info */
@@ -122,8 +129,6 @@ public class GeneralRepository {
      *
      * @param logFileName name of the logging file.
      * @param maxDis maximum displacement of the ordinary thieves.
-     * @param numPaint number of paintings in each room.
-     * @param roomDist distance to each room.
      */
     public synchronized void initSimul(String logFileName, int[] maxDis) {
         /* Store the logging filename */
@@ -374,8 +379,10 @@ public class GeneralRepository {
      * New operation.
      */
     public synchronized void shutdown() {
-        // TODO: 6/05/23
-        notifyAll(); // the barber may now terminate
+        nEntities += 1;
+        if (nEntities >= SimulPar.E)
+            ServerHeistToTheMuseumGeneralRepository.waitConnection = false;
+        notifyAll();
     }
 
     /**

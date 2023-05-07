@@ -1,8 +1,10 @@
 package serverSide.sharedRegions;
 
+import serverSide.entities.AssaultPartyClientProxy;
+import serverSide.main.*;
 import clientSide.entities.*;
-import genclass.*;
-import serverSide.main.SimulPar;
+import clientSide.stubs.*;
+import genclass.GenericIO;
 
 /**
  * Assault Party.
@@ -15,6 +17,21 @@ import serverSide.main.SimulPar;
  * move outside the museum and moves outside the museum.
  */
 public class AssaultParty {
+    /**
+     * Reference to barber threads.
+     */
+    private AssaultPartyClientProxy mas;
+
+    /**
+     * Reference to customer threads.
+     */
+    private final AssaultPartyClientProxy[] ord;
+
+    /**
+     * Number of entity groups requesting the shutdown.
+     */
+    private int nEntities;
+
     /**
      * Flag to indicate that there is not a thief to be called.
      */
@@ -53,7 +70,7 @@ public class AssaultParty {
     /**
      * Reference to the general repository.
      */
-    private final GeneralRepository repos;
+    private final GeneralRepositoryStub reposStub;
 
     /**
      * Assault party id.
@@ -100,11 +117,16 @@ public class AssaultParty {
     /**
      * Assault party constructor.
      *
-     * @param repos general repository.
+     * @param reposStub reference to the stub of the general repository.
      * @param assaultPartyId assault party id.
      */
-    public AssaultParty(GeneralRepository repos, int assaultPartyId) {
-        this.repos = repos;
+    public AssaultParty(GeneralRepositoryStub reposStub, int assaultPartyId) {
+        mas = null;
+        ord = new AssaultPartyClientProxy[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            ord[i] = null;
+        this.nEntities = 0;
+        this.reposStub = reposStub;
         this.assaultPartyId = assaultPartyId;
         this.assaultPartyState = ON_HOLD;
         this.targetRoom = NOT_A_ROOM;
@@ -120,7 +142,7 @@ public class AssaultParty {
      * It is called by the master thief to send the assault party on mission
      */
     public synchronized void sendAssaultParty() {
-        MasterThief mt = (MasterThief) Thread.currentThread();
+        mas = (AssaultPartyClientProxy) Thread.currentThread();
 
         setAssaultPartyState(CRAWLING_IN);
 
@@ -130,8 +152,8 @@ public class AssaultParty {
         /* Notify first thief to start crawling */
         notifyAll();
 
-        mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        repos.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        mas.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
+        reposStub.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
     }
 
     /**
@@ -142,10 +164,12 @@ public class AssaultParty {
      * @return true if can continue to crawl in - false otherwise.
      */
     public synchronized boolean crawlIn() {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+        int ordId;
+        ordId = ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId();
+        ord[ordId] = (AssaultPartyClientProxy) Thread.currentThread();
 
         /* Wait until is time to move */
-        while (nextToMove != ot.getOrdinaryThiefId()) {
+        while (nextToMove != ord[ordId].getOrdinaryThiefId()) {
             try {
                 wait();
             } catch (InterruptedException ie) {
@@ -158,31 +182,31 @@ public class AssaultParty {
         int thiefPosition, thiefMovement, thiefNextPosition;
         do {
             moved = false;
-            thiefPosition = getThiefPosition(ot.getOrdinaryThiefId());
+            thiefPosition = getThiefPosition(ord[ordId].getOrdinaryThiefId());
             thiefMovement = 0;
 
             /* If the thieves are at the start */
             if (thiefAtFront() == thiefAtBack()) {
-                thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                 moved = true;
             }
             /* If thief is at the front of the pack */
-            else if (thiefAtFront() == ot.getOrdinaryThiefId()) {
+            else if (thiefAtFront() == ord[ordId].getOrdinaryThiefId()) {
                 /* Get thief behind him */
-                int thiefBehind = thiefBehind(ot.getOrdinaryThiefId());
+                int thiefBehind = thiefBehind(ord[ordId].getOrdinaryThiefId());
                 /* Check if the distance between the 2 is less than the maximum separation limit */
                 if (thiefPosition - getThiefPosition(thiefBehind) < SimulPar.S) {
                     /* Maximum movement allowed to thief */
                     thiefMovement =
                             Math.min(SimulPar.S - (thiefPosition - getThiefPosition(thiefBehind)),
-                                    ot.getMaximumDisplacement());
+                                    ord[ordId].getMaximumDisplacement());
                     moved = true;
                 }
             }
             /* If thief is at the back of the pack */
-            else if (thiefAtBack() == ot.getOrdinaryThiefId()) {
+            else if (thiefAtBack() == ord[ordId].getOrdinaryThiefId()) {
                 /* Maximum movement allowed to thief */
-                thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                 /* Search for the furthest available position */
                 while (thiefInPosition(thiefPosition + thiefMovement) && thiefMovement > 0)
                     thiefMovement--;
@@ -192,12 +216,12 @@ public class AssaultParty {
             /* If the thief is in the middle of the pack */
             else {
                 /* Get thieves behind and ahead */
-                int thiefBehind = thiefBehind(ot.getOrdinaryThiefId());
-                int thiefAhead = thiefAhead(ot.getOrdinaryThiefId());
+                int thiefBehind = thiefBehind(ord[ordId].getOrdinaryThiefId());
+                int thiefAhead = thiefAhead(ord[ordId].getOrdinaryThiefId());
                 /* if thief ahead and behind are separated by less than the maximum separation */
                 if (getThiefPosition(thiefAhead) - getThiefPosition(thiefBehind) <= SimulPar.S) {
                     /* Maximum movement allowed to thief */
-                    thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                    thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                     /* Search for the furthest available position */
                     while (thiefInPosition(thiefPosition + thiefMovement) && thiefMovement > 0)
                         thiefMovement--;
@@ -207,7 +231,7 @@ public class AssaultParty {
                     /* Maximum movement allowed to thief */
                     thiefMovement =
                             Math.min(SimulPar.S - (thiefPosition - getThiefPosition(thiefBehind)),
-                                    ot.getMaximumDisplacement());
+                                    ord[ordId].getMaximumDisplacement());
                     /* Search for the furthest available position */
                     while (thiefInPosition(thiefPosition + thiefMovement) && thiefMovement > 0)
                         thiefMovement--;
@@ -220,9 +244,9 @@ public class AssaultParty {
             thiefNextPosition = Math.min(thiefPosition + thiefMovement, getTargetRoomDistance());
             if (moved) {
                 /* Update thief position */
-                updateThiefPosition(ot.getOrdinaryThiefId(), thiefNextPosition);
-                repos.setAssaultPartyElementPosition(assaultPartyId,
-                        getThiefElement(ot.getOrdinaryThiefId()), thiefNextPosition);
+                updateThiefPosition(ord[ordId].getOrdinaryThiefId(), thiefNextPosition);
+                reposStub.setAssaultPartyElementPosition(assaultPartyId,
+                        getThiefElement(ord[ordId].getOrdinaryThiefId()), thiefNextPosition);
             }
 
             /* Update moved to check if thief already arrived at room */
@@ -236,10 +260,11 @@ public class AssaultParty {
         notifyAll();
 
         /* Return wether the thief arrived at the room or not */
-        if (getThiefPosition(ot.getOrdinaryThiefId()) >= getTargetRoomDistance()) {
+        if (getThiefPosition(ord[ordId].getOrdinaryThiefId()) >= getTargetRoomDistance()) {
             /* Change ordinary thief state */
-            ot.setOrdinaryThiefState(OrdinaryThiefStates.AT_A_ROOM);
-            repos.setOrdinaryThiefState(ot.getOrdinaryThiefId(), OrdinaryThiefStates.AT_A_ROOM);
+            ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.AT_A_ROOM);
+            reposStub.setOrdinaryThiefState(ord[ordId].getOrdinaryThiefId(),
+                    OrdinaryThiefStates.AT_A_ROOM);
             return false;
         }
         return true;
@@ -251,7 +276,9 @@ public class AssaultParty {
      * It is called by the ordinary thief to reverse the crawling direction from in to out.
      */
     public synchronized void reverseDirection() {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+        int ordId;
+        ordId = ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId();
+        ord[ordId] = (AssaultPartyClientProxy) Thread.currentThread();
 
         numberOfReversedThieves++;
 
@@ -262,8 +289,9 @@ public class AssaultParty {
             notifyAll();
         }
 
-        ot.setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_OUTWARDS);
-        repos.setOrdinaryThiefState(ot.getOrdinaryThiefId(), OrdinaryThiefStates.CRAWLING_OUTWARDS);
+        ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_OUTWARDS);
+        reposStub.setOrdinaryThiefState(ord[ordId].getOrdinaryThiefId(),
+                OrdinaryThiefStates.CRAWLING_OUTWARDS);
     }
 
     /**
@@ -274,10 +302,12 @@ public class AssaultParty {
      * @return true if can continue to crawl out - false otherwise.
      */
     public synchronized boolean crawlOut() {
-        OrdinaryThief ot = (OrdinaryThief) Thread.currentThread();
+        int ordId;
+        ordId = ((AssaultPartyClientProxy) Thread.currentThread()).getOrdinaryThiefId();
+        ord[ordId] = (AssaultPartyClientProxy) Thread.currentThread();
 
         /* Wait until is time to move */
-        while (nextToMove != ot.getOrdinaryThiefId()) {
+        while (nextToMove != ord[ordId].getOrdinaryThiefId()) {
             try {
                 wait();
             } catch (InterruptedException ie) {
@@ -290,31 +320,31 @@ public class AssaultParty {
         int thiefPosition, thiefMovement, thiefNextPosition;
         do {
             moved = false;
-            thiefPosition = getThiefPosition(ot.getOrdinaryThiefId());
+            thiefPosition = getThiefPosition(ord[ordId].getOrdinaryThiefId());
             thiefMovement = 0;
 
             /* If the thieves are at the start */
             if (thiefAtFront() == thiefAtBack()) {
-                thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                 moved = true;
             }
             /* If thief is at the front of the pack */
-            else if (thiefAtFront() == ot.getOrdinaryThiefId()) {
+            else if (thiefAtFront() == ord[ordId].getOrdinaryThiefId()) {
                 /* Get thief behind him */
-                int thiefBehind = thiefBehind(ot.getOrdinaryThiefId());
+                int thiefBehind = thiefBehind(ord[ordId].getOrdinaryThiefId());
                 /* Check if the distance between the 2 is less than the maximum separation limit */
                 if (getThiefPosition(thiefBehind) - thiefPosition < SimulPar.S) {
                     /* Maximum movement allowed to thief */
                     thiefMovement =
                             Math.min(SimulPar.S - (getThiefPosition(thiefBehind) - thiefPosition),
-                                    ot.getMaximumDisplacement());
+                                    ord[ordId].getMaximumDisplacement());
                     moved = true;
                 }
             }
             /* If thief is at the back of the pack */
-            else if (thiefAtBack() == ot.getOrdinaryThiefId()) {
+            else if (thiefAtBack() == ord[ordId].getOrdinaryThiefId()) {
                 /* Maximum movement allowed to thief */
-                thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                 /* Search for the furthest available position */
                 while (thiefInPosition(thiefPosition - thiefMovement) && thiefMovement > 0)
                     thiefMovement--;
@@ -324,12 +354,12 @@ public class AssaultParty {
             /* If the thief is in the middle of the pack */
             else {
                 /* Get thieves behind and ahead */
-                int thiefBehind = thiefBehind(ot.getOrdinaryThiefId());
-                int thiefAhead = thiefAhead(ot.getOrdinaryThiefId());
+                int thiefBehind = thiefBehind(ord[ordId].getOrdinaryThiefId());
+                int thiefAhead = thiefAhead(ord[ordId].getOrdinaryThiefId());
                 /* if thief ahead and behind are separated by less than the maximum separation */
                 if (getThiefPosition(thiefBehind) - getThiefPosition(thiefAhead) <= SimulPar.S) {
                     /* Maximum movement allowed to thief */
-                    thiefMovement = Math.min(SimulPar.S, ot.getMaximumDisplacement());
+                    thiefMovement = Math.min(SimulPar.S, ord[ordId].getMaximumDisplacement());
                     /* Search for the furthest available position */
                     while (thiefInPosition(thiefPosition - thiefMovement) && thiefMovement > 0)
                         thiefMovement--;
@@ -339,7 +369,7 @@ public class AssaultParty {
                     /* Maximum movement allowed to thief */
                     thiefMovement =
                             Math.min(SimulPar.S - (getThiefPosition(thiefBehind) - thiefPosition),
-                                    ot.getMaximumDisplacement());
+                                    ord[ordId].getMaximumDisplacement());
                     /* Search for the furthest available position */
                     while (thiefInPosition(thiefPosition - thiefMovement) && thiefMovement > 0)
                         thiefMovement--;
@@ -352,9 +382,9 @@ public class AssaultParty {
             thiefNextPosition = Math.max(thiefPosition - thiefMovement, 0);
             if (moved) {
                 /* Update thief position */
-                updateThiefPosition(ot.getOrdinaryThiefId(), thiefNextPosition);
-                repos.setAssaultPartyElementPosition(assaultPartyId,
-                        getThiefElement(ot.getOrdinaryThiefId()), thiefNextPosition);
+                updateThiefPosition(ord[ordId].getOrdinaryThiefId(), thiefNextPosition);
+                reposStub.setAssaultPartyElementPosition(assaultPartyId,
+                        getThiefElement(ord[ordId].getOrdinaryThiefId()), thiefNextPosition);
             }
 
             /* Update moved to check if thief already arrived at room */
@@ -368,9 +398,9 @@ public class AssaultParty {
         notifyAll();
 
         /* Return wether the thief arrived at the controlSite or not */
-        if (getThiefPosition(ot.getOrdinaryThiefId()) <= 0) {
-            ot.setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
-            repos.setOrdinaryThiefState(ot.getOrdinaryThiefId(),
+        if (getThiefPosition(ord[ordId].getOrdinaryThiefId()) <= 0) {
+            ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.COLLECTION_SITE);
+            reposStub.setOrdinaryThiefState(ord[ordId].getOrdinaryThiefId(),
                     OrdinaryThiefStates.COLLECTION_SITE);
             return false;
         }
@@ -411,8 +441,10 @@ public class AssaultParty {
      * New operation.
      */
     public synchronized void shutdown() {
-        // TODO: 6/05/23
-        notifyAll(); // the barber may now terminate
+        nEntities += 1;
+        if (nEntities >= SimulPar.E)
+            ServerHeistToTheMuseumAssaultParty.waitConnection = false;
+        notifyAll();
     }
 
     /**

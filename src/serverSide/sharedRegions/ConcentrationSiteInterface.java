@@ -44,33 +44,30 @@ public class ConcentrationSiteInterface {
         /* validation of the incoming message */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.AMINEE:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.AM_I_NEEDED:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                        || (inMessage
-                                .getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE))
+                if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                        || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE))
                     throw new MessageException("Invalid Ordinary Thief State!", inMessage);
                 break;
 
-            case MessageType.PREASSPAR:
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= SimulPar.K))
+            case MessageType.PREPARE_ASSAULT_PARTY:
+                if ((inMessage.getAssPartId() < 0) || (inMessage.getAssPartId() >= SimulPar.K))
                     throw new MessageException("Invalid Assault Party Id!", inMessage);
                 if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N))
                     throw new MessageException("Invalid Room Id!", inMessage);
                 break;
 
-            case MessageType.PREEXC:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.PREPARE_EXCURSION:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-
-            case MessageType.SUMUPRES:
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.SUM_UP_RESULTS:
+                break;
+
+            case MessageType.SHUTDOWN:
                 break;
 
             default:
@@ -80,13 +77,13 @@ public class ConcentrationSiteInterface {
         /* processing */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.AMINEE:
+            case MessageType.AM_I_NEEDED:
                 ((ConcentrationSiteClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                        .setOrdinaryThiefId(inMessage.getOtId());
                 ((ConcentrationSiteClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+                        .setOrdinaryThiefState(inMessage.getOtState());
                 boolean isNeeded = concentrationSite.amINeeded();
-                outMessage = new Message(MessageType.AMINEEDONE,
+                outMessage = new Message(MessageType.AM_I_NEEDED_DONE,
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
                                 .getOrdinaryThiefId(),
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
@@ -94,19 +91,19 @@ public class ConcentrationSiteInterface {
                         isNeeded);
                 break;
 
-            case MessageType.PREASSPAR:
-                concentrationSite.prepareAssaultParty(inMessage.getAssaultPartyId(),
+            case MessageType.PREPARE_ASSAULT_PARTY:
+                concentrationSite.prepareAssaultParty(inMessage.getAssPartId(),
                         inMessage.getRoomId());
-                outMessage = new Message(MessageType.PREASSPARDONE,
+                outMessage = new Message(MessageType.PREPARE_ASSAULT_PARTY_DONE,
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
                                 .getMasterThiefState());
                 break;
 
-            case MessageType.PREEXC:
+            case MessageType.PREPARE_EXCURSION:
                 ((ConcentrationSiteClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                        .setOrdinaryThiefId(inMessage.getOtId());
                 int assPartId = concentrationSite.prepareExcursion();
-                outMessage = new Message(MessageType.PREEXCDONE,
+                outMessage = new Message(MessageType.PREPARE_EXCURSION_DONE,
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
                                 .getOrdinaryThiefId(),
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
@@ -114,16 +111,16 @@ public class ConcentrationSiteInterface {
                         assPartId);
                 break;
 
-            case MessageType.SUMUPRES:
+            case MessageType.SUM_UP_RESULTS:
                 concentrationSite.sumUpResults();
-                outMessage = new Message(MessageType.SUMUPRESDONE,
+                outMessage = new Message(MessageType.SUM_UP_RESULTS_DONE,
                         ((ConcentrationSiteClientProxy) Thread.currentThread())
                                 .getMasterThiefState());
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.SHUTDOWN:
                 concentrationSite.shutdown();
-                outMessage = new Message(MessageType.SHUTDONE);
+                outMessage = new Message(MessageType.SHUTDOWN_DONE);
                 break;
         }
 

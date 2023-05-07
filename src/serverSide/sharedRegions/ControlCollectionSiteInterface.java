@@ -43,43 +43,44 @@ public class ControlCollectionSiteInterface {
         /* validation of the incoming message */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.STAOPE:
+            case MessageType.START_OPERATIONS:
                 break;
 
-            case MessageType.APPSIT:
+            case MessageType.APPRAISE_SIT:
                 break;
 
-            case MessageType.TAKARES:
+            case MessageType.TAKE_A_REST:
                 break;
 
-            case MessageType.HANACAN:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.HAND_A_CANVAS:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid assault party id!", inMessage);
                 break;
 
-            case MessageType.COLACAN:
+            case MessageType.COLLECT_A_CANVAS:
                 break;
 
-            case MessageType.GETAVAASSPAR:
+            case MessageType.GET_AVAILABLE_ASSAULT_PARTY:
                 break;
 
-            case MessageType.GETAVAROO:
+            case MessageType.GET_AVAILABLE_ROOM:
                 break;
 
-            case MessageType.SETTHITOPAR:
-                if ((inMessage.getOrdinaryThiefId() < 0)
-                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+            case MessageType.SET_THIEF_TO_PARTY:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
                     throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getAssaultPartyId() < 0)
-                        || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K)))
+                if ((inMessage.getAssPartId() < 0)
+                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
                     throw new MessageException("Invalid assault party id!", inMessage);
                 break;
 
-            case MessageType.SHUT:
+            case MessageType.END_OPERATION:
+                break;
+
+            case MessageType.SHUTDOWN:
                 break;
 
             default:
@@ -89,59 +90,65 @@ public class ControlCollectionSiteInterface {
         /* processing */
 
         switch (inMessage.getMsgType()) {
-            case MessageType.STAOPE:
+            case MessageType.START_OPERATIONS:
                 controlCollectionSite.startOperations();
-                outMessage = new Message(MessageType.STAOPEDONE,
+                outMessage = new Message(MessageType.START_OPERATIONS_DONE,
                         ((ControlCollectionSiteClientProxy) Thread.currentThread())
                                 .getMasterThiefState());
                 break;
 
-            case MessageType.APPSIT:
+            case MessageType.APPRAISE_SIT:
                 char oper = controlCollectionSite.appraiseSit();
-                outMessage = new Message(MessageType.APPSITDONE, oper);
+                outMessage = new Message(MessageType.APPRAISE_SIT_DONE, oper);
                 break;
 
-            case MessageType.TAKARES:
+            case MessageType.TAKE_A_REST:
                 controlCollectionSite.takeARest();
-                outMessage = new Message(MessageType.TAKARESDONE,
+                outMessage = new Message(MessageType.TAKE_A_REST_DONE,
                         ((ControlCollectionSiteClientProxy) Thread.currentThread())
                                 .getMasterThiefState());
                 break;
 
-            case MessageType.HANACAN:
+            case MessageType.HAND_A_CANVAS:
                 ((ControlCollectionSiteClientProxy) Thread.currentThread())
-                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
-                controlCollectionSite.handACanvas(inMessage.getAssaultPartyId());
-                outMessage = new Message(MessageType.HANACANDONE,
+                        .setOrdinaryThiefId(inMessage.getOtId());
+                controlCollectionSite.handACanvas(inMessage.getAssPartId());
+                outMessage = new Message(MessageType.HAND_A_CANVAS_DONE,
                         ((ControlCollectionSiteClientProxy) Thread.currentThread())
                                 .getOrdinaryThiefId());
                 break;
 
-            case MessageType.COLACAN:
+            case MessageType.COLLECT_A_CANVAS:
                 controlCollectionSite.collectACanvas();
-                outMessage = new Message(MessageType.COLACANDONE,
+                outMessage = new Message(MessageType.COLLECT_A_CANVAS_DONE,
                         ((ControlCollectionSiteClientProxy) Thread.currentThread())
                                 .getMasterThiefState());
                 break;
 
-            case MessageType.GETAVAASSPAR:
+            case MessageType.GET_AVAILABLE_ASSAULT_PARTY:
                 int assPartId = controlCollectionSite.getAvailableAssaultParty();
-                outMessage = new Message(MessageType.GETAVAASSPARDONE, assPartId);
+                outMessage = new Message(MessageType.GET_AVAILABLE_ASSAULT_PARTY_DONE, assPartId);
                 break;
 
-            case MessageType.GETAVAROO:
+            case MessageType.GET_AVAILABLE_ROOM:
                 int roomId = controlCollectionSite.getAvailableRoom();
-                outMessage = new Message(MessageType.GETAVAROODONE, roomId);
+                outMessage = new Message(MessageType.GET_AVAILABLE_ROOM_DONE, roomId);
                 break;
 
-            case MessageType.SETTHITOPAR:
-                controlCollectionSite.setThiefToParty(inMessage.getOrdinaryThiefId(),
-                        inMessage.getAssaultPartyId());
-                outMessage = new Message(MessageType.SETTHITOPARDONE);
+            case MessageType.SET_THIEF_TO_PARTY:
+                controlCollectionSite.setThiefToParty(inMessage.getOtId(),
+                        inMessage.getAssPartId());
+                outMessage = new Message(MessageType.SET_THIEF_TO_PARTY_DONE);
+                break;
 
-            case MessageType.SHUT:
+            case MessageType.END_OPERATION:
+                controlCollectionSite.endOperation();
+                outMessage = new Message(MessageType.END_OPERATION_DONE);
+                break;
+
+            case MessageType.SHUTDOWN:
                 controlCollectionSite.shutdown();
-                outMessage = new Message(MessageType.SHUTDONE);
+                outMessage = new Message(MessageType.SHUTDOWN_DONE);
                 break;
         }
 
