@@ -83,4 +83,14 @@ public class Museum {
     public synchronized int getRoomDistance(int roomId) {
         return roomDistances[roomId];
     }
+
+    /**
+     * Operation server shutdown.
+     *
+     * New operation.
+     */
+    public synchronized void shutdown() {
+        // TODO: 6/05/23
+        notifyAll(); // the barber may now terminate
+    }
 }
