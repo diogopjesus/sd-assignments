@@ -5,6 +5,12 @@ import clientSide.entities.*;
 import commInfra.*;
 import genclass.GenericIO;
 
+/**
+ * Service provider agent for access to the Museum.
+ *
+ * Implementation of a client-server model of type 2 (server replication). Communication is based on
+ * a communication channel under the TCP protocol.
+ */
 public class MuseumClientProxy extends Thread implements OrdinaryThiefCloning {
     /**
      * Number of instantiated threads.
@@ -40,7 +46,7 @@ public class MuseumClientProxy extends Thread implements OrdinaryThiefCloning {
      * Instantiation of a client proxy.
      *
      * @param sconi communication channel
-     * @param contColSiteInter interface to the control collection site
+     * @param museumInter interface to the museum
      */
     public MuseumClientProxy(ServerCom sconi, MuseumInterface museumInter) {
         super("ControlCollectionSiteProxy_" + MuseumClientProxy.getProxyId());

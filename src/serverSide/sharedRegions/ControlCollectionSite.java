@@ -90,8 +90,8 @@ public class ControlCollectionSite {
     /**
      * Control collection site constructor.
      *
-     * @param repos general repository.
-     * @param assaultParties assault parties.
+     * @param reposStub general repository.
+     * @param assaultPartiesStub assault parties.
      */
     public ControlCollectionSite(GeneralRepositoryStub reposStub,
             AssaultPartyStub[] assaultPartiesStub) {
@@ -321,20 +321,6 @@ public class ControlCollectionSite {
         }
 
         return availableRoom;
-    }
-
-    /**
-     * Operation end of work.
-     */
-    public synchronized void endOperation() {
-        while (nEntities == 0) { /* the master thief waits for the termination of the customers */
-            try {
-                wait();
-            } catch (InterruptedException e) {
-            }
-        }
-        if (mas != null)
-            mas.interrupt();
     }
 
     /**

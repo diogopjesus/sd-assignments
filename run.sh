@@ -54,6 +54,20 @@ if [ ! -d $SRC_PATH ]; then
     exit 1;
 fi
 
+# run check-log.py script
+if [ "$1" = "check-log" ]; then
+    if [ "$2" = "" ]; then
+        echo "Error: No log file passed as an argument!" >&2;
+        exit 1
+    fi
+    if [ ! -f "$2" ]; then
+        echo "Error: $2 is not a file!" >&2;
+        exit 1;
+    fi
+    python3 utils/check-log.py $2
+    exit $?;
+fi
+
 # add lib path to classpath
 export CLASSPATH=$CLASSPATH:$LIB_PATH/*
 
@@ -72,19 +86,11 @@ if [ "$1" = "local" ]; then
     exit 0;
 fi
 
-# # run check-log.py script
-# if [ "$1" = "check-log" ]; then
-#     if [ "$2" = "" ]; then
-#         echo "Error: No log file passed as an argument!" >&2;
-#         exit 1
-#     fi
-#     if [ ! -f "$2" ]; then
-#         echo "Error: $2 is not a file!" >&2;
-#         exit 1;
-#     fi
-#     python3 utils/check-log.py $2
-#     exit $?;
-# fi
+# generate javadoc
+if [ "$1" = "doc" ]; then
+    javadoc -cp .:$LIB_PATH/genclass.jar -d $DOC_PATH/  $SRC_PATH/*/*.java $SRC_PATH/*/*/*.java
+    exit 0;
+fi
 
 # # run check-logs.py script on log directory
 # if [ "$1" = "check-log-dir" ]; then
@@ -115,12 +121,6 @@ fi
 #     echo "Please run script at root of project!"
 #     cd $PREVIOUS_DIR
 #     exit 1;
-# fi
-
-# # generate javadoc
-# if [ "$1" = "doc" ]; then
-#     javadoc -cp .:$PREVIOUS_DIR/lib/genclass.jar -d ../doc/ **/*.java
-#     exit 0;
 # fi
 
 # # compile project

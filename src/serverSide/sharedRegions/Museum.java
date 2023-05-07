@@ -46,10 +46,8 @@ public class Museum {
     /**
      * Museum constructor.
      *
-     * @param repos general repository.
-     * @param assaultParties assault parties.
-     * @param canvasInRoom number of canvas in each room.
-     * @param roomDistances distance to each room.
+     * @param reposStub general repository.
+     * @param assaultPartiesStub assault parties.
      */
     public Museum(GeneralRepositoryStub reposStub, AssaultPartyStub[] assaultPartiesStub) {
         ord = new MuseumClientProxy[SimulPar.M - 1];

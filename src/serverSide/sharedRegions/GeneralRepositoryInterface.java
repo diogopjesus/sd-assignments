@@ -107,6 +107,11 @@ public class GeneralRepositoryInterface {
                 String logFileName = inMessage.getfName();
                 if ((logFileName == null))
                     throw new MessageException("Invalid Log File Name!", inMessage);
+                int[] maxDisArray = inMessage.getMaxDisArray();
+                for (int i = 0; i < SimulPar.N; i++) {
+                    if ((maxDisArray[i] < SimulPar.md) || (maxDisArray[i] > SimulPar.MD))
+                        throw new MessageException("Invalid Maximum Displacement!", inMessage);
+                }
                 int[] numPaint = inMessage.getNumPaint();
                 int[] roomDist = inMessage.getRoomDist();
                 for (int i = 0; i < SimulPar.N; i++) {
@@ -115,13 +120,6 @@ public class GeneralRepositoryInterface {
                     if ((roomDist[i] < SimulPar.d) || (roomDist[i] > SimulPar.D))
                         throw new MessageException("Invalid Room Distance!", inMessage);
                 }
-                break;
-
-            case MessageType.SET_ORDINARY_THIEF:
-                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
-                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getMaxDis() < SimulPar.md) || (inMessage.getMaxDis() > SimulPar.MD))
-                    throw new MessageException("Invalid Maximum Displacement!", inMessage);
                 break;
 
             case MessageType.SHUTDOWN:
@@ -173,14 +171,9 @@ public class GeneralRepositoryInterface {
                 break;
 
             case MessageType.INIT_SIMULATION:
-                repos.initSimul(inMessage.getfName(), inMessage.getNumPaint(),
-                        inMessage.getRoomDist());
+                repos.initSimul(inMessage.getfName(), inMessage.getMaxDisArray(),
+                        inMessage.getNumPaint(), inMessage.getRoomDist());
                 outMessage = new Message(MessageType.INIT_SIMULATION_DONE);
-                break;
-
-            case MessageType.SET_ORDINARY_THIEF:
-                repos.setOrdinaryThief(inMessage.getOtId(), inMessage.getMaxDis());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
             case MessageType.SHUTDOWN:

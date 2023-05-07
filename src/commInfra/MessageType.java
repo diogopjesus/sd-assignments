@@ -349,16 +349,6 @@ public final class MessageType {
     public static final int SHUTDOWN_DONE = 67;
 
     /**
-     * End of work - master thief (service request)
-     */
-    public static final int END_OPERATION = 68;
-
-    /**
-     * master thief goes home (reply)
-     */
-    public static final int END_OPERATION_DONE = 69;
-
-    /**
      * Initialize simulation (service request).
      */
     public static final int INIT_SIMULATION = 70;
@@ -367,9 +357,4 @@ public final class MessageType {
      * Simulation was initialized (reply).
      */
     public static final int INIT_SIMULATION_DONE = 71;
-
-    /**
-     * Set ordinary thief (service request).
-     */
-    public static final int SET_ORDINARY_THIEF = 73;
 }

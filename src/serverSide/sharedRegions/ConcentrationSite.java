@@ -87,8 +87,8 @@ public class ConcentrationSite {
      * Concentration site constructor.
      *
      * @param reposStub general repository.
-     * @param contColSite control collection site.
-     * @param assaultParties assault parties.
+     * @param contColSiteStub control collection site.
+     * @param assaultPartiesStub assault parties.
      * @param museumStub museum.
      */
     public ConcentrationSite(GeneralRepositoryStub reposStub,

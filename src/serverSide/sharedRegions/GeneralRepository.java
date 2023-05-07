@@ -90,16 +90,14 @@ public class GeneralRepository {
         logFileName = "logger";
 
         /* Store master thief initial info */
-        this.masterThiefState = -1;
+        this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
 
         /* Store ordinary thieves initial info */
         this.ordinaryThiefState = new int[SimulPar.M - 1];
         this.ordinaryThiefSituation = new char[SimulPar.M - 1];
-        this.ordinaryThiefMaximumDisplacement = new int[SimulPar.M - 1];
         for (int i = 0; i < SimulPar.M - 1; i++) {
-            this.ordinaryThiefState[i] = -1;
-            this.ordinaryThiefSituation[i] = 0x00;
-            this.ordinaryThiefMaximumDisplacement[i] = -1;
+            this.ordinaryThiefState[i] = OrdinaryThiefStates.CONCENTRATION_SITE;
+            this.ordinaryThiefSituation[i] = 'W';
         }
 
         /* Store assault parties initial info */
@@ -129,34 +127,29 @@ public class GeneralRepository {
      *
      * @param logFileName name of the logging file.
      * @param maxDis maximum displacement of the ordinary thieves.
+     * @param numPaint number of paintings in each room.
+     * @param roomDist distance between each room and the outside gathering site.
      */
-    public synchronized void initSimul(String logFileName, int[] numPaint, int[] roomDist) {
+    public synchronized void initSimul(String logFileName, int[] maxDis, int[] numPaint,
+            int[] roomDist) {
         /* Store the logging filename */
         if (!Objects.equals(logFileName, ""))
             this.logFileName = logFileName;
 
+        /* Store ordinary thief maximimum displacement */
+        this.ordinaryThiefMaximumDisplacement = new int[SimulPar.M - 1];
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            this.ordinaryThiefMaximumDisplacement[i] = maxDis[i];
+
+        /* Store museum initial info */
+        this.museumRoomNumberPaintings = new int[SimulPar.N];
+        this.museumRoomDistance = new int[SimulPar.N];
         for (int i = 0; i < SimulPar.N; i++) {
             this.museumRoomNumberPaintings[i] = numPaint[i];
             this.museumRoomDistance[i] = roomDist[i];
         }
 
-        this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
-
         reportInitialStatus();
-    }
-
-    /**
-     * Set a master thief to the simulation.
-     *
-     * @param ordinaryThiefId ordinary thief identification
-     * @param maxDis maximum displacement
-     */
-    public synchronized void setOrdinaryThief(int ordinaryThiefId, int maxDis) {
-        this.ordinaryThiefState[ordinaryThiefId] = OrdinaryThiefStates.CONCENTRATION_SITE;
-        this.ordinaryThiefSituation[ordinaryThiefId] = 'W';
-        this.ordinaryThiefMaximumDisplacement[ordinaryThiefId] = maxDis;
-        if (masterThiefState > -1)
-            reportStatus();
     }
 
     /**
@@ -211,10 +204,8 @@ public class GeneralRepository {
         lineStatus += getMasterThiefState() + "  ";
         for (int thief = 0; thief < SimulPar.M - 1; thief++) {
             lineStatus += getOrdinaryThiefState(thief) + " ";
-            int otSit = getOrdinaryThiefSituation(thief);
-            lineStatus += (otSit == 0x0 ? "#" : otSit) + "  ";
-            int maxDis = getOrdinaryThiefMaximumDisplacement(thief);
-            lineStatus += (maxDis == -1 ? "#" : maxDis) + "    ";
+            lineStatus += getOrdinaryThiefSituation(thief) + "  ";
+            lineStatus += getOrdinaryThiefMaximumDisplacement(thief) + "    ";
         }
         log.writelnString(lineStatus);
 
@@ -361,7 +352,6 @@ public class GeneralRepository {
      * Increment canvas stolen by a thief, if he has one and remove the thief from the assault
      * party.
      *
-     * @param canvas true if the thief is holding a canvas - false, otherwise.
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief in the party).
      */
@@ -431,8 +421,6 @@ public class GeneralRepository {
                 return "OUTW";
             case OrdinaryThiefStates.COLLECTION_SITE:
                 return "COLL";
-            case -1: /* in case it is not initialized yet */
-                return "#";
             default:
                 return "ERRO";
         }

@@ -15,9 +15,9 @@ Stat  Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD    Stat S MD
 
 """
 
-ORDINARY_THIEF_STATES = ["CONC", "INWA", "ROOM", "OUTW", "COLL"]
+ORDINARY_THIEF_STATES = ["CONC", "INWA", "ROOM", "OUTW", "COLL", "####"]
 MASTER_THIEF_STATES = ["PLAN", "DECI", "ASSE", "WAIT", "PRES"]
-ORDINARY_THIEF_SITUATION = ["W", "P"]
+ORDINARY_THIEF_SITUATION = ["W", "P", "#"]
 
 LOG_TAIL = "My friends, tonight's effort produced [0-9][0-9] priceless paintings!"
 
@@ -82,10 +82,8 @@ def check_if_file_is_log(file):
                     )
                     sys.exit(1)
                 if (
-                    not line[j + 2].isnumeric()
-                    or len(line[j + 2]) > 1
-                    or int(line[j + 2]) < 2
-                    or int(line[j + 2]) > 6
+                    (line[j + 2].isnumeric() and (len(line[j + 2]) > 1 or int(line[j + 2]) < 2 or int(line[j + 2]) > 6)
+                     or (not line[j+2].isnumeric() and line[j+2] != "#"))
                 ):
                     print(
                         "Error: Line %d does not have a valid ordinary maximum displacement!"

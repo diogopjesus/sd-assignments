@@ -77,9 +77,6 @@ public class ControlCollectionSiteInterface {
                     throw new MessageException("Invalid assault party id!", inMessage);
                 break;
 
-            case MessageType.END_OPERATION:
-                break;
-
             case MessageType.SHUTDOWN:
                 break;
 
@@ -139,11 +136,6 @@ public class ControlCollectionSiteInterface {
                 controlCollectionSite.setThiefToParty(inMessage.getOtId(),
                         inMessage.getAssPartId());
                 outMessage = new Message(MessageType.SET_THIEF_TO_PARTY_DONE);
-                break;
-
-            case MessageType.END_OPERATION:
-                controlCollectionSite.endOperation();
-                outMessage = new Message(MessageType.END_OPERATION_DONE);
                 break;
 
             case MessageType.SHUTDOWN:

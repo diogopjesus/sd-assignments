@@ -249,7 +249,6 @@ public class GeneralRepositoryStub {
      * Increment canvas stolen by a thief, if he has one and remove the thief from the assault
      * party.
      *
-     * @param canvas true if the thief is holding a canvas - false, otherwise.
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief in the party).
      */
@@ -286,9 +285,10 @@ public class GeneralRepositoryStub {
      * Operation initialization of simulation.
      *
      * @param logFileName name of the logging file.
-     * @param maxDis maximum displacement of the ordinary thieves.
+     * @param numPaint number of paintings in the museum.
+     * @param roomDist distance between each room and the outside.
      */
-    public void initSimul(String logFileName, int[] numPaint, int[] roomDist) {
+    public void initSimul(String logFileName, int[] maxDis, int[] numPaint, int[] roomDist) {
         ClientCom com; // communication channel
         Message outMessage, // outgoing message
                 inMessage; // incoming message
@@ -301,7 +301,8 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.INIT_SIMULATION, logFileName, numPaint, roomDist);
+        outMessage =
+                new Message(MessageType.INIT_SIMULATION, logFileName, maxDis, numPaint, roomDist);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
@@ -314,41 +315,6 @@ public class GeneralRepositoryStub {
         }
 
         com.close();
-    }
-
-    /**
-     * Set a master thief to the simulation.
-     *
-     * @param ordinaryThiefId ordinary thief identification
-     * @param maxDis maximum displacement
-     */
-    public synchronized void setOrdinaryThief(int ordinaryThiefId, int maxDis) {
-        ClientCom com; // communication channel
-        Message outMessage, // outgoing message
-                inMessage; // incoming message
-
-        com = new ClientCom(serverHostName, serverPortNumb);
-        while (!com.open()) {
-            try {
-                Thread.sleep((long) (1000));
-            } catch (InterruptedException e) {
-            }
-        }
-
-        outMessage = new Message(MessageType.SET_ORDINARY_THIEF, ordinaryThiefId, maxDis);
-        com.writeObject(outMessage);
-
-        inMessage = (Message) com.readObject();
-
-        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
-            GenericIO.writelnString(
-                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
-            GenericIO.writelnString(inMessage.toString());
-            System.exit(1);
-        }
-
-        com.close();
-
     }
 
     /**

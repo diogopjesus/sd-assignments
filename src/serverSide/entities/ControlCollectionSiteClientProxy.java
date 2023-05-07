@@ -6,7 +6,7 @@ import commInfra.*;
 import genclass.GenericIO;
 
 /**
- * Service provider agent for access to the control collection site.
+ * Service provider agent for access to the Control Collection Site.
  *
  * Implementation of a client-server model of type 2 (server replication). Communication is based on
  * a communication channel under the TCP protocol.

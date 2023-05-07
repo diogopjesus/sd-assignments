@@ -129,7 +129,8 @@ public class Message implements Serializable {
      * Message instantiation (form 2).
      *
      * @param type message type
-     * @param value
+     * @param value master thief state, ordinary thief identification, room identification,
+     *        distance, element identification or assault party identification
      */
     public Message(int type, int value) {
         this.msgType = type;
@@ -211,13 +212,13 @@ public class Message implements Serializable {
      * Message instantiation (form 5).
      *
      * @param type message type
-     * @param value1
-     * @param value2
+     * @param value1 ordinary thief identification or assault party identification
+     * @param value2 maximum displacement, ordinary thief state, room identification, assault party
+     *        identification or element identification
      */
     public Message(int type, int value1, int value2) {
         this.msgType = type;
-        if ((msgType == MessageType.CRAWL_IN) || (msgType == MessageType.CRAWL_OUT)
-                || (msgType == MessageType.SET_ORDINARY_THIEF)) {
+        if ((msgType == MessageType.CRAWL_IN) || (msgType == MessageType.CRAWL_OUT)) {
             otId = value1;
             maxDis = value2;
         } else if ((msgType == MessageType.REVERSE_DIRECTION_DONE)
@@ -248,14 +249,14 @@ public class Message implements Serializable {
      * Message instantiation (form 6).
      *
      * @param type message type
-     * @param value1
-     * @param value2
+     * @param otId ordinary thief identification
+     * @param canvas holding canvas
      */
-    public Message(int type, int value1, boolean value2) {
+    public Message(int type, int otId, boolean canvas) {
         this.msgType = type;
         if ((msgType == MessageType.SET_HOLDING_CANVAS)) {
-            otId = value1;
-            canvas = value2;
+            this.otId = otId;
+            this.canvas = canvas;
         } else {
             GenericIO.writelnString(
                     "Message type = " + msgType + ": non-implemented instantiation!");
@@ -268,9 +269,9 @@ public class Message implements Serializable {
      * Message instantiation (form 7).
      *
      * @param type message type
-     * @param value1
-     * @param value2
-     * @param value3
+     * @param value1 ordinary thief identification or assault party identification
+     * @param value2 ordinary thief state or element identification
+     * @param value3 assault party identification, ordinary thief identification or position
      */
     public Message(int type, int value1, int value2, int value3) {
         this.msgType = type;
@@ -297,9 +298,9 @@ public class Message implements Serializable {
      * Message instantiation (form 8).
      *
      * @param type message type
-     * @param value1
-     * @param value2
-     * @param value3
+     * @param value1 ordinary thief identification or assault party identification
+     * @param value2 ordinary thief state or element identification
+     * @param value3 continue crawling, is needed or canvas
      */
     public Message(int type, int value1, int value2, boolean value3) {
         this.msgType = type;
@@ -347,11 +348,15 @@ public class Message implements Serializable {
      * @param type message type
      * @param logFileName name of the logging file
      * @param maxDisArray maximum displacement array
+     * @param numPaint number of paintings
+     * @param roomDist room distances
      */
-    public Message(int type, String logFileName, int[] numPaint, int[] roomDist) {
+    public Message(int type, String logFileName, int[] maxDisArray, int[] numPaint,
+            int[] roomDist) {
         this.msgType = type;
         if ((msgType == MessageType.INIT_SIMULATION)) {
             this.fName = logFileName;
+            this.maxDisArray = maxDisArray;
             this.numPaint = numPaint;
             this.roomDist = roomDist;
         } else {
@@ -499,7 +504,7 @@ public class Message implements Serializable {
     /**
      * Get continue crawling.
      *
-     * @return
+     * @return continue crawling
      */
     public boolean isContCrawl() {
         return contCrawl;

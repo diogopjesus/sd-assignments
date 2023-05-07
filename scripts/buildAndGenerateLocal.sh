@@ -175,62 +175,35 @@ cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
 cp $SRC_PATH/commInfra/*.class dirMuseum/commInfra
 
 
-echo "  Master Thief"
-rm -rf dirMasterThief
-mkdir -p dirMasterThief \
-         dirMasterThief/serverSide dirMasterThief/serverSide/main \
-         dirMasterThief/clientSide dirMasterThief/clientSide/main dirMasterThief/clientSide/entities dirMasterThief/clientSide/stubs \
-         dirMasterThief/commInfra
+echo "  Client"
+rm -rf dirClient
+mkdir -p dirClient \
+         dirClient/serverSide dirClient/serverSide/main \
+         dirClient/clientSide dirClient/clientSide/main dirClient/clientSide/entities dirClient/clientSide/stubs \
+         dirClient/commInfra
 
-cp $SRC_PATH/serverSide/main/SimulPar.class dirMasterThief/serverSide/main
+cp $SRC_PATH/serverSide/main/SimulPar.class dirClient/serverSide/main
 
-cp $SRC_PATH/clientSide/main/ClientHeistToTheMuseumMasterThief.class dirMasterThief/clientSide/main
+cp $SRC_PATH/clientSide/main/ClientHeistToTheMuseum.class dirClient/clientSide/main
 
 cp $SRC_PATH/clientSide/entities/MasterThief.class \
    $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   dirMasterThief/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   $SRC_PATH/clientSide/stubs/ConcentrationSiteStub.class \
-   $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
-   $SRC_PATH/clientSide/stubs/MuseumStub.class \
-   dirMasterThief/clientSide/stubs
-
-cp $SRC_PATH/commInfra/Message.class \
-   $SRC_PATH/commInfra/MessageType.class \
-   $SRC_PATH/commInfra/MessageException.class \
-   $SRC_PATH/commInfra/ClientCom.class \
-   dirMasterThief/commInfra
-
-
-echo "  Ordinary Thieves"
-rm -rf dirOrdinaryThieves
-mkdir -p dirOrdinaryThieves \
-         dirOrdinaryThieves/serverSide dirOrdinaryThieves/serverSide/main \
-         dirOrdinaryThieves/clientSide dirOrdinaryThieves/clientSide/main dirOrdinaryThieves/clientSide/entities dirOrdinaryThieves/clientSide/stubs \
-         dirOrdinaryThieves/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class dirOrdinaryThieves/serverSide/main
-
-cp $SRC_PATH/clientSide/main/ClientHeistToTheMuseumOrdinaryThief.class dirOrdinaryThieves/clientSide/main
-
-cp $SRC_PATH/clientSide/entities/OrdinaryThief.class \
+   $SRC_PATH/clientSide/entities/OrdinaryThief.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   dirOrdinaryThieves/clientSide/entities
+   dirClient/clientSide/entities
 
 cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
    $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
    $SRC_PATH/clientSide/stubs/ConcentrationSiteStub.class \
    $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
    $SRC_PATH/clientSide/stubs/MuseumStub.class \
-   dirOrdinaryThieves/clientSide/stubs
+   dirClient/clientSide/stubs
 
 cp $SRC_PATH/commInfra/Message.class \
    $SRC_PATH/commInfra/MessageType.class \
    $SRC_PATH/commInfra/MessageException.class \
    $SRC_PATH/commInfra/ClientCom.class \
-   dirOrdinaryThieves/commInfra
+   dirClient/commInfra
 
 
 echo "Compressing execution environments."
@@ -254,13 +227,9 @@ echo "  Museum"
 rm -f  dirMuseum.zip
 zip -rq dirMuseum.zip dirMuseum
 
-echo "  Master Thief"
-rm -f  dirMasterThief.zip
-zip -rq dirMasterThief.zip dirMasterThief
-
-echo "  Ordinary Thieves"
-rm -f  dirOrdinaryThieves.zip
-zip -rq dirOrdinaryThieves.zip dirOrdinaryThieves
+echo "  Client"
+rm -f  dirClient.zip
+zip -rq dirClient.zip dirClient
 
 
 echo "Deploying and decompressing execution environments."
@@ -272,8 +241,7 @@ cp dirAssaultParty.zip $TEST_PATH
 cp dirConcentrationSite.zip $TEST_PATH
 cp dirControlCollectionSite.zip $TEST_PATH
 cp dirMuseum.zip $TEST_PATH
-cp dirMasterThief.zip $TEST_PATH
-cp dirOrdinaryThieves.zip $TEST_PATH
+cp dirClient.zip $TEST_PATH
 
 cd $TEST_PATH
 unzip -q dirGeneralRepository.zip
@@ -281,5 +249,4 @@ unzip -q dirAssaultParty.zip
 unzip -q dirConcentrationSite.zip
 unzip -q dirControlCollectionSite.zip
 unzip -q dirMuseum.zip
-unzip -q dirMasterThief.zip
-unzip -q dirOrdinaryThieves.zip
+unzip -q dirClient.zip

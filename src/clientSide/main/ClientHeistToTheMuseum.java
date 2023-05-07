@@ -6,12 +6,12 @@ import serverSide.main.*;
 import genclass.GenericIO;
 
 /**
- * Client side of the Heist to the Museum (ordinary thieves).
+ * Client side of the Heist to the Museum.
  *
  * Implementation of a client-server model of type 2 (server replication). Communication is based on
  * a communication channel under the TCP protocol.
  */
-public class ClientHeistToTheMuseumOrdinaryThief {
+public class ClientHeistToTheMuseum {
     /**
      * Main method.
      *
@@ -33,38 +33,41 @@ public class ClientHeistToTheMuseumOrdinaryThief {
      *        <li>args[10] - name of the platform where is located the general repository
      *        server</li>
      *        <li>args[11] - port number for listening to service requests</li>
+     *        <li>args[12] - name of the logging file</li>
      *        </ul>
      */
     public static void main(String[] args) {
         String assaultParty1ServerHostName; // name of the platform where is located the first
-        // assault party server
+                                            // assault party server
         int assaultParty1ServerPortNumb = -1; // port number for listening to service requests
         String assaultParty2ServerHostName; // name of the platform where is located the second
-        // assault party server
+                                            // assault party server
         int assaultParty2ServerPortNumb = -1; // port number for listening to service requests
         String concSiteServerHostName; // name of the platform where is located the concentration
-        // site server
+                                       // site server
         int concSiteServerPortNumb = -1; // port number for listening to service requests
         String contColSiteServerHostName; // name of the platform where is located the control
-        // collection site server
+                                          // collection site server
         int contColSiteServerPortNumb = -1; // port number for listening to service requests
         String museumServerHostName; // name of the platform where is located the museum server
         int museumServerPortNumb = -1; // port number for listening to service requests
         String reposServerHostName; // name of the platform where is located the general
-        // repository server
+                                    // repository server
         int reposServerPortNumb = -1; // port number for listening to service requests
+        String fileName; // name of the logging file
+        MasterThief masterThief; // master thief thread
         OrdinaryThief[] ordThief = new OrdinaryThief[SimulPar.M - 1]; // array of ordinary thief
                                                                       // threads
         AssaultPartyStub[] assPartStub; // remote reference to the barber shop
         ConcentrationSiteStub concSiteStub; // remote reference to the concentration site
         ControlCollectionSiteStub contColSiteStub; // remote reference to the control collection
-        // site
+                                                   // site
         MuseumStub museumStub; // remote reference to the museum
         GeneralRepositoryStub reposStub; // remote reference to the general repository
 
         /* getting problem runtime parameters */
 
-        if (args.length != 12) {
+        if (args.length != 13) {
             GenericIO.writelnString("Wrong number of parameters!");
             System.exit(1);
         }
@@ -141,6 +144,20 @@ public class ClientHeistToTheMuseumOrdinaryThief {
             System.exit(1);
         }
 
+        fileName = args[12];
+
+        /* Generate random values */
+
+        int[] maxDis = new int[SimulPar.M - 1]; // maximum displacement of each thief
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            maxDis[i] = SimulPar.md + (int) Math.round(Math.random() * (SimulPar.MD - SimulPar.md));
+        int[] numPaint = new int[SimulPar.N]; // number of paintings to be stolen
+        int[] roomDist = new int[SimulPar.N]; // distance between rooms and outside gathering site
+        for (int i = 0; i < SimulPar.N; i++) {
+            numPaint[i] = SimulPar.p + (int) Math.round(Math.random() * (SimulPar.P - SimulPar.p));
+            roomDist[i] = SimulPar.d + (int) Math.round(Math.random() * (SimulPar.D - SimulPar.d));
+        }
+
         /* problem initialization */
 
         assPartStub = new AssaultPartyStub[2];
@@ -152,16 +169,17 @@ public class ClientHeistToTheMuseumOrdinaryThief {
         contColSiteStub =
                 new ControlCollectionSiteStub(contColSiteServerHostName, contColSiteServerPortNumb);
         museumStub = new MuseumStub(museumServerHostName, museumServerPortNumb);
+        museumStub.setRoomInfo(numPaint, roomDist);
         reposStub = new GeneralRepositoryStub(reposServerHostName, reposServerPortNumb);
-        for (int i = 0; i < SimulPar.M - 1; i++) {
-            int maxDis =
-                    SimulPar.md + (int) Math.round(Math.random() * (SimulPar.MD - SimulPar.md));
-            ordThief[i] = new OrdinaryThief("ord_" + (i + 1), i, maxDis, contColSiteStub,
+        reposStub.initSimul(fileName, maxDis, numPaint, roomDist);
+        masterThief = new MasterThief("mas_0", contColSiteStub, concSiteStub, assPartStub);
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            ordThief[i] = new OrdinaryThief("ord_" + (i + 1), i, maxDis[i], contColSiteStub,
                     concSiteStub, assPartStub, museumStub);
-            reposStub.setOrdinaryThief(i, maxDis);
-        }
 
         /* start of the simulation */
+
+        masterThief.start();
 
         for (int i = 0; i < SimulPar.M - 1; i++)
             ordThief[i].start();
@@ -176,6 +194,12 @@ public class ClientHeistToTheMuseumOrdinaryThief {
             }
             GenericIO.writelnString("The ordinary thief " + (i + 1) + " has terminated.");
         }
+        GenericIO.writelnString();
+        try {
+            masterThief.join();
+        } catch (InterruptedException e) {
+        }
+        GenericIO.writelnString("The master thief has terminated.");
         GenericIO.writelnString();
 
         assPartStub[0].shutdown();

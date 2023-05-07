@@ -105,10 +105,6 @@ ControlCollectionSite:
         -> ordinaryThiefId, assaultPartyId
         <- ()
 
-    END_OPERATION
-        -> ()
-        <- ()
-
 Museum:
     ROLL_A_CANVAS
         -> ordinaryThiefId, assaultPartyId
@@ -153,8 +149,4 @@ GeneralRepository:
 
     INIT_SIMULATION
         -> logFileName, maxDis, numPaint, roomDist
-        <- ()
-
-    SET_ORDINARY_THIEF
-        -> ordinaryThiefId, maxDis
         <- ()

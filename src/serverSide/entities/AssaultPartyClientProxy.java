@@ -6,7 +6,7 @@ import commInfra.*;
 import genclass.GenericIO;
 
 /**
- * Service provider agent for access to the assault party.
+ * Service provider agent for access to the Assault Party.
  *
  * Implementation of a client-server model of type 2 (server replication). Communication is based on
  * a communication channel under the TCP protocol.
