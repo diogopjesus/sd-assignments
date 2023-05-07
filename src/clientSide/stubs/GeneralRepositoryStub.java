@@ -6,8 +6,10 @@ import genclass.GenericIO;
 /**
  * Stub to the general repository.
  *
- * It instantiates a remote reference to the general repository. Implementation of a client-server
- * model of type 2 (server replication). Communication is based on a communication channel under the
+ * It instantiates a remote reference to the general repository. Implementation
+ * of a client-server
+ * model of type 2 (server replication). Communication is based on a
+ * communication channel under the
  * TCP protocol.
  */
 public class GeneralRepositoryStub {
@@ -24,7 +26,8 @@ public class GeneralRepositoryStub {
     /**
      * Instantiation of a stub to the general repository.
      *
-     * @param serverHostName name of the platform where is located the barber shop server
+     * @param serverHostName name of the platform where is located the barber shop
+     *                       server
      * @param serverPortNumb port number for listening to service requests
      */
     public GeneralRepositoryStub(String serverHostName, int serverPortNumb) {
@@ -68,7 +71,7 @@ public class GeneralRepositoryStub {
     /**
      * Set the current state of an ordinary thief.
      *
-     * @param thiefId the thief id.
+     * @param thiefId            the thief id.
      * @param ordinaryThiefState the ordinary thief state.
      */
     public void setOrdinaryThiefState(int thiefId, int ordinaryThiefState) {
@@ -99,11 +102,10 @@ public class GeneralRepositoryStub {
         com.close();
     }
 
-
     /**
      * Set the current room id of an assault party.
      *
-     * @param assaultPartyId the assault party id.
+     * @param assaultPartyId     the assault party id.
      * @param assaultPartyRoomId the target room id of the assault party.
      */
     public void setAssaultPartyRoomId(int assaultPartyId, int assaultPartyRoomId) {
@@ -139,8 +141,8 @@ public class GeneralRepositoryStub {
      * Set the current element id of an assault party.
      *
      * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param thiefId thief id.
+     * @param elementId      the element id.
+     * @param thiefId        thief id.
      */
     public void setAssaultPartyElementId(int assaultPartyId, int elementId, int thiefId) {
         ClientCom com; // communication channel
@@ -174,9 +176,10 @@ public class GeneralRepositoryStub {
     /**
      * Set the current element position of an assault party.
      *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param assaultPartyElementPosition the target element position of the assault party.
+     * @param assaultPartyId              the assault party id.
+     * @param elementId                   the element id.
+     * @param assaultPartyElementPosition the target element position of the assault
+     *                                    party.
      */
     public void setAssaultPartyElementPosition(int assaultPartyId, int elementId,
             int assaultPartyElementPosition) {
@@ -211,9 +214,10 @@ public class GeneralRepositoryStub {
     /**
      * Set the current element canvas of an assault party.
      *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param assaultPartyElementCanvas the target element canvas of the assault party.
+     * @param assaultPartyId            the assault party id.
+     * @param elementId                 the element id.
+     * @param assaultPartyElementCanvas the target element canvas of the assault
+     *                                  party.
      */
     public void setAssaultPartyElementCanvas(int assaultPartyId, int elementId,
             boolean assaultPartyElementCanvas) {
@@ -246,11 +250,12 @@ public class GeneralRepositoryStub {
     }
 
     /**
-     * Increment canvas stolen by a thief, if he has one and remove the thief from the assault
+     * Increment canvas stolen by a thief, if he has one and remove the thief from
+     * the assault
      * party.
      *
      * @param assaultPartyId assault party id.
-     * @param elementId element id (position of the thief in the party).
+     * @param elementId      element id (position of the thief in the party).
      */
     public void endAssaultPartyElementMission(int assaultPartyId, int elementId) {
         ClientCom com; // communication channel
@@ -285,8 +290,9 @@ public class GeneralRepositoryStub {
      * Operation initialization of simulation.
      *
      * @param logFileName name of the logging file.
-     * @param numPaint number of paintings in the museum.
-     * @param roomDist distance between each room and the outside.
+     * @param maxDis      maximum displacement of ordinary thieves.
+     * @param numPaint    number of paintings in the museum.
+     * @param roomDist    distance between each room and the outside.
      */
     public void initSimul(String logFileName, int[] maxDis, int[] numPaint, int[] roomDist) {
         ClientCom com; // communication channel
@@ -301,8 +307,7 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage =
-                new Message(MessageType.INIT_SIMULATION, logFileName, maxDis, numPaint, roomDist);
+        outMessage = new Message(MessageType.INIT_SIMULATION, logFileName, maxDis, numPaint, roomDist);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
