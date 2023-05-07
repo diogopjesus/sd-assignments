@@ -206,8 +206,6 @@ public class ConcentrationSite {
             System.exit(1);
         }
 
-        GenericIO.writelnString("Master thief called ot-" + getCalledThiefId() + " to join party.");
-
         /* Notify ordinary thief that he was called to join a party */
         notifyAll();
 
@@ -233,19 +231,13 @@ public class ConcentrationSite {
         ordId = ((ConcentrationSiteClientProxy) Thread.currentThread()).getOrdinaryThiefId();
         ord[ordId] = (ConcentrationSiteClientProxy) Thread.currentThread();
 
-        GenericIO.writelnString("Ordinary thief " + ordId + " is preparing excursion.");
-
         /* Store info on Control site to associate a thief to an assault party */
         contColSiteStub.setThiefToParty(ord[ordId].getOrdinaryThiefId(),
                 getAvailableAssaultPartyId());
 
-        GenericIO.writelnString("Ordinary thief " + ordId + " joined ass party on contColSite.");
-
         /* Join the available assault party */
         assaultPartiesStub[getAvailableAssaultPartyId()]
                 .joinAssaultParty(ord[ordId].getOrdinaryThiefId());
-
-        GenericIO.writelnString("Ordinary thief " + ordId + " joined assault party.");
 
         /* Check if assault party is full */
         if (assaultPartiesStub[getAvailableAssaultPartyId()].isFull())
@@ -262,16 +254,12 @@ public class ConcentrationSite {
                 System.exit(1);
             }
 
-        GenericIO.writelnString("Next thief to be called is " + getCalledThiefId() + ".");
-
         /* Update ordinary thief state */
         ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_INWARDS);
         reposStub.setAssaultPartyElementId(
                 getAvailableAssaultPartyId(), assaultPartiesStub[getAvailableAssaultPartyId()]
                         .getThiefElement(ord[ordId].getOrdinaryThiefId()),
                 ord[ordId].getOrdinaryThiefId());
-
-        GenericIO.writelnString("Ordinary thief " + ordId + " updated state to CrawlIn.");
 
         /*
          * Notify a new thief to join the assault party, or the master thief the party is full.
