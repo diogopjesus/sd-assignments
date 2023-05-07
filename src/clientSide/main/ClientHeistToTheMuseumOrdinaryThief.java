@@ -33,7 +33,6 @@ public class ClientHeistToTheMuseumOrdinaryThief {
      *        <li>args[10] - name of the platform where is located the general repository
      *        server</li>
      *        <li>args[11] - port number for listening to service requests</li>
-     *        <li>args[12] - name of the logging file</li>
      *        </ul>
      */
     public static void main(String[] args) {
@@ -54,7 +53,6 @@ public class ClientHeistToTheMuseumOrdinaryThief {
         String reposServerHostName; // name of the platform where is located the general
         // repository server
         int reposServerPortNumb = -1; // port number for listening to service requests
-        String fileName; // name of the logging file
         OrdinaryThief[] ordThief = new OrdinaryThief[SimulPar.M - 1]; // array of ordinary thief
                                                                       // threads
         AssaultPartyStub[] assPartStub; // remote reference to the barber shop
@@ -64,13 +62,9 @@ public class ClientHeistToTheMuseumOrdinaryThief {
         MuseumStub museumStub; // remote reference to the museum
         GeneralRepositoryStub reposStub; // remote reference to the general repository
 
-        int[] maxDis = new int[SimulPar.M - 1]; // maximum displacement
-        for (int i = 0; i < SimulPar.M - 1; i++)
-            maxDis[i] = SimulPar.md + (int) Math.round(Math.random() * (SimulPar.MD - SimulPar.md));
-
         /* getting problem runtime parameters */
 
-        if (args.length != 13) {
+        if (args.length != 12) {
             GenericIO.writelnString("Wrong number of parameters!");
             System.exit(1);
         }
@@ -147,8 +141,6 @@ public class ClientHeistToTheMuseumOrdinaryThief {
             System.exit(1);
         }
 
-        fileName = args[12];
-
         /* problem initialization */
 
         assPartStub = new AssaultPartyStub[2];
@@ -161,10 +153,13 @@ public class ClientHeistToTheMuseumOrdinaryThief {
                 new ControlCollectionSiteStub(contColSiteServerHostName, contColSiteServerPortNumb);
         museumStub = new MuseumStub(museumServerHostName, museumServerPortNumb);
         reposStub = new GeneralRepositoryStub(reposServerHostName, reposServerPortNumb);
-        reposStub.initSimul(fileName, maxDis);
-        for (int i = 0; i < SimulPar.M - 1; i++)
-            ordThief[i] = new OrdinaryThief("ord_" + (i + 1), i, maxDis[i], contColSiteStub,
+        for (int i = 0; i < SimulPar.M - 1; i++) {
+            int maxDis =
+                    SimulPar.md + (int) Math.round(Math.random() * (SimulPar.MD - SimulPar.md));
+            ordThief[i] = new OrdinaryThief("ord_" + (i + 1), i, maxDis, contColSiteStub,
                     concSiteStub, assPartStub, museumStub);
+            reposStub.setOrdinaryThief(i, maxDis);
+        }
 
         /* start of the simulation */
 

@@ -54,6 +54,17 @@ public class MuseumInterface {
                     throw new MessageException("Invalid Room Id!", inMessage);
                 break;
 
+            case MessageType.SET_ROOM_INFO:
+                int[] numPaint = inMessage.getNumPaint();
+                int[] roomDist = inMessage.getRoomDist();
+                for (int i = 0; i < SimulPar.N; i++) {
+                    if ((numPaint[i] < SimulPar.p) || (numPaint[i] > SimulPar.P))
+                        throw new MessageException("Invalid Number of Paintings!", inMessage);
+                    if ((roomDist[i] < SimulPar.d) || (roomDist[i] > SimulPar.D))
+                        throw new MessageException("Invalid Room Distance!", inMessage);
+                }
+                break;
+
             case MessageType.SHUTDOWN:
                 break;
 
@@ -75,6 +86,11 @@ public class MuseumInterface {
             case MessageType.GET_ROOM_DISTANCE:
                 int roomDis = museum.getRoomDistance(inMessage.getRoomId());
                 outMessage = new Message(MessageType.GET_ROOM_DISTANCE_DONE, roomDis);
+                break;
+
+            case MessageType.SET_ROOM_INFO:
+                museum.setRoomInfo(inMessage.getNumPaint(), inMessage.getRoomDist());
+                outMessage = new Message(MessageType.SET_ROOM_INFO_DONE);
                 break;
 
             case MessageType.SHUTDOWN:

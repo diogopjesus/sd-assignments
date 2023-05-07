@@ -103,7 +103,10 @@ public class GeneralRepositoryInterface {
                     throw new MessageException("Invalid Element Id!", inMessage);
                 break;
 
-            case MessageType.SET_ROOM_INFO:
+            case MessageType.INIT_SIMULATION:
+                String logFileName = inMessage.getfName();
+                if ((logFileName == null))
+                    throw new MessageException("Invalid Log File Name!", inMessage);
                 int[] numPaint = inMessage.getNumPaint();
                 int[] roomDist = inMessage.getRoomDist();
                 for (int i = 0; i < SimulPar.N; i++) {
@@ -114,15 +117,11 @@ public class GeneralRepositoryInterface {
                 }
                 break;
 
-            case MessageType.INIT_SIMULATION:
-                String logFileName = inMessage.getfName();
-                if ((logFileName == null))
-                    throw new MessageException("Invalid Log File Name!", inMessage);
-                int[] maxDis = inMessage.getMaxDisArray();
-                for (int i = 0; i < SimulPar.M - 1; i++) {
-                    if ((maxDis[i] < SimulPar.md) || (maxDis[i] > SimulPar.MD))
-                        throw new MessageException("Invalid Maximum Displacement!", inMessage);
-                }
+            case MessageType.SET_ORDINARY_THIEF:
+                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
+                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
+                if ((inMessage.getMaxDis() < SimulPar.md) || (inMessage.getMaxDis() > SimulPar.MD))
+                    throw new MessageException("Invalid Maximum Displacement!", inMessage);
                 break;
 
             case MessageType.SHUTDOWN:
@@ -173,14 +172,15 @@ public class GeneralRepositoryInterface {
                 outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
-            case MessageType.SET_ROOM_INFO:
-                repos.setRoomInfo(inMessage.getNumPaint(), inMessage.getRoomDist());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
+            case MessageType.INIT_SIMULATION:
+                repos.initSimul(inMessage.getfName(), inMessage.getNumPaint(),
+                        inMessage.getRoomDist());
+                outMessage = new Message(MessageType.INIT_SIMULATION_DONE);
                 break;
 
-            case MessageType.INIT_SIMULATION:
-                repos.initSimul(inMessage.getfName(), inMessage.getMaxDisArray());
-                outMessage = new Message(MessageType.INIT_SIMULATION_DONE);
+            case MessageType.SET_ORDINARY_THIEF:
+                repos.setOrdinaryThief(inMessage.getOtId(), inMessage.getMaxDis());
+                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
                 break;
 
             case MessageType.SHUTDOWN:

@@ -2,6 +2,7 @@ package clientSide.main;
 
 import clientSide.entities.*;
 import clientSide.stubs.*;
+import serverSide.main.*;
 import genclass.GenericIO;
 
 /**
@@ -32,6 +33,7 @@ public class ClientHeistToTheMuseumMasterThief {
      *        <li>args[10] - name of the platform where is located the general repository
      *        server</li>
      *        <li>args[11] - port number for listening to service requests</li>
+     *        <li>args[12] - name of the logging file</li>
      *        </ul>
      */
     public static void main(String[] args) {
@@ -52,6 +54,7 @@ public class ClientHeistToTheMuseumMasterThief {
         String reposServerHostName; // name of the platform where is located the general
                                     // repository server
         int reposServerPortNumb = -1; // port number for listening to service requests
+        String fileName; // name of the logging file
         MasterThief masterThief; // master thief thread
         AssaultPartyStub[] assPartStub; // remote reference to the barber shop
         ConcentrationSiteStub concSiteStub; // remote reference to the concentration site
@@ -59,10 +62,17 @@ public class ClientHeistToTheMuseumMasterThief {
                                                    // site
         MuseumStub museumStub; // remote reference to the museum
         GeneralRepositoryStub reposStub; // remote reference to the general repository
+        int[] numPaint = new int[SimulPar.N]; // number of paintings to be stolen
+        for (int i = 0; i < SimulPar.N; i++)
+            numPaint[i] = SimulPar.p + (int) Math.round(Math.random() * (SimulPar.P - SimulPar.p));
+        int[] roomDist = new int[SimulPar.N]; // distance between rooms and outside gathering site
+        roomDist = new int[SimulPar.N];
+        for (int i = 0; i < SimulPar.N; i++)
+            roomDist[i] = SimulPar.d + (int) Math.round(Math.random() * (SimulPar.D - SimulPar.d));
 
         /* getting problem runtime parameters */
 
-        if (args.length != 12) {
+        if (args.length != 13) {
             GenericIO.writelnString("Wrong number of parameters!");
             System.exit(1);
         }
@@ -139,6 +149,8 @@ public class ClientHeistToTheMuseumMasterThief {
             System.exit(1);
         }
 
+        fileName = args[12];
+
         /* problem initialization */
 
         assPartStub = new AssaultPartyStub[2];
@@ -150,7 +162,9 @@ public class ClientHeistToTheMuseumMasterThief {
         contColSiteStub =
                 new ControlCollectionSiteStub(contColSiteServerHostName, contColSiteServerPortNumb);
         museumStub = new MuseumStub(museumServerHostName, museumServerPortNumb);
+        museumStub.setRoomInfo(numPaint, roomDist);
         reposStub = new GeneralRepositoryStub(reposServerHostName, reposServerPortNumb);
+        reposStub.initSimul(fileName, numPaint, roomDist);
         masterThief = new MasterThief("mas_0", contColSiteStub, concSiteStub, assPartStub);
 
         /* start of the simulation */

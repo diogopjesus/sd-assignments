@@ -119,6 +119,38 @@ public class MuseumStub {
     }
 
     /**
+     * Operation set room information (number of canvas and distance to each room).
+     *
+     * It is called by the ordinary thieves server before the simulation starts.
+     *
+     * @param canvasInRoom number of canvas in each room.
+     * @param roomDistances distance to each room.
+     */
+    public synchronized void setRoomInfo(int[] canvasInRoom, int[] roomDistances) {
+        ClientCom com; // communication channel
+        Message outMessage, // outgoing message
+                inMessage; // incoming message
+
+        com = new ClientCom(serverHostName, serverPortNumb);
+        while (!com.open()) {
+            try {
+                Thread.sleep((long) (1000));
+            } catch (InterruptedException e) {
+            }
+        }
+        outMessage = new Message(MessageType.SET_ROOM_INFO, canvasInRoom, roomDistances);
+        com.writeObject(outMessage);
+        inMessage = (Message) com.readObject();
+        if (inMessage.getMsgType() != MessageType.SET_ROOM_INFO_DONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        com.close();
+    }
+
+    /**
      * Operation server shutdown.
      */
     public void shutdown() {

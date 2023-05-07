@@ -216,7 +216,8 @@ public class Message implements Serializable {
      */
     public Message(int type, int value1, int value2) {
         this.msgType = type;
-        if ((msgType == MessageType.CRAWL_IN) || (msgType == MessageType.CRAWL_OUT)) {
+        if ((msgType == MessageType.CRAWL_IN) || (msgType == MessageType.CRAWL_OUT)
+                || (msgType == MessageType.SET_ORDINARY_THIEF)) {
             otId = value1;
             maxDis = value2;
         } else if ((msgType == MessageType.REVERSE_DIRECTION_DONE)
@@ -347,11 +348,12 @@ public class Message implements Serializable {
      * @param logFileName name of the logging file
      * @param maxDisArray maximum displacement array
      */
-    public Message(int type, String logFileName, int[] maxDisArray) {
+    public Message(int type, String logFileName, int[] numPaint, int[] roomDist) {
         this.msgType = type;
         if ((msgType == MessageType.INIT_SIMULATION)) {
             this.fName = logFileName;
-            this.maxDisArray = maxDisArray;
+            this.numPaint = numPaint;
+            this.roomDist = roomDist;
         } else {
             GenericIO.writelnString(
                     "Message type = " + msgType + ": non-implemented instantiation!");

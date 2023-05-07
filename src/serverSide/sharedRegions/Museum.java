@@ -60,13 +60,10 @@ public class Museum {
         this.assaultPartiesStub = assaultPartiesStub;
         canvasInRoom = new int[SimulPar.N];
         for (int i = 0; i < SimulPar.N; i++)
-            canvasInRoom[i] =
-                    SimulPar.p + (int) Math.round(Math.random() * (SimulPar.P - SimulPar.p));
+            canvasInRoom[i] = -1;
         roomDistances = new int[SimulPar.N];
         for (int i = 0; i < SimulPar.N; i++)
-            roomDistances[i] =
-                    SimulPar.d + (int) Math.round(Math.random() * (SimulPar.D - SimulPar.d));
-        reposStub.setRoomInfo(canvasInRoom, roomDistances);
+            roomDistances[i] = -1;
     }
 
     /**
@@ -107,6 +104,19 @@ public class Museum {
      */
     public synchronized int getRoomDistance(int roomId) {
         return roomDistances[roomId];
+    }
+
+    /**
+     * Operation set room information (number of canvas and distance to each room).
+     *
+     * It is called by the ordinary thieves server before the simulation starts.
+     *
+     * @param canvasInRoom number of canvas in each room.
+     * @param roomDistances distance to each room.
+     */
+    public synchronized void setRoomInfo(int[] canvasInRoom, int[] roomDistances) {
+        this.canvasInRoom = canvasInRoom;
+        this.roomDistances = roomDistances;
     }
 
     /**

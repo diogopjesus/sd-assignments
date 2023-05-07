@@ -289,6 +289,16 @@ public final class MessageType {
     public static final int GET_ROOM_DISTANCE_DONE = 56;
 
     /**
+     * Set room information (service request).
+     */
+    public static final int SET_ROOM_INFO = 64;
+
+    /**
+     * Set room information was done (reply).
+     */
+    public static final int SET_ROOM_INFO_DONE = 72;
+
+    /**
      * Set master thief state (service request).
      */
     public static final int SET_MASTER_THIEF_STATE = 57;
@@ -324,11 +334,6 @@ public final class MessageType {
     public static final int END_ASSAULT_PARTY_ELEMENT_MISSION = 63;
 
     /**
-     * Set room information (service request).
-     */
-    public static final int SET_ROOM_INFO = 64;
-
-    /**
      * Setting acknowledged (reply).
      */
     public static final int SET_ACKNOWLEDGE = 65;
@@ -362,4 +367,9 @@ public final class MessageType {
      * Simulation was initialized (reply).
      */
     public static final int INIT_SIMULATION_DONE = 71;
+
+    /**
+     * Set ordinary thief (service request).
+     */
+    public static final int SET_ORDINARY_THIEF = 73;
 }
