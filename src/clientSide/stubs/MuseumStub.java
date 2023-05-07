@@ -54,20 +54,19 @@ public class MuseumStub {
             }
         }
 
-        outMessage = new Message(MessageType.ROLACAN,
+        outMessage = new Message(MessageType.ROLL_A_CANVAS,
                 ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(), assaultPartyId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.ROLACANDONE) {
+        if (inMessage.getMsgType() != MessageType.ROLL_A_CANVAS_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
-                .getOrdinaryThiefId()) {
+        if (inMessage.getOtId() != ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId()) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
             GenericIO.writelnString(inMessage.toString());
@@ -96,12 +95,12 @@ public class MuseumStub {
             }
         }
 
-        outMessage = new Message(MessageType.GETROODIS, roomId);
+        outMessage = new Message(MessageType.GET_ROOM_DISTANCE, roomId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.GETROODISDONE) {
+        if (inMessage.getMsgType() != MessageType.GET_ROOM_DISTANCE_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -134,10 +133,10 @@ public class MuseumStub {
             } catch (InterruptedException e) {
             }
         }
-        outMessage = new Message(MessageType.SHUT);
+        outMessage = new Message(MessageType.SHUTDOWN);
         com.writeObject(outMessage);
         inMessage = (Message) com.readObject();
-        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+        if (inMessage.getMsgType() != MessageType.SHUTDOWN_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());

@@ -53,19 +53,19 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.SENASSPAR);
+        outMessage = new Message(MessageType.SEND_ASSAULT_PARTY);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.SENASSPARDONE)) {
+        if ((inMessage.getMsgType() != MessageType.SEND_ASSAULT_PARTY_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
-                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+        if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
             GenericIO.writelnString(inMessage.toString());
@@ -74,7 +74,7 @@ public class AssaultPartyStub {
 
         com.close();
 
-        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMtState());
     }
 
     /**
@@ -97,28 +97,27 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.CRAWIN,
+        outMessage = new Message(MessageType.CRAWL_IN,
                 ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(),
                 ((OrdinaryThief) Thread.currentThread()).getMaximumDisplacement());
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.CRAWINDONE)) {
+        if ((inMessage.getMsgType() != MessageType.CRAWL_IN_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
-                .getOrdinaryThiefId()) {
+        if (inMessage.getOtId() != ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId()) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                || (inMessage.getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE)) {
+        if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE)) {
             GenericIO.writelnString("Thread " + Thread.currentThread().getName()
                     + ": Invalid ordinary thief state!");
             GenericIO.writelnString(inMessage.toString());
@@ -127,8 +126,7 @@ public class AssaultPartyStub {
 
         com.close();
 
-        ((OrdinaryThief) Thread.currentThread())
-                .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+        ((OrdinaryThief) Thread.currentThread()).setOrdinaryThiefState(inMessage.getOtState());
 
         return inMessage.isContCrawl();
     }
@@ -151,26 +149,26 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.REVDIR);
+        outMessage = new Message(MessageType.REVERSE_DIRECTION,
+                ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId());
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.REVDIRDONE)) {
+        if ((inMessage.getMsgType() != MessageType.REVERSE_DIRECTION_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
-                .getOrdinaryThiefId()) {
+        if (inMessage.getOtId() != ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId()) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                || (inMessage.getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE)) {
+        if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE)) {
             GenericIO.writelnString("Thread " + Thread.currentThread().getName()
                     + ": Invalid ordinary thief state!");
             GenericIO.writelnString(inMessage.toString());
@@ -179,8 +177,7 @@ public class AssaultPartyStub {
 
         com.close();
 
-        ((OrdinaryThief) Thread.currentThread())
-                .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+        ((OrdinaryThief) Thread.currentThread()).setOrdinaryThiefState(inMessage.getOtState());
     }
 
     /**
@@ -203,28 +200,27 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.CRAWOUT,
+        outMessage = new Message(MessageType.CRAWL_OUT,
                 ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(),
                 ((OrdinaryThief) Thread.currentThread()).getMaximumDisplacement());
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.CRAWOUTDONE)) {
+        if ((inMessage.getMsgType() != MessageType.CRAWL_OUT_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
-                .getOrdinaryThiefId()) {
+        if (inMessage.getOtId() != ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId()) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                || (inMessage.getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE)) {
+        if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE)) {
             GenericIO.writelnString("Thread " + Thread.currentThread().getName()
                     + ": Invalid ordinary thief state!");
             GenericIO.writelnString(inMessage.toString());
@@ -233,8 +229,7 @@ public class AssaultPartyStub {
 
         com.close();
 
-        ((OrdinaryThief) Thread.currentThread())
-                .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+        ((OrdinaryThief) Thread.currentThread()).setOrdinaryThiefState(inMessage.getOtState());
 
         return inMessage.isContCrawl();
     }
@@ -257,12 +252,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARTARROO, targetRoom);
+        outMessage = new Message(MessageType.SET_TARGET_ROOM, targetRoom);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.SETASSPARTARROODONE)) {
+        if ((inMessage.getMsgType() != MessageType.SET_TARGET_ROOM_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -290,18 +285,19 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.GETASSPARTARROO);
+        outMessage = new Message(MessageType.GET_TARGET_ROOM);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.GETASSPARTARROODONE)) {
+        if ((inMessage.getMsgType() != MessageType.GET_TARGET_ROOM_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N)) {
+        // <-1 instead of <0 because the room id can be -1, meaning NOT_A_ROOM
+        if ((inMessage.getRoomId() < -1) || (inMessage.getRoomId() >= SimulPar.N)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid room id!");
             GenericIO.writelnString(inMessage.toString());
@@ -331,12 +327,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARTARROODIS, targetRoomDistance);
+        outMessage = new Message(MessageType.SET_TARGET_ROOM_DISTANCE, targetRoomDistance);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.SETASSPARTARROODISDONE)) {
+        if ((inMessage.getMsgType() != MessageType.SET_TARGET_ROOM_DISTANCE_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -364,12 +360,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.ASSPARISAVA);
+        outMessage = new Message(MessageType.IS_AVAILABLE);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.ASSPARISAVADONE)) {
+        if ((inMessage.getMsgType() != MessageType.IS_AVAILABLE_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -399,12 +395,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.ASSPARISFUL);
+        outMessage = new Message(MessageType.IS_FULL);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.ASSPARISFULDONE)) {
+        if ((inMessage.getMsgType() != MessageType.IS_FULL_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -435,12 +431,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.JOIASSPAR, thiefId);
+        outMessage = new Message(MessageType.JOIN_ASSAULT_PARTY, thiefId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.JOIASSPARDONE)) {
+        if ((inMessage.getMsgType() != MessageType.JOIN_ASSAULT_PARTY_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -469,12 +465,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.QUIASSPAR, thiefId);
+        outMessage = new Message(MessageType.QUIT_ASSAULT_PARTY, thiefId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.QUIASSPARDONE)) {
+        if ((inMessage.getMsgType() != MessageType.QUIT_ASSAULT_PARTY_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -504,12 +500,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETHOLCAN, thiefId, canvas);
+        outMessage = new Message(MessageType.SET_HOLDING_CANVAS, thiefId, canvas);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.SETHOLCANDONE)) {
+        if ((inMessage.getMsgType() != MessageType.SET_HOLDING_CANVAS_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -539,12 +535,12 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.ISHOLCAN, thiefId);
+        outMessage = new Message(MessageType.IS_HOLDING_CANVAS, thiefId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.ISHOLCANDONE)) {
+        if ((inMessage.getMsgType() != MessageType.IS_HOLDING_CANVAS_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -576,19 +572,19 @@ public class AssaultPartyStub {
             }
         }
 
-        outMessage = new Message(MessageType.GETTHIELEINASSPAR, thiefId);
+        outMessage = new Message(MessageType.GET_THIEF_ELEMENT, thiefId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if ((inMessage.getMsgType() != MessageType.GETTHIELEINASSPARDONE)) {
+        if ((inMessage.getMsgType() != MessageType.GET_THIEF_ELEMENT_DONE)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getElementId() < 0)
-                || (inMessage.getElementId() > ((SimulPar.M - 1) / SimulPar.K))) {
+        if ((inMessage.getElemId() < 0)
+                || (inMessage.getElemId() > ((SimulPar.M - 1) / SimulPar.K))) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid element id!");
             GenericIO.writelnString(inMessage.toString());
@@ -597,7 +593,7 @@ public class AssaultPartyStub {
 
         com.close();
 
-        return inMessage.getElementId();
+        return inMessage.getElemId();
     }
 
     /**
@@ -615,10 +611,10 @@ public class AssaultPartyStub {
             } catch (InterruptedException e) {
             }
         }
-        outMessage = new Message(MessageType.SHUT);
+        outMessage = new Message(MessageType.SHUTDOWN);
         com.writeObject(outMessage);
         inMessage = (Message) com.readObject();
-        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+        if (inMessage.getMsgType() != MessageType.SHUTDOWN_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());

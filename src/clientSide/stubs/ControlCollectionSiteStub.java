@@ -54,19 +54,19 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.STAOPE);
+        outMessage = new Message(MessageType.START_OPERATIONS);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.STAOPEDONE) {
+        if (inMessage.getMsgType() != MessageType.START_OPERATIONS_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
-                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+        if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
             GenericIO.writelnString(inMessage.toString());
@@ -75,7 +75,7 @@ public class ControlCollectionSiteStub {
 
         com.close();
 
-        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMtState());
     }
 
     /**
@@ -99,12 +99,12 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.APPSIT);
+        outMessage = new Message(MessageType.APPRAISE_SIT);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.APPSITDONE) {
+        if (inMessage.getMsgType() != MessageType.APPRAISE_SIT_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -143,19 +143,19 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.TAKARES);
+        outMessage = new Message(MessageType.TAKE_A_REST);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.TAKARESDONE) {
+        if (inMessage.getMsgType() != MessageType.TAKE_A_REST_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
-                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+        if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
             GenericIO.writelnString(inMessage.toString());
@@ -164,7 +164,7 @@ public class ControlCollectionSiteStub {
 
         com.close();
 
-        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMtState());
     }
 
     /**
@@ -188,20 +188,19 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.HANACAN,
+        outMessage = new Message(MessageType.HAND_A_CANVAS,
                 ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(), assaultPartyId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.HANACANDONE) {
+        if (inMessage.getMsgType() != MessageType.HAND_A_CANVAS_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
-                .getOrdinaryThiefId()) {
+        if (inMessage.getOtId() != ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId()) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
             GenericIO.writelnString(inMessage.toString());
@@ -230,19 +229,19 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.COLACAN);
+        outMessage = new Message(MessageType.COLLECT_A_CANVAS);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.COLACANDONE) {
+        if (inMessage.getMsgType() != MessageType.COLLECT_A_CANVAS_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
-                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+        if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
             GenericIO.writelnString(inMessage.toString());
@@ -251,7 +250,7 @@ public class ControlCollectionSiteStub {
 
         com.close();
 
-        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMtState());
     }
 
     /**
@@ -272,19 +271,19 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.GETAVAASSPAR);
+        outMessage = new Message(MessageType.GET_AVAILABLE_ASSAULT_PARTY);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.GETAVAASSPARDONE) {
+        if (inMessage.getMsgType() != MessageType.GET_AVAILABLE_ASSAULT_PARTY_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
-        if ((inMessage.getAssaultPartyId() < 0)
-                || (inMessage.getAssaultPartyId() > ((SimulPar.M - 1) / SimulPar.K))) {
+        if ((inMessage.getAssPartId() < 0)
+                || (inMessage.getAssPartId() > ((SimulPar.M - 1) / SimulPar.K))) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid assault party id!");
             GenericIO.writelnString(inMessage.toString());
@@ -293,7 +292,7 @@ public class ControlCollectionSiteStub {
 
         com.close();
 
-        return inMessage.getAssaultPartyId();
+        return inMessage.getAssPartId();
     }
 
     /**
@@ -314,12 +313,12 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.GETAVAROO);
+        outMessage = new Message(MessageType.GET_AVAILABLE_ROOM);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.GETAVAROODONE) {
+        if (inMessage.getMsgType() != MessageType.GET_AVAILABLE_ROOM_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -356,12 +355,12 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETTHITOPAR, thiefId, assaultPartyId);
+        outMessage = new Message(MessageType.SET_THIEF_TO_PARTY, thiefId, assaultPartyId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SETTHITOPARDONE) {
+        if (inMessage.getMsgType() != MessageType.SET_THIEF_TO_PARTY_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -386,15 +385,47 @@ public class ControlCollectionSiteStub {
             } catch (InterruptedException e) {
             }
         }
-        outMessage = new Message(MessageType.SHUT);
+        outMessage = new Message(MessageType.SHUTDOWN);
         com.writeObject(outMessage);
         inMessage = (Message) com.readObject();
-        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+        if (inMessage.getMsgType() != MessageType.SHUTDOWN_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
             System.exit(1);
         }
+        com.close();
+    }
+
+
+    /**
+     * Operation end of work.
+     */
+    public void endOperation() {
+        ClientCom com; // communication channel
+        Message outMessage, // outgoing message
+                inMessage; // incoming message
+
+        com = new ClientCom(serverHostName, serverPortNumb);
+        while (!com.open()) {
+            try {
+                Thread.sleep((long) (1000));
+            } catch (InterruptedException e) {
+            }
+        }
+
+        outMessage = new Message(MessageType.END_OPERATION);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.END_OPERATION_DONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
         com.close();
     }
 }

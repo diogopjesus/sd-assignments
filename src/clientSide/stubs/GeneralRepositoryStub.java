@@ -50,12 +50,12 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETMASTHISTA, masterThiefState);
+        outMessage = new Message(MessageType.SET_MASTER_THIEF_STATE, masterThiefState);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -84,12 +84,12 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETORDTHISTA, thiefId, ordinaryThiefState);
+        outMessage = new Message(MessageType.SET_ORDINARY_THIEF_STATE, thiefId, ordinaryThiefState);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -119,12 +119,13 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARROOID, assaultPartyId, assaultPartyRoomId);
+        outMessage = new Message(MessageType.SET_ASSAULT_PARTY_ROOM_ID, assaultPartyId,
+                assaultPartyRoomId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -154,12 +155,13 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARELEID, assaultPartyId, elementId, thiefId);
+        outMessage = new Message(MessageType.SET_ASSAULT_PARTY_ELEMENT_ID, assaultPartyId,
+                elementId, thiefId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -190,13 +192,13 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARELEPOS, assaultPartyId, elementId,
-                assaultPartyElementPosition);
+        outMessage = new Message(MessageType.SET_ASSAULT_PARTY_ELEMENT_POSITION, assaultPartyId,
+                elementId, assaultPartyElementPosition);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -227,13 +229,13 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETASSPARELECAN, assaultPartyId, elementId,
-                assaultPartyElementCanvas);
+        outMessage = new Message(MessageType.SET_ASSAULT_PARTY_ELEMENT_CANVAS, assaultPartyId,
+                elementId, assaultPartyElementCanvas);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -264,12 +266,13 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.ENDASSPARELEMIS, assaultPartyId, elementId);
+        outMessage = new Message(MessageType.END_ASSAULT_PARTY_ELEMENT_MISSION, assaultPartyId,
+                elementId);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -285,7 +288,7 @@ public class GeneralRepositoryStub {
      * @param numPaint number of paintings in each room.
      * @param roomDist distance between each room and the outside.
      */
-    public synchronized void setRoomInfo(int[] numPaint, int[] roomDist) {
+    public void setRoomInfo(int[] numPaint, int[] roomDist) {
         ClientCom com; // communication channel
         Message outMessage, // outgoing message
                 inMessage; // incoming message
@@ -298,12 +301,46 @@ public class GeneralRepositoryStub {
             }
         }
 
-        outMessage = new Message(MessageType.SETROOINF, numPaint, roomDist);
+        outMessage = new Message(MessageType.SET_ROOM_INFO, numPaint, roomDist);
         com.writeObject(outMessage);
 
         inMessage = (Message) com.readObject();
 
-        if (inMessage.getMsgType() != MessageType.SACK) {
+        if (inMessage.getMsgType() != MessageType.SET_ACKNOWLEDGE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+    }
+
+    /**
+     * Operation initialization of simulation.
+     *
+     * @param logFileName name of the logging file.
+     * @param maxDis maximum displacement of the ordinary thieves.
+     */
+    public void initSimul(String logFileName, int[] maxDis) {
+        ClientCom com; // communication channel
+        Message outMessage, // outgoing message
+                inMessage; // incoming message
+
+        com = new ClientCom(serverHostName, serverPortNumb);
+        while (!com.open()) {
+            try {
+                Thread.sleep((long) (1000));
+            } catch (InterruptedException e) {
+            }
+        }
+
+        outMessage = new Message(MessageType.INIT_SIMULATION, logFileName, maxDis);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.INIT_SIMULATION_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
@@ -328,10 +365,10 @@ public class GeneralRepositoryStub {
             } catch (InterruptedException e) {
             }
         }
-        outMessage = new Message(MessageType.SHUT);
+        outMessage = new Message(MessageType.SHUTDOWN);
         com.writeObject(outMessage);
         inMessage = (Message) com.readObject();
-        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+        if (inMessage.getMsgType() != MessageType.SHUTDOWN_DONE) {
             GenericIO.writelnString(
                     "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
             GenericIO.writelnString(inMessage.toString());
