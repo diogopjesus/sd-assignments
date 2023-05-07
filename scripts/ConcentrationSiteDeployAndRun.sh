@@ -11,5 +11,4 @@ echo "Decompressing data sent to the concentration site node."
 sshpass -f password ssh $LOGIN@$NODE03 'cd test/HeistToTheMuseum ; unzip -uq dirConcentrationSite.zip'
 
 echo "Executing program at the server concentration site."
-sshpass -f password ssh $LOGIN@$NODE03 'cd test/HeistToTheMuseum/dirConcentrationSite ; java serverSide.main.ServerHeistToTheMuseumConcentrationSite $PORT2'
-
+sshpass -f password ssh $LOGIN@$NODE03 "cd test/HeistToTheMuseum/dirConcentrationSite ; java serverSide.main.ServerHeistToTheMuseumConcentrationSite $PORT2 $NODE06 $PORT2 $NODE04 $PORT2 $NODE01 $PORT2 $NODE02 $PORT2 $NODE05 $PORT2"
