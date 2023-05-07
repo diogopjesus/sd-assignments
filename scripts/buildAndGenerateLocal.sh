@@ -65,7 +65,8 @@ cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
    dirAssaultParty/clientSide/entities
 
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class dirAssaultParty/clientSide/stubs
+cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
+   dirAssaultParty/clientSide/stubs
 
 cp $SRC_PATH/commInfra/*.class dirAssaultParty/commInfra
 
@@ -95,9 +96,13 @@ cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
    $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
-   dirAssaultParty/clientSide/entities
+   dirConcentrationSite/clientSide/entities
 
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class dirConcentrationSite/clientSide/stubs
+cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
+   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
+   $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
+   $SRC_PATH/clientSide/stubs/MuseumStub.class \
+   dirConcentrationSite/clientSide/stubs
 
 cp $SRC_PATH/commInfra/*.class dirConcentrationSite/commInfra
 
@@ -127,9 +132,11 @@ cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
    $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
-   dirAssaultParty/clientSide/entities
+   dirControlCollectionSite/clientSide/entities
 
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class dirControlCollectionSite/clientSide/stubs
+cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
+   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
+   dirControlCollectionSite/clientSide/stubs
 
 cp $SRC_PATH/commInfra/*.class dirControlCollectionSite/commInfra
 
@@ -159,9 +166,11 @@ cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
    $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
    $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
-   dirAssaultParty/clientSide/entities
+   dirMuseum/clientSide/entities
 
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class dirMuseum/clientSide/stubs
+cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
+   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
+   dirMuseum/clientSide/stubs
 
 cp $SRC_PATH/commInfra/*.class dirMuseum/commInfra
 
