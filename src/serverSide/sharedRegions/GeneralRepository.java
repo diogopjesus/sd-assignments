@@ -3,6 +3,7 @@ package serverSide.sharedRegions;
 import clientSide.entities.*;
 import genclass.*;
 import serverSide.main.*;
+import java.util.Objects;
 
 /**
  * General repository.
@@ -15,7 +16,7 @@ public class GeneralRepository {
     /**
      * Name of the logging file.
      */
-    private final String logFileName;
+    private String logFileName;
 
     /**
      * State of the master thief.
@@ -77,18 +78,9 @@ public class GeneralRepository {
 
     /**
      * Instantiation of a general repository object.
-     *
-     * @param logFileName name of the logging file.
-     * @param maxDis maximum displacement of the ordinary thieves.
-     * @param numPaint number of paintings in each room.
-     * @param roomDist distance to each room.
      */
-    public GeneralRepository(String logFileName, int[] maxDis, int[] numPaint, int[] roomDist) {
-        /* Store the logging filename */
-        if ((logFileName == null) || logFileName.compareTo("") == 0)
-            this.logFileName = "internalState.log";
-        else
-            this.logFileName = logFileName;
+    public GeneralRepository() {
+        logFileName = "logger";
 
         /* Store master thief initial info */
         this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
@@ -100,7 +92,7 @@ public class GeneralRepository {
         for (int i = 0; i < SimulPar.M - 1; i++) {
             this.ordinaryThiefState[i] = OrdinaryThiefStates.CONCENTRATION_SITE;
             this.ordinaryThiefSituation[i] = 'W';
-            this.ordinaryThiefMaximumDisplacement[i] = maxDis[i];
+            this.ordinaryThiefMaximumDisplacement[i] = -1;
         }
 
         /* Store assault parties initial info */
@@ -120,13 +112,26 @@ public class GeneralRepository {
         /* Store museum initial info */
         this.museumRoomNumberPaintings = new int[SimulPar.N];
         this.museumRoomDistance = new int[SimulPar.N];
-        for (int i = 0; i < SimulPar.N; i++) {
-            this.museumRoomNumberPaintings[i] = numPaint[i];
-            this.museumRoomDistance[i] = roomDist[i];
-        }
 
         /* Initial number of stolen paintings */
         this.stolenPaintings = 0;
+    }
+
+    /**
+     * Operation initialization of simulation.
+     *
+     * @param logFileName name of the logging file.
+     * @param maxDis maximum displacement of the ordinary thieves.
+     * @param numPaint number of paintings in each room.
+     * @param roomDist distance to each room.
+     */
+    public synchronized void initSimul(String logFileName, int[] maxDis) {
+        /* Store the logging filename */
+        if (!Objects.equals(logFileName, ""))
+            this.logFileName = logFileName;
+
+        for (int i = 0; i < SimulPar.M - 1; i++)
+            this.ordinaryThiefMaximumDisplacement[i] = maxDis[i];
 
         reportInitialStatus();
     }
@@ -208,8 +213,6 @@ public class GeneralRepository {
         }
         log.writelnString(lineStatus);
 
-        // log.writelnString();
-
         if (!log.close()) {
             GenericIO
                     .writelnString("The operation of closing the file " + logFileName + " failed!");
@@ -240,6 +243,20 @@ public class GeneralRepository {
                     .writelnString("The operation of closing the file " + logFileName + " failed!");
             System.exit(1);
         }
+    }
+
+    /**
+     * Set room information (number of paintings and room distances).
+     *
+     * @param numPaint number of paintings in each room.
+     * @param roomDist distance between each room and the outside.
+     */
+    public synchronized void setRoomInfo(int[] numPaint, int[] roomDist) {
+        for (int i = 0; i < SimulPar.N; i++) {
+            this.museumRoomNumberPaintings[i] = numPaint[i];
+            this.museumRoomDistance[i] = roomDist[i];
+        }
+        reportStatus();
     }
 
     /**
@@ -337,10 +354,9 @@ public class GeneralRepository {
      * @param assaultPartyId assault party id.
      * @param elementId element id (position of the thief in the party).
      */
-    public synchronized void endAssaultPartyElementMission(boolean canvas, int assaultPartyId,
-            int elementId) {
+    public synchronized void endAssaultPartyElementMission(int assaultPartyId, int elementId) {
         /* Increment number of paintings stolen if there's a canvas */
-        if (canvas)
+        if (getAssaultPartyElementCanvas(assaultPartyId, elementId) > 0)
             incrementStolenPaintings();
 
         /* Remove ordinary thief from the assault party */
@@ -350,6 +366,16 @@ public class GeneralRepository {
         masterThiefState = MasterThiefStates.DECIDING_WHAT_TO_DO;
 
         reportStatus();
+    }
+
+    /**
+     * Operation server shutdown.
+     *
+     * New operation.
+     */
+    public synchronized void shutdown() {
+        // TODO: 6/05/23
+        notifyAll(); // the barber may now terminate
     }
 
     /**

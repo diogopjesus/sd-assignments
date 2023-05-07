@@ -267,6 +267,16 @@ public class ConcentrationSite {
     }
 
     /**
+     * Operation server shutdown.
+     *
+     * New operation.
+     */
+    public synchronized void shutdown() {
+        // TODO: 6/05/23
+        notifyAll(); // the barber may now terminate
+    }
+
+    /**
      * Get the id of the thief that was called to join an assault party.
      *
      * @return called thief id.

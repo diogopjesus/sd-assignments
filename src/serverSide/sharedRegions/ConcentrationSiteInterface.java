@@ -45,18 +45,86 @@ public class ConcentrationSiteInterface {
 
         switch (inMessage.getMsgType()) {
             case MessageType.AMINEE:
+                if ((inMessage.getOrdinaryThiefId() < 0)
+                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
+                if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                        || (inMessage
+                                .getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE))
+                    throw new MessageException("Invalid Ordinary Thief State!", inMessage);
+                break;
+
             case MessageType.PREASSPAR:
+                if ((inMessage.getAssaultPartyId() < 0)
+                        || (inMessage.getAssaultPartyId() >= SimulPar.K))
+                    throw new MessageException("Invalid Assault Party Id!", inMessage);
+                if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N))
+                    throw new MessageException("Invalid Room Id!", inMessage);
+                break;
+
             case MessageType.PREEXC:
+                if ((inMessage.getOrdinaryThiefId() < 0)
+                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
+
             case MessageType.SUMUPRES:
+                break;
+
+            case MessageType.SHUT:
+                break;
+
+            default:
+                throw new MessageException("Invalid message type!", inMessage);
         }
 
         /* processing */
 
         switch (inMessage.getMsgType()) {
             case MessageType.AMINEE:
+                ((ConcentrationSiteClientProxy) Thread.currentThread())
+                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                ((ConcentrationSiteClientProxy) Thread.currentThread())
+                        .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+                boolean isNeeded = concentrationSite.amINeeded();
+                outMessage = new Message(MessageType.AMINEEDONE,
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getOrdinaryThiefId(),
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getOrdinaryThiefState(),
+                        isNeeded);
+                break;
+
             case MessageType.PREASSPAR:
+                concentrationSite.prepareAssaultParty(inMessage.getAssaultPartyId(),
+                        inMessage.getRoomId());
+                outMessage = new Message(MessageType.PREASSPARDONE,
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getMasterThiefState());
+                break;
+
             case MessageType.PREEXC:
+                ((ConcentrationSiteClientProxy) Thread.currentThread())
+                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                int assPartId = concentrationSite.prepareExcursion();
+                outMessage = new Message(MessageType.PREEXCDONE,
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getOrdinaryThiefId(),
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getOrdinaryThiefState(),
+                        assPartId);
+                break;
+
             case MessageType.SUMUPRES:
+                concentrationSite.sumUpResults();
+                outMessage = new Message(MessageType.SUMUPRESDONE,
+                        ((ConcentrationSiteClientProxy) Thread.currentThread())
+                                .getMasterThiefState());
+                break;
+
+            case MessageType.SHUT:
+                concentrationSite.shutdown();
+                outMessage = new Message(MessageType.SHUTDONE);
+                break;
         }
 
         return (outMessage);

@@ -44,14 +44,46 @@ public class MuseumInterface {
 
         switch (inMessage.getMsgType()) {
             case MessageType.ROLACAN:
+                if ((inMessage.getOrdinaryThiefId() < 0)
+                        || (inMessage.getOrdinaryThiefId() >= SimulPar.M - 1))
+                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
+                if ((inMessage.getAssaultPartyId() < 0)
+                        || (inMessage.getAssaultPartyId() >= SimulPar.N))
+                    throw new MessageException("Invalid Assault Party Id!", inMessage);
+                break;
+
             case MessageType.GETROODIS:
+                if (inMessage.getRoomId() < 0 || inMessage.getRoomId() >= SimulPar.N)
+                    throw new MessageException("Invalid Room Id!", inMessage);
+                break;
+
+            case MessageType.SHUT:
+                break;
+
+            default:
+                throw new MessageException("Invalid message type!", inMessage);
         }
 
         /* processing */
 
         switch (inMessage.getMsgType()) {
             case MessageType.ROLACAN:
+                ((MuseumClientProxy) Thread.currentThread())
+                        .setOrdinaryThiefId(inMessage.getOrdinaryThiefId());
+                museum.rollACanvas(inMessage.getAssaultPartyId());
+                outMessage = new Message(MessageType.ROLACANDONE,
+                        ((MuseumClientProxy) Thread.currentThread()).getOrdinaryThiefId());
+                break;
+
             case MessageType.GETROODIS:
+                int roomDis = museum.getRoomDistance(inMessage.getRoomId());
+                outMessage = new Message(MessageType.GETROODISDONE, roomDis);
+                break;
+
+            case MessageType.SHUT:
+                museum.shutdown();
+                outMessage = new Message(MessageType.SHUTDONE);
+                break;
         }
 
         return (outMessage);

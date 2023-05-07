@@ -406,6 +406,16 @@ public class AssaultParty {
     }
 
     /**
+     * Operation server shutdown.
+     *
+     * New operation.
+     */
+    public synchronized void shutdown() {
+        // TODO: 6/05/23
+        notifyAll(); // the barber may now terminate
+    }
+
+    /**
      * Get the assault party target room distance for mission.
      *
      * @return Target room distance.

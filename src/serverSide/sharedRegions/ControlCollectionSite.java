@@ -224,10 +224,7 @@ public class ControlCollectionSite {
         int assaultPartyId = getThiefParty(ordinaryThiefId);
 
         /* Collect canvas */
-        boolean canvas = false;
-        if (isHoldingCanvas(ordinaryThiefId)) {
-            canvas = true;
-        } else {
+        if (!isHoldingCanvas(ordinaryThiefId)) {
             setRoomEmpty(assaultParties[assaultPartyId].getTargetRoom());
         }
 
@@ -242,7 +239,7 @@ public class ControlCollectionSite {
         notifyAll();
 
         mt.setMasterThiefState(MasterThiefStates.DECIDING_WHAT_TO_DO);
-        repos.endAssaultPartyElementMission(canvas, assaultPartyId, element);
+        repos.endAssaultPartyElementMission(assaultPartyId, element);
     }
 
     /**
@@ -298,7 +295,6 @@ public class ControlCollectionSite {
         }
 
         return availableRoom;
-
     }
 
     /**
@@ -365,6 +361,16 @@ public class ControlCollectionSite {
      */
     public synchronized void setThiefToParty(int thiefId, int assaultPartyId) {
         this.thievesParties[thiefId] = assaultPartyId;
+    }
+
+    /**
+     * Operation server shutdown.
+     *
+     * New operation.
+     */
+    public synchronized void shutdown() {
+        // TODO: 6/05/23
+        notifyAll(); // the barber may now terminate
     }
 
     /**
