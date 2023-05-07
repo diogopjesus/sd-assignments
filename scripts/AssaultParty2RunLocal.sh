@@ -4,7 +4,7 @@ source .env
 
 echo "Executing the ap2 node."
 
-cd  $BUILD_PATH/dirAssaultParty
+cd  $TEST_PATH/dirAssaultParty
 
 java serverSide.main.ServerHeistToTheMuseumAssaultParty 1 22312 127.0.0.1 22310
 
