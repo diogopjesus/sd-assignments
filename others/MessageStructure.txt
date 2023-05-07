@@ -118,6 +118,10 @@ Museum:
         -> roomId
         <- distance
 
+    SET_ROOM_INFO
+        -> numPaint, roomDist
+        <- ()
+
 GeneralRepository:
     SET_MASTER_THIEF_STATE:
         -> masterThiefState
@@ -147,10 +151,10 @@ GeneralRepository:
         -> assaultPartyId, elementId
         <- ()
 
-    SET_ROOM_INFO
-        -> numPaint, roomDist
+    INIT_SIMULATION
+        -> logFileName, maxDis, numPaint, roomDist
         <- ()
 
-    INIT_SIMULATION
-        -> logFileName, maxDis
+    SET_ORDINARY_THIEF
+        -> ordinaryThiefId, maxDis
         <- ()
