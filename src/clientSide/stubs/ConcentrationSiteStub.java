@@ -1,6 +1,9 @@
 package clientSide.stubs;
 
+import serverSide.main.*;
+import clientSide.entities.*;
 import commInfra.*;
+import genclass.GenericIO;
 
 /**
  * Stub to the concentration site.
@@ -52,7 +55,40 @@ public class ConcentrationSiteStub {
             }
         }
 
-        return false;
+        outMessage = new Message(MessageType.AMINEE,
+                ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(),
+                ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefState());
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if ((inMessage.getMsgType() != MessageType.AMINEEDONE)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
+                .getOrdinaryThiefId()) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                || (inMessage.getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE)) {
+            GenericIO.writelnString("Thread " + Thread.currentThread().getName()
+                    + ": Invalid ordinary thief state!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((OrdinaryThief) Thread.currentThread())
+                .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+
+        return inMessage.isNeeded();
     }
 
     /**
@@ -75,6 +111,29 @@ public class ConcentrationSiteStub {
             } catch (InterruptedException e) {
             }
         }
+
+        outMessage = new Message(MessageType.PREASSPAR, assaultPartyId, roomId);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if ((inMessage.getMsgType() != MessageType.PREASSPARDONE)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
     }
 
     /**
@@ -97,7 +156,46 @@ public class ConcentrationSiteStub {
             }
         }
 
-        return 0;
+        outMessage = new Message(MessageType.PREEXC,
+                ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId());
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if ((inMessage.getMsgType() != MessageType.PREEXCDONE)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
+                .getOrdinaryThiefId()) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getOrdinaryThiefState() < OrdinaryThiefStates.CONCENTRATION_SITE)
+                || (inMessage.getOrdinaryThiefState() > OrdinaryThiefStates.COLLECTION_SITE)) {
+            GenericIO.writelnString("Thread " + Thread.currentThread().getName()
+                    + ": Invalid ordinary thief state!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getAssaultPartyId() < 0)
+                || (inMessage.getAssaultPartyId() >= ((SimulPar.M - 1) / SimulPar.K))) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid assault party id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((OrdinaryThief) Thread.currentThread())
+                .setOrdinaryThiefState(inMessage.getOrdinaryThiefState());
+
+        return inMessage.getAssaultPartyId();
     }
 
     /**
@@ -117,6 +215,29 @@ public class ConcentrationSiteStub {
             } catch (InterruptedException e) {
             }
         }
+
+        outMessage = new Message(MessageType.SUMUPRES);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if ((inMessage.getMsgType() != MessageType.SUMUPRESDONE)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
     }
 
     /**
@@ -134,5 +255,15 @@ public class ConcentrationSiteStub {
             } catch (InterruptedException e) {
             }
         }
+        outMessage = new Message(MessageType.SHUT);
+        com.writeObject(outMessage);
+        inMessage = (Message) com.readObject();
+        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        com.close();
     }
 }

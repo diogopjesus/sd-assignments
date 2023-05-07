@@ -1,6 +1,9 @@
 package clientSide.stubs;
 
+import serverSide.main.*;
+import clientSide.entities.*;
 import commInfra.*;
+import genclass.GenericIO;
 
 /**
  * Stub to the control collection site.
@@ -53,8 +56,26 @@ public class ControlCollectionSiteStub {
 
         outMessage = new Message(MessageType.STAOPE);
         com.writeObject(outMessage);
+
         inMessage = (Message) com.readObject();
 
+        if (inMessage.getMsgType() != MessageType.STAOPEDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
     }
 
     /**
@@ -78,7 +99,28 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        return 0;
+        outMessage = new Message(MessageType.APPSIT);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.APPSITDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getOper() != 'P' && inMessage.getOper() != 'R'
+                && inMessage.getOper() != 'E')) {
+            GenericIO.writelnString("Thread " + Thread.currentThread().getName()
+                    + ": Invalid appraise sit operation!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        return inMessage.getOper();
     }
 
 
@@ -100,6 +142,29 @@ public class ControlCollectionSiteStub {
             } catch (InterruptedException e) {
             }
         }
+
+        outMessage = new Message(MessageType.TAKARES);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.TAKARESDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
     }
 
     /**
@@ -122,6 +187,28 @@ public class ControlCollectionSiteStub {
             } catch (InterruptedException e) {
             }
         }
+
+        outMessage = new Message(MessageType.HANACAN,
+                ((OrdinaryThief) Thread.currentThread()).getOrdinaryThiefId(), assaultPartyId);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.HANACANDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if (inMessage.getOrdinaryThiefId() != ((OrdinaryThief) Thread.currentThread())
+                .getOrdinaryThiefId()) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid ordinary thief id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
     }
 
     /**
@@ -142,6 +229,29 @@ public class ControlCollectionSiteStub {
             } catch (InterruptedException e) {
             }
         }
+
+        outMessage = new Message(MessageType.COLACAN);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.COLACANDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getMasterThiefState() < MasterThiefStates.PLANNING_THE_HEIST
+                || inMessage.getMasterThiefState() > MasterThiefStates.PRESENTING_THE_REPORT)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid Master Thief State!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        ((MasterThief) Thread.currentThread()).setMasterThiefState(inMessage.getMasterThiefState());
     }
 
     /**
@@ -162,7 +272,28 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        return 0;
+        outMessage = new Message(MessageType.GETAVAASSPAR);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.GETAVAASSPARDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getAssaultPartyId() < 0)
+                || (inMessage.getAssaultPartyId() > ((SimulPar.M - 1) / SimulPar.K))) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid assault party id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        return inMessage.getAssaultPartyId();
     }
 
     /**
@@ -183,7 +314,61 @@ public class ControlCollectionSiteStub {
             }
         }
 
-        return 0;
+        outMessage = new Message(MessageType.GETAVAROO);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.GETAVAROODONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N)) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid room id!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
+
+        return inMessage.getRoomId();
+    }
+
+    /**
+     * Associate a thief to an assault party.
+     *
+     * @param thiefId thief id.
+     * @param assaultPartyId assault party id.
+     */
+    public void setThiefToParty(int thiefId, int assaultPartyId) {
+        ClientCom com; // communication channel
+        Message outMessage, // outgoing message
+                inMessage; // incoming message
+
+        com = new ClientCom(serverHostName, serverPortNumb);
+        while (!com.open()) {
+            try {
+                Thread.sleep((long) (1000));
+            } catch (InterruptedException e) {
+            }
+        }
+
+        outMessage = new Message(MessageType.SETTHITOPAR, thiefId, assaultPartyId);
+        com.writeObject(outMessage);
+
+        inMessage = (Message) com.readObject();
+
+        if (inMessage.getMsgType() != MessageType.SETTHITOPARDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+
+        com.close();
     }
 
     /**
@@ -201,5 +386,15 @@ public class ControlCollectionSiteStub {
             } catch (InterruptedException e) {
             }
         }
+        outMessage = new Message(MessageType.SHUT);
+        com.writeObject(outMessage);
+        inMessage = (Message) com.readObject();
+        if (inMessage.getMsgType() != MessageType.SHUTDONE) {
+            GenericIO.writelnString(
+                    "Thread " + Thread.currentThread().getName() + ": Invalid message type!");
+            GenericIO.writelnString(inMessage.toString());
+            System.exit(1);
+        }
+        com.close();
     }
 }
