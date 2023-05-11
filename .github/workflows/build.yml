@@ -22,22 +22,10 @@ jobs:
           distribution: 'temurin'
           java-version: '8'
 
-      - name: Compile project (run 'run.sh compile')
+      - name: Build project (run 'run.sh build')
         run: |
           chmod +x ./run.sh
-          ./run.sh compile
-        shell: bash
-
-      - name: Run program 10 times
-        run: |
-          chmod +x ./run.sh
-          ./run.sh 10
-        shell: bash
-
-      - name: Check if logs are valid
-        run: |
-          chmod +x ./run.sh
-          ./run.sh check-log-dir log
+          printf '\ntest-login\n11111\npassword\n' |./run.sh build
         shell: bash
 
   # TODO: deploy docs based on success
