@@ -233,6 +233,10 @@ zip -rq dirClient.zip dirClient
 
 
 echo "Deploying and decompressing execution environments."
+if [["$TEST_PATH" = ""]]; then
+  echo "ERROR: Test variable not defined!"
+  exit 1
+fi
 mkdir -p $TEST_PATH
 rm -rf $TEST_PATH/dirGeneralRepository
 rm -rf $TEST_PATH/dirAssaultParty
