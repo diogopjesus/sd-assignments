@@ -213,14 +213,14 @@ public class GeneralRepository {
         lineStatus = "     ";
         for (int assPart = 0; assPart < (SimulPar.M - 1) / SimulPar.K; assPart++) {
             int roomId = getAssaultPartyRoomId(assPart);
-            lineStatus += (roomId == -1 ? "#" : roomId + 1) + "    ";
+            lineStatus += (roomId == -1 ? "-" : roomId + 1) + "    ";
             for (int elem = 0; elem < SimulPar.K; elem++) {
                 int elementId = getAssaultPartyElementId(assPart, elem);
-                lineStatus += (elementId == -1 ? "#" : elementId + 1) + "  ";
+                lineStatus += (elementId == -1 ? "-" : elementId + 1) + "  ";
                 int position = getAssaultPartyElementPosition(assPart, elem);
-                lineStatus += (position == -1 ? "##" : String.format("%02d", position)) + "  ";
+                lineStatus += (position == -1 ? "--" : String.format("%02d", position)) + "  ";
                 int canvas = getAssaultPartyElementCanvas(assPart, elem);
-                lineStatus += (canvas == -1 ? "#" : canvas) + "   ";
+                lineStatus += (canvas == -1 ? "-" : canvas) + "   ";
             }
         }
         for (int room = 0; room < SimulPar.N; room++) {
