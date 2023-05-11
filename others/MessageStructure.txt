@@ -1,0 +1,152 @@
+AssaultParty:
+    SEND_ASSAULT_PARTY
+        -> ()
+        <- masterThiefState
+
+    CRAWL_IN
+        -> ordinaryThiefId, maxDis
+        <- ordinaryThiefId, ordinaryThiefState, contCrawl
+
+    REVERSE_DIRECTION
+        -> ordinaryThiefId
+        <- ordinaryThiefId, ordinaryThiefState
+
+    CRAWL_OUT
+        -> ordinaryThiefId, maxDis
+        <- ordinaryThiefId, ordinaryThiefState, contCrawl
+
+    SET_TARGET_ROOM
+        -> roomId
+        <- ()
+
+    GET_TARGET_ROOM
+        -> ()
+        <- roomId
+
+    SET_TARGET_ROOM_DISTANCE
+        -> dist
+        <- ()
+
+    IS_AVAILABLE
+        -> ()
+        <- isAvailable
+
+    IS_FULL
+        -> ()
+        <- isFull
+
+    JOIN_ASSAULT_PARTY
+        -> ordinaryThiefId
+        <- ()
+
+    QUIT_ASSAULT_PARTY
+        -> ordinaryThiefId
+        <-  ()
+
+    SET_HOLDLING_CANVAS
+        -> ordinaryThiefId, canvas
+        <- ()
+
+    IS_HOLDING_CANVAS
+        -> ordinaryThiefId
+        <- canvas
+
+    GET_THIEF_ELEMENT
+        -> ordinaryThiefId
+        <- element
+
+ConcentrationSite:
+    AM_I_NEEDED
+        -> ordinaryThiefId, ordinaryThiefState
+        <- ordinaryThiefId, ordinaryThiefState, isNeeded
+
+    PREPARE_ASSAULT_PARTY
+        -> assaultPartyId, roomId
+        <- masterThiefState
+
+    PREPARE_EXCURSION
+        -> ordinaryThiefId
+        <- ordinaryThiefId, ordinaryThiefState, assaultPartyId
+
+    SUM_UP_RESULTS
+        -> ()
+        <- masterThiefState
+
+ControlCollectionSite:
+    START_OPERATIONS
+        -> ()
+        <- masterThiefState
+
+    APPRAISE_SIT
+        -> ()
+        <- oper
+
+    TAKE_A_REST
+        -> ()
+        <- masterThiefState
+
+    HAND_A_CANVAS
+        -> ordinaryThiefId, assaultPartyId
+        <- ordinaryThiefId
+
+    COLLECT_A_CANVAS
+        -> ()
+        <- masterThiefState
+
+    GET_AVAILABLE_ASSAULT_PARTY
+        -> ()
+        <- assaultPartyId
+
+    GET_AVAILABLE_ROOM
+        -> ()
+        <- roomId
+
+    SET_THIEF_TO_PARTY
+        -> ordinaryThiefId, assaultPartyId
+        <- ()
+
+Museum:
+    ROLL_A_CANVAS
+        -> ordinaryThiefId, assaultPartyId
+        <- ordinaryThiefId
+
+    GET_ROOM_DISTANCE
+        -> roomId
+        <- distance
+
+    SET_ROOM_INFO
+        -> numPaint, roomDist
+        <- ()
+
+GeneralRepository:
+    SET_MASTER_THIEF_STATE:
+        -> masterThiefState
+        <- ()
+
+    SET_ORDINARY_THIEF_STATE
+        -> ordinaryThiefId, ordinaryThiefState
+        <- ()
+
+    SET_ASSAULT_PARTY_ROOM_ID
+        -> assaultPartyId, roomId
+        <- ()
+
+    SET_ASSAULT_PARTY_ELEMENT_ID
+        -> assaultPartyId, elementId, ordinaryThiefId
+        <- ()
+
+    SET_ASSAULT_PARTY_ELEMENT_POSITION
+        -> assaultPartyId, elementId, position
+        <- ()
+
+    SET_ASSAULT_PARTY_ELEMENT_CANVAS
+        -> assaultPartyId, elementId, canvas
+        <- ()
+
+    END_ASSAULT_PARTY_ELEMENT_MISSION
+        -> assaultPartyId, elementId
+        <- ()
+
+    INIT_SIMULATION
+        -> logFileName, maxDis, numPaint, roomDist
+        <- ()
