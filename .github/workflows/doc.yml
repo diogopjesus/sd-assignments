@@ -19,8 +19,14 @@ jobs:
           with:
             distribution: 'temurin'
             java-version: '8'
-        
+            
         - name: Build project
+          run: |
+            chmod +x ./run.sh
+            printf '\ntest-login\n11111\npassword\n' |./run.sh build
+          shell: bash
+        
+        - name: Generate documentation
           run: |
             chmod +x ./run.sh
             ./run.sh doc
