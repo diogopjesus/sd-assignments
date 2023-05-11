@@ -4,7 +4,7 @@ source .env
 
 echo "Compiling source code."
 cd $SRC_PATH
-javac --release 8 */*.java */*/*.java
+javac */*.java */*/*.java
 
 echo "Distributing intermediate code to the different execution environments."
 
