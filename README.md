@@ -8,7 +8,7 @@ Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag
 **Final Grade**: 14/16.
 
 ## Assignment 2
-Code not yet available.
+Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag/second-assignment).
 
 **Final Grade**: 16/16.
 
