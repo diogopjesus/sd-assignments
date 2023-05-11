@@ -234,7 +234,12 @@ zip -rq dirClient.zip dirClient
 
 echo "Deploying and decompressing execution environments."
 mkdir -p $TEST_PATH
-rm -rf $TEST_PATH/*
+rm -rf $TEST_PATH/dirGeneralRepository
+rm -rf $TEST_PATH/dirAssaultParty
+rm -rf $TEST_PATH/dirConcentrationSite
+rm -rf $TEST_PATH/dirControlCollectionSite
+rm -rf $TEST_PATH/dirMuseum
+rm -rf $TEST_PATH/dirClient
 
 cp dirGeneralRepository.zip $TEST_PATH
 cp dirAssaultParty.zip $TEST_PATH

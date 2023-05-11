@@ -2,7 +2,7 @@
 
 source .env
 
-echo "Executing the GeneraRepos node."
+echo "Executing general repository program locally."
 
 cd  $TEST_PATH/dirGeneralRepository
 

@@ -2,10 +2,8 @@
 
 source .env
 
-echo "Executing the ap2 node."
+echo "Executing assault party 2 program locally."
 
 cd  $TEST_PATH/dirAssaultParty
 
 java serverSide.main.ServerHeistToTheMuseumAssaultParty 1 22312 127.0.0.1 22310
-
-echo "AP2 Server shutdown."
