@@ -14,5 +14,5 @@ indent_size = 4
 max_line_length = 140
 continuation_indent_size = 8
 
-[*{py,sh,yml}]
+[*.{py,sh,yml}]
 indent_size = 2
