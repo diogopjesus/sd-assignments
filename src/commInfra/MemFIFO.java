@@ -1,7 +1,8 @@
 package commInfra;
 
 /**
- * Parametric FIFO derived from a parametric memory. Errors are reported.
+ * Parametric FIFO derived from a parametric memory.
+ * Errors are reported.
  *
  * @param <R> data type of stored objects
  */
@@ -22,8 +23,9 @@ public class MemFIFO<R> extends MemObject<R> {
     private boolean empty;
 
     /**
-     * FIFO instantiation. The instantiation only takes place if the memory exists. Otherwise, an
-     * error is reported.
+     * FIFO instantiation.
+     * The instantiation only takes place if the memory exists.
+     * Otherwise, an error is reported.
      *
      * @param storage memory to be used
      * @throws MemException when the memory does not exist
@@ -35,8 +37,9 @@ public class MemFIFO<R> extends MemObject<R> {
     }
 
     /**
-     * FIFO insertion. A parametric object is written into it. If the FIFO is full, an error is
-     * reported.
+     * FIFO insertion.
+     * A parametric object is written into it.
+     * If the FIFO is full, an error is reported.
      *
      * @param val parametric object to be written
      * @throws MemException when the FIFO is full
@@ -52,8 +55,9 @@ public class MemFIFO<R> extends MemObject<R> {
     }
 
     /**
-     * FIFO retrieval. A parametric object is read from it. If the FIFO is empty, an error is
-     * reported.
+     * FIFO retrieval.
+     * A parametric object is read from it.
+     * If the FIFO is empty, an error is reported.
      *
      * @return first parametric object that was written
      * @throws MemException when the FIFO is empty
@@ -74,7 +78,8 @@ public class MemFIFO<R> extends MemObject<R> {
     /**
      * Test FIFO current full status.
      *
-     * @return true, if FIFO is full - false, otherwise
+     * @return true, if FIFO is full -
+     *         false, otherwise
      */
     public boolean full() {
         return !((inPnt != outPnt) || empty);
