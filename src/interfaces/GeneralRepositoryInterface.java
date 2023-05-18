@@ -1,188 +1,112 @@
 package interfaces;
 
-import serverSide.main.*;
-import serverSide.objects.GeneralRepository;
-import clientSide.entities.*;
-import commInfra.*;
+import java.rmi.*;
 
 /**
- * Interface to the General Repository of Information.
+ * Operational interface of a remote object of type GeneralRepository.
  *
- * It is responsible to validate and process the incoming message, execute the corresponding method
- * on the General Repository and generate the outgoing message. Implementation of a client-server
- * model of type 2 (server replication). Communication is based on a communication channel under the
- * TCP protocol.
+ * It provides the functionality to access the General Repository of
+ * Information.
  */
 
-public class GeneralRepositoryInterface {
+public interface GeneralRepositoryInterface extends Remote {
     /**
-     * Reference to the general repository.
-     */
-
-    private final GeneralRepository repos;
-
-    /**
-     * Instantiation of an interface to the general repository.
+     * Operation initialization of simulation.
      *
-     * @param repos reference to the general repository
+     * @param logFileName name of the logging file.
+     * @param maxDis      maximum displacement of the ordinary thieves.
+     * @param numPaint    number of paintings in each room.
+     * @param roomDist    distance between each room and the outside gathering site.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-
-    public GeneralRepositoryInterface(GeneralRepository repos) {
-        this.repos = repos;
-    }
+    public void initSimul(String logFileName, int[] maxDis, int[] numPaint, int[] roomDist) throws RemoteException;
 
     /**
-     * Processing of the incoming messages.
+     * Set the current state of the master thief.
      *
-     * Validation, execution of the corresponding method and generation of the outgoing message.
+     * @param masterThiefState the current state of the master thief.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setMasterThiefState(int masterThiefState) throws RemoteException;
+
+    /**
+     * Set the current state of an ordinary thief.
      *
-     * @param inMessage service request
-     * @return service reply
-     * @throws MessageException if the incoming message is not valid
+     * @param thiefId            the thief id.
+     * @param ordinaryThiefState the ordinary thief state.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setOrdinaryThiefState(int thiefId, int ordinaryThiefState) throws RemoteException;
+
+    /**
+     * Set the current room id of an assault party.
+     *
+     * @param assaultPartyId     the assault party id.
+     * @param assaultPartyRoomId the target room id of the assault party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setAssaultPartyRoomId(int assaultPartyId, int assaultPartyRoomId) throws RemoteException;
+
+    /**
+     * Set the current element id of an assault party.
+     *
+     * @param assaultPartyId the assault party id.
+     * @param elementId      the element id.
+     * @param thiefId        thief id.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setAssaultPartyElementId(int assaultPartyId, int elementId, int thiefId) throws RemoteException;
+
+    /**
+     * Set the current element position of an assault party.
+     *
+     * @param assaultPartyId              the assault party id.
+     * @param elementId                   the element id.
+     * @param assaultPartyElementPosition the target element position of the assault
+     *                                    party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setAssaultPartyElementPosition(int assaultPartyId, int elementId, int assaultPartyElementPosition)
+            throws RemoteException;
+
+    /**
+     * Set the current element canvas of an assault party.
+     *
+     * @param assaultPartyId            the assault party id.
+     * @param elementId                 the element id.
+     * @param assaultPartyElementCanvas the target element canvas of the assault
+     *                                  party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void setAssaultPartyElementCanvas(int assaultPartyId, int elementId, boolean assaultPartyElementCanvas)
+            throws RemoteException;
+
+    /**
+     * Increment canvas stolen by a thief, if he has one and remove the thief from
+     * the assault
+     * party.
+     *
+     * @param assaultPartyId assault party id.
+     * @param elementId      element id (position of the thief in the party).
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    public void endAssaultPartyElementMission(int assaultPartyId, int elementId) throws RemoteException;
+
+    /**
+     * Operation server shutdown.
+     *
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
 
-    public Message processAndReply(Message inMessage) throws MessageException {
-        Message outMessage = null; // outgoing message
+    public void shutdown() throws RemoteException;
 
-        /* validation of the incoming message */
-        switch (inMessage.getMsgType()) {
-            case MessageType.SET_MASTER_THIEF_STATE:
-                if ((inMessage.getMtState() < MasterThiefStates.PLANNING_THE_HEIST)
-                        || (inMessage.getMtState() > MasterThiefStates.PRESENTING_THE_REPORT))
-                    throw new MessageException("Invalid Master Thief State!", inMessage);
-                break;
-
-            case MessageType.SET_ORDINARY_THIEF_STATE:
-                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
-                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                if ((inMessage.getOtState() < OrdinaryThiefStates.CONCENTRATION_SITE)
-                        || (inMessage.getOtState() > OrdinaryThiefStates.COLLECTION_SITE))
-                    throw new MessageException("Invalid Ordinary Thief State!", inMessage);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ROOM_ID:
-                if ((inMessage.getAssPartId() < 0)
-                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
-                    throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getRoomId() < 0) || (inMessage.getRoomId() >= SimulPar.N))
-                    throw new MessageException("Invalid Room Id!", inMessage);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_ID:
-                if ((inMessage.getAssPartId() < 0)
-                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
-                    throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
-                    throw new MessageException("Invalid Element Id!", inMessage);
-                if ((inMessage.getOtId() < 0) || (inMessage.getOtId() >= SimulPar.M - 1))
-                    throw new MessageException("Invalid Ordinary Thief Id!", inMessage);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_POSITION:
-                if ((inMessage.getAssPartId() < 0)
-                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
-                    throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
-                    throw new MessageException("Invalid Element Id!", inMessage);
-                if ((inMessage.getPos() < 0) || (inMessage.getPos() > SimulPar.D))
-                    throw new MessageException("Invalid Position!", inMessage);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_CANVAS:
-                if ((inMessage.getAssPartId() < 0)
-                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
-                    throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
-                    throw new MessageException("Invalid Element Id!", inMessage);
-                break;
-
-            case MessageType.END_ASSAULT_PARTY_ELEMENT_MISSION:
-                if ((inMessage.getAssPartId() < 0)
-                        || (inMessage.getAssPartId() >= ((SimulPar.M - 1) / SimulPar.K)))
-                    throw new MessageException("Invalid Assault Party Id!", inMessage);
-                if ((inMessage.getElemId() < 0) || (inMessage.getElemId() >= SimulPar.K))
-                    throw new MessageException("Invalid Element Id!", inMessage);
-                break;
-
-            case MessageType.INIT_SIMULATION:
-                String logFileName = inMessage.getfName();
-                if ((logFileName == null))
-                    throw new MessageException("Invalid Log File Name!", inMessage);
-                int[] maxDisArray = inMessage.getMaxDisArray();
-                for (int i = 0; i < SimulPar.N; i++) {
-                    if ((maxDisArray[i] < SimulPar.md) || (maxDisArray[i] > SimulPar.MD))
-                        throw new MessageException("Invalid Maximum Displacement!", inMessage);
-                }
-                int[] numPaint = inMessage.getNumPaint();
-                int[] roomDist = inMessage.getRoomDist();
-                for (int i = 0; i < SimulPar.N; i++) {
-                    if ((numPaint[i] < SimulPar.p) || (numPaint[i] > SimulPar.P))
-                        throw new MessageException("Invalid Number of Paintings!", inMessage);
-                    if ((roomDist[i] < SimulPar.d) || (roomDist[i] > SimulPar.D))
-                        throw new MessageException("Invalid Room Distance!", inMessage);
-                }
-                break;
-
-            case MessageType.SHUTDOWN:
-                break;
-
-            default:
-                throw new MessageException("Invalid message type!", inMessage);
-        }
-
-        /* processing */
-        switch (inMessage.getMsgType()) {
-            case MessageType.SET_MASTER_THIEF_STATE:
-                repos.setMasterThiefState(inMessage.getMtState());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.SET_ORDINARY_THIEF_STATE:
-                repos.setOrdinaryThiefState(inMessage.getOtId(), inMessage.getOtState());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ROOM_ID:
-                repos.setAssaultPartyRoomId(inMessage.getAssPartId(), inMessage.getRoomId());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_ID:
-                repos.setAssaultPartyElementId(inMessage.getAssPartId(), inMessage.getElemId(),
-                        inMessage.getOtId());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_POSITION:
-                repos.setAssaultPartyElementPosition(inMessage.getAssPartId(),
-                        inMessage.getElemId(), inMessage.getPos());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.SET_ASSAULT_PARTY_ELEMENT_CANVAS:
-                repos.setAssaultPartyElementCanvas(inMessage.getAssPartId(), inMessage.getElemId(),
-                        inMessage.isCanvas());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.END_ASSAULT_PARTY_ELEMENT_MISSION:
-                repos.endAssaultPartyElementMission(inMessage.getAssPartId(),
-                        inMessage.getElemId());
-                outMessage = new Message(MessageType.SET_ACKNOWLEDGE);
-                break;
-
-            case MessageType.INIT_SIMULATION:
-                repos.initSimul(inMessage.getfName(), inMessage.getMaxDisArray(),
-                        inMessage.getNumPaint(), inMessage.getRoomDist());
-                outMessage = new Message(MessageType.INIT_SIMULATION_DONE);
-                break;
-
-            case MessageType.SHUTDOWN:
-                repos.shutdown();
-                outMessage = new Message(MessageType.SHUTDOWN_DONE);
-                break;
-        }
-
-        return (outMessage);
-    }
 }
