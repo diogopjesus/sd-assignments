@@ -17,7 +17,7 @@ public interface AssaultPartyInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void sendAssaultParty() throws RemoteException;
+    public int sendAssaultParty() throws RemoteException;
 
     /**
      * Operation crawl in.
@@ -28,7 +28,7 @@ public interface AssaultPartyInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public boolean crawlIn() throws RemoteException;
+    public ReturnBoolean crawlIn(int ordId, int maxDis) throws RemoteException;
 
     /**
      * Operation reverse direction.
@@ -39,7 +39,7 @@ public interface AssaultPartyInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void reverseDirection() throws RemoteException;
+    public int reverseDirection(int ordId) throws RemoteException;
 
     /**
      * Operation crawl out.
@@ -50,7 +50,7 @@ public interface AssaultPartyInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public boolean crawlOut() throws RemoteException;
+    public ReturnBoolean crawlOut(int ordId, int maxDis) throws RemoteException;
 
     /**
      * Set the assault party target room for mission.

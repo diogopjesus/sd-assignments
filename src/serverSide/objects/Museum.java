@@ -1,17 +1,21 @@
 package serverSide.objects;
 
-import serverSide.entities.*;
+import java.rmi.*;
+import interfaces.*;
 import serverSide.main.*;
-import clientSide.stubs.*;
+import genclass.GenericIO;
 
 /**
  * Museum.
  *
- * It is responsible to keep in count the number of paintings in each room and is implemented as an
- * implicit monitor. All public methods are executed in mutual exclusion. There are no internal
- * synchronization points.
+ * It is responsible to keep in count the number of paintings in each room and
+ * is implemented as an implicit monitor.
+ * All public methods are executed in mutual exclusion.
+ * There are no internal synchronization points.
+ * Implementation of a client-server model of type 2 (server replication).
+ * Communication is based on Java RMI.
  */
-public class Museum {
+public class Museum implements MuseumInterface {
     /**
      * Number of canvas in each room.
      */
@@ -30,27 +34,26 @@ public class Museum {
     /**
      * Reference to customer threads.
      */
-
-    private final MuseumClientProxy[] ord;
+    private final Thread[] ord;
 
     /**
      * Reference to the general repository.
      */
-    private final GeneralRepositoryStub reposStub;
+    private final GeneralRepositoryInterface reposStub;
 
     /**
      * Reference to the assault parties.
      */
-    private final AssaultPartyStub[] assaultPartiesStub;
+    private final AssaultPartyInterface[] assaultPartiesStub;
 
     /**
      * Museum constructor.
      *
-     * @param reposStub general repository.
+     * @param reposStub          general repository.
      * @param assaultPartiesStub assault parties.
      */
-    public Museum(GeneralRepositoryStub reposStub, AssaultPartyStub[] assaultPartiesStub) {
-        ord = new MuseumClientProxy[SimulPar.M - 1];
+    public Museum(GeneralRepositoryInterface reposStub, AssaultPartyInterface[] assaultPartiesStub) {
+        ord = new Thread[SimulPar.M - 1];
         for (int i = 0; i < SimulPar.M - 1; i++)
             ord[i] = null;
         this.nEntities = 0;
@@ -70,27 +73,56 @@ public class Museum {
      * It is called by an ordinary thief to roll a canvas from a room.
      *
      * @param assaultPartyId assault party id.
+     * @param ordId          identification of the ordinary thief.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized void rollACanvas(int assaultPartyId) {
-        int ordId;
-        ordId = ((MuseumClientProxy) Thread.currentThread()).getOrdinaryThiefId();
-        ord[ordId] = (MuseumClientProxy) Thread.currentThread();
+    @Override
+    public synchronized void rollACanvas(int assaultPartyId, int ordId) {
+        ord[ordId] = (Thread) Thread.currentThread();
 
         /* Get target room from assault party */
-        int targetRoom = assaultPartiesStub[assaultPartyId].getTargetRoom();
+        int targetRoom = Integer.MIN_VALUE;
+        try {
+            targetRoom = assaultPartiesStub[assaultPartyId].getTargetRoom();
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordId + " remote exception on rollACanvas - getTargetRoom: " + e.getMessage());
+            System.exit(1);
+        }
 
         /* Define if thief is holding a canvas */
-        assaultPartiesStub[assaultPartyId].setHoldingCanvas(ord[ordId].getOrdinaryThiefId(),
-                canvasInRoom[targetRoom] > 0);
+        try {
+            assaultPartiesStub[assaultPartyId].setHoldingCanvas(ordId, canvasInRoom[targetRoom] > 0);
+        } catch (RemoteException e) {
+            GenericIO.writelnString("Ordinary thief " + ordId + " remote exception on rollACanvas - setHoldingCanvas: "
+                    + e.getMessage());
+        }
 
         if (canvasInRoom[targetRoom] > 0) {
             canvasInRoom[targetRoom]--;
 
             /* Get ordinary thief element (position inside the assault party) */
-            int elementId = assaultPartiesStub[assaultPartyId]
-                    .getThiefElement(ord[ordId].getOrdinaryThiefId());
+            int elementId = Integer.MIN_VALUE;
+
+            try {
+                elementId = assaultPartiesStub[assaultPartyId].getThiefElement(ordId);
+            } catch (RemoteException e) {
+                GenericIO.writelnString(
+                        "Ordinary thief " + ordId + " remote exception on rollACanvas - getThiefElement: "
+                                + e.getMessage());
+                System.exit(1);
+            }
+
             /* Set thief holding a canvas */
-            reposStub.setAssaultPartyElementCanvas(assaultPartyId, elementId, true);
+            try {
+                reposStub.setAssaultPartyElementCanvas(assaultPartyId, elementId, true);
+            } catch (RemoteException e) {
+                GenericIO.writelnString(
+                        "Ordinary thief " + ordId + " remote exception on rollACanvas - setAssaultPartyElementCanvas: "
+                                + e.getMessage());
+                System.exit(1);
+            }
         }
     }
 
@@ -100,6 +132,7 @@ public class Museum {
      * @param roomId room id.
      * @return distance to a room.
      */
+    @Override
     public synchronized int getRoomDistance(int roomId) {
         return roomDistances[roomId];
     }
@@ -109,9 +142,10 @@ public class Museum {
      *
      * It is called by the ordinary thieves server before the simulation starts.
      *
-     * @param canvasInRoom number of canvas in each room.
+     * @param canvasInRoom  number of canvas in each room.
      * @param roomDistances distance to each room.
      */
+    @Override
     public synchronized void setRoomInfo(int[] canvasInRoom, int[] roomDistances) {
         this.canvasInRoom = canvasInRoom;
         this.roomDistances = roomDistances;
@@ -122,10 +156,11 @@ public class Museum {
      *
      * New operation.
      */
+    @Override
     public synchronized void shutdown() {
         nEntities += 1;
         if (nEntities >= SimulPar.E)
-            ServerHeistToTheMuseumMuseum.waitConnection = false;
+            ServerHeistToTheMuseumMuseum.shutdown();
         notifyAll();
     }
 }

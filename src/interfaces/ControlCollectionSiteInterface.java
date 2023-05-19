@@ -16,7 +16,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void startOperations() throws RemoteException;
+    public int startOperations() throws RemoteException;
 
     /**
      * Operation appraise situation.
@@ -28,7 +28,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public char appraiseSit() throws RemoteException;
+    public char appraiseSit(int ordId) throws RemoteException;
 
     /**
      * Operation take a rest.
@@ -39,7 +39,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void takeARest() throws RemoteException;
+    public int takeARest() throws RemoteException;
 
     /**
      * Operation hand a canvas.
@@ -52,7 +52,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void handACanvas(int assaultPartyId) throws RemoteException;
+    public void handACanvas(int assaultPartyId, int ordId) throws RemoteException;
 
     /**
      * Operation collect a canvas.
@@ -64,7 +64,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void collectACanvas() throws RemoteException;
+    public int collectACanvas() throws RemoteException;
 
     /**
      * Get the id of an available assault party.

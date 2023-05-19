@@ -1,32 +1,37 @@
 package serverSide.objects;
 
-import serverSide.entities.ConcentrationSiteClientProxy;
+import java.rmi.*;
+import interfaces.*;
 import serverSide.main.*;
 import clientSide.entities.*;
-import clientSide.stubs.*;
 import commInfra.*;
 import genclass.GenericIO;
 
 /**
  * Concentration Site.
  *
- * It is responsible to keep in count the number of thieves waiting to be assigned to an assault and
- * is implemented as an implicit monitor. All public methods are executed in mutual exclusion. There
- * are 3 synchronization points: an array of blocking points, one per each ordinary thief, where
- * they wait to be called to join an assault party; a blocking point where the master thief waits
- * for all ordinary thieves to join an assault party; and a blocking point where the master thief
- * waits for all ordinary thieves to be present at the concentration site to end the operations.
+ * It is responsible to keep in count the number of thieves waiting to be
+ * assigned to an assault and is implemented as an implicit monitor.
+ * All public methods are executed in mutual exclusion.
+ * There are 3 synchronization points: an array of blocking points, one per each
+ * ordinary thief, where they wait to be called to join an assault party; a
+ * blocking point where the master thief waits for all ordinary thieves to join
+ * an assault party; and a blocking point where the master thief waits for all
+ * ordinary thieves to be present at the concentration site to end the
+ * operations.
+ * Implementation of a client-server model of type 2 (server replication).
+ * Communication is based on Java RMI.
  */
-public class ConcentrationSite {
+public class ConcentrationSite implements ConcentrationSiteInterface {
     /**
-     * Reference to barber threads.
+     * State of the ordinary thieves.
      */
-    private ConcentrationSiteClientProxy mas;
+    private final int[] ordStates;
 
     /**
-     * Reference to customer threads.
+     * State of the master thief.
      */
-    private final ConcentrationSiteClientProxy[] ord;
+    private int masState;
 
     /**
      * Number of entity groups requesting the shutdown.
@@ -41,22 +46,22 @@ public class ConcentrationSite {
     /**
      * Reference to the general repository.
      */
-    private final GeneralRepositoryStub reposStub;
+    private final GeneralRepositoryInterface reposStub;
 
     /**
      * Reference to the control collection site.
      */
-    private final ControlCollectionSiteStub contColSiteStub;
+    private final ControlCollectionSiteInterface contColSiteStub;
 
     /**
      * Reference to the assault parties.
      */
-    private final AssaultPartyStub[] assaultPartiesStub;
+    private final AssaultPartyInterface[] assaultPartiesStub;
 
     /**
      * Reference to the museum.
      */
-    private final MuseumStub museumStub;
+    private final MuseumInterface museumStub;
 
     /**
      * Queue of thieves waiting to be assigned to an assault party.
@@ -86,18 +91,20 @@ public class ConcentrationSite {
     /**
      * Concentration site constructor.
      *
-     * @param reposStub general repository.
-     * @param contColSiteStub control collection site.
+     * @param reposStub          general repository.
+     * @param contColSiteStub    control collection site.
      * @param assaultPartiesStub assault parties.
-     * @param museumStub museum.
+     * @param museumStub         museum.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public ConcentrationSite(GeneralRepositoryStub reposStub,
-            ControlCollectionSiteStub contColSiteStub, AssaultPartyStub[] assaultPartiesStub,
-            MuseumStub museumStub) {
-        mas = null;
-        ord = new ConcentrationSiteClientProxy[SimulPar.M - 1];
+    public ConcentrationSite(GeneralRepositoryInterface reposStub,
+            ControlCollectionSiteInterface contColSiteStub, AssaultPartyInterface[] assaultPartiesStub,
+            MuseumInterface museumStub) {
+        masState = -1;
+        ordStates = new int[SimulPar.M - 1];
         for (int i = 0; i < SimulPar.M - 1; i++)
-            ord[i] = null;
+            ordStates[i] = -1;
         this.nEntities = 0;
         this.reposStub = reposStub;
         this.contColSiteStub = contColSiteStub;
@@ -120,22 +127,20 @@ public class ConcentrationSite {
      * It is called by the ordinary thief to check if he is needed.
      *
      * @return true if he is needed - false otherwise (to end operations).
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized boolean amINeeded() {
-        int ordId;
-        ordId = ((ConcentrationSiteClientProxy) Thread.currentThread()).getOrdinaryThiefId();
-        ord[ordId] = (ConcentrationSiteClientProxy) Thread.currentThread();
-
+    @Override
+    public synchronized ReturnBoolean amINeeded(int ordId, int ordState) throws RemoteException {
         /* Set ordinary thief state to concentration site */
-        if (ord[ordId].getOrdinaryThiefState() != OrdinaryThiefStates.CONCENTRATION_SITE) {
-            ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.CONCENTRATION_SITE);
-            reposStub.setOrdinaryThiefState(ord[ordId].getOrdinaryThiefId(),
-                    OrdinaryThiefStates.CONCENTRATION_SITE);
+        if (ordState != OrdinaryThiefStates.CONCENTRATION_SITE) {
+            ordStates[ordId] = OrdinaryThiefStates.CONCENTRATION_SITE;
+            reposStub.setOrdinaryThiefState(ordId, OrdinaryThiefStates.CONCENTRATION_SITE);
         }
 
         /* Add thief to the waiting queue */
         try {
-            waitingThieves.write(ord[ordId].getOrdinaryThiefId());
+            waitingThieves.write(ordId);
         } catch (MemException e) {
             GenericIO.writelnString("Instantiation of waiting FIFO failed: " + e.getMessage());
             System.exit(1);
@@ -146,7 +151,7 @@ public class ConcentrationSite {
         notifyAll();
 
         /* Wait until thief is called to join a party or to end operations */
-        while (getCalledThiefId() != ord[ordId].getOrdinaryThiefId() && !getEndOfOperations()) {
+        while (calledThiefId != ordId && !endOfOperations) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -154,7 +159,7 @@ public class ConcentrationSite {
             }
         }
 
-        return !getEndOfOperations();
+        return new ReturnBoolean(!endOfOperations, ordStates[ordId]);
     }
 
     /**
@@ -163,11 +168,12 @@ public class ConcentrationSite {
      * It is called by the master thief to prepare an assault party.
      *
      * @param assaultPartyId assault party id.
-     * @param roomId room id.
+     * @param roomId         room id.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized void prepareAssaultParty(int assaultPartyId, int roomId) {
-        mas = (ConcentrationSiteClientProxy) Thread.currentThread();
-
+    @Override
+    public synchronized int prepareAssaultParty(int assaultPartyId, int roomId) throws RemoteException {
         /* Block until there is a sufficient number of ordinary thieves available */
         while (numberOfWaitingThieves < SimulPar.K) {
             try {
@@ -178,11 +184,11 @@ public class ConcentrationSite {
         }
 
         /* Update master thief state to assembling a group */
-        mas.setMasterThiefState(MasterThiefStates.ASSEMBLING_A_GROUP);
+        masState = MasterThiefStates.ASSEMBLING_A_GROUP;
         reposStub.setMasterThiefState(MasterThiefStates.ASSEMBLING_A_GROUP);
 
         /* Update available assault party id */
-        setAvailableAssaultPartyId(assaultPartyId);
+        availableAssaultPartyId = assaultPartyId;
 
         /* Update assault party target room */
         assaultPartiesStub[assaultPartyId].setTargetRoom(roomId);
@@ -191,14 +197,16 @@ public class ConcentrationSite {
         reposStub.setAssaultPartyRoomId(assaultPartyId, roomId);
 
         /*
-         * In this implementation, the master thief calls an ordinary thief to join a party. Then,
-         * the ordinary thief calls the next ordinary thief to join the party. The last ordinary
+         * In this implementation, the master thief calls an ordinary thief to join a
+         * party. Then,
+         * the ordinary thief calls the next ordinary thief to join the party. The last
+         * ordinary
          * thief calls the master thief to prepare the next assault party.
          */
 
         /* Get the id of the first ordinary thief to join the assault party */
         try {
-            setCalledThiefId(waitingThieves.read());
+            calledThiefId = waitingThieves.read();
             numberOfWaitingThieves--;
         } catch (MemException e) {
             GenericIO.writelnString(
@@ -210,13 +218,15 @@ public class ConcentrationSite {
         notifyAll();
 
         /* Wait until all ordinary thieves have entered the assault party */
-        while (getCalledThiefId() != NOT_A_THIEF) {
+        while (calledThiefId != NOT_A_THIEF) {
             try {
                 wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+
+        return masState;
     }
 
     /**
@@ -225,28 +235,25 @@ public class ConcentrationSite {
      * It is called by an ordinary thief to prepare excursion.
      *
      * @return id of the assault party that the thief joined.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized int prepareExcursion() {
-        int ordId;
-        ordId = ((ConcentrationSiteClientProxy) Thread.currentThread()).getOrdinaryThiefId();
-        ord[ordId] = (ConcentrationSiteClientProxy) Thread.currentThread();
-
+    @Override
+    public synchronized ReturnInt prepareExcursion(int ordId) throws RemoteException {
         /* Store info on Control site to associate a thief to an assault party */
-        contColSiteStub.setThiefToParty(ord[ordId].getOrdinaryThiefId(),
-                getAvailableAssaultPartyId());
+        contColSiteStub.setThiefToParty(ordId, availableAssaultPartyId);
 
         /* Join the available assault party */
-        assaultPartiesStub[getAvailableAssaultPartyId()]
-                .joinAssaultParty(ord[ordId].getOrdinaryThiefId());
+        assaultPartiesStub[availableAssaultPartyId].joinAssaultParty(ordId);
 
         /* Check if assault party is full */
-        if (assaultPartiesStub[getAvailableAssaultPartyId()].isFull())
+        if (assaultPartiesStub[availableAssaultPartyId].isFull())
             /* Clear called thief */
-            setCalledThiefId(NOT_A_THIEF);
+            calledThiefId = NOT_A_THIEF;
         else
             /* Get the id of a new ordinary thief */
             try {
-                setCalledThiefId(waitingThieves.read());
+                calledThiefId = waitingThieves.read();
                 numberOfWaitingThieves--;
             } catch (MemException e) {
                 GenericIO.writelnString(
@@ -255,28 +262,30 @@ public class ConcentrationSite {
             }
 
         /* Update ordinary thief state */
-        ord[ordId].setOrdinaryThiefState(OrdinaryThiefStates.CRAWLING_INWARDS);
+        ordStates[ordId] = OrdinaryThiefStates.CRAWLING_INWARDS;
         reposStub.setAssaultPartyElementId(
-                getAvailableAssaultPartyId(), assaultPartiesStub[getAvailableAssaultPartyId()]
-                        .getThiefElement(ord[ordId].getOrdinaryThiefId()),
-                ord[ordId].getOrdinaryThiefId());
+                availableAssaultPartyId, assaultPartiesStub[availableAssaultPartyId].getThiefElement(ordId),
+                ordId);
 
         /*
-         * Notify a new thief to join the assault party, or the master thief the party is full.
+         * Notify a new thief to join the assault party, or the master thief the party
+         * is full.
          */
         notifyAll();
 
-        return getAvailableAssaultPartyId();
+        return new ReturnInt(availableAssaultPartyId, ordStates[ordId]);
     }
 
     /**
      * Operation sum up results.
      *
      * It is called by the master thief to sum up the results of the heist.
+     * 
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized void sumUpResults() {
-        mas = (ConcentrationSiteClientProxy) Thread.currentThread();
-
+    @Override
+    public synchronized int sumUpResults() throws RemoteException {
         /* Block until there is a sufficient number of ordinary thieves available */
         while (numberOfWaitingThieves < SimulPar.M - 1) {
             try {
@@ -286,77 +295,29 @@ public class ConcentrationSite {
             }
         }
 
-        mas.setMasterThiefState(MasterThiefStates.PRESENTING_THE_REPORT);
+        masState = MasterThiefStates.PRESENTING_THE_REPORT;
         reposStub.setMasterThiefState(MasterThiefStates.PRESENTING_THE_REPORT);
 
         /* Signal end of operations */
-        setEndOfOperations();
+        endOfOperations = true;
 
         /* Notify all ordinary thieves that the heist has ended */
         notifyAll();
+
+        return masState;
     }
 
     /**
      * Operation server shutdown.
-     *
-     * New operation.
+     * 
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
-    public synchronized void shutdown() {
+    @Override
+    public synchronized void shutdown() throws RemoteException {
         nEntities += 1;
         if (nEntities >= SimulPar.E)
-            ServerHeistToTheMuseumConcentrationSite.waitConnection = false;
+            ServerHeistToTheMuseumConcentrationSite.shutdown();
         notifyAll();
-    }
-
-    /**
-     * Get the id of the thief that was called to join an assault party.
-     *
-     * @return called thief id.
-     */
-    private int getCalledThiefId() {
-        return calledThiefId;
-    }
-
-    /**
-     * Set the id of the thief that was called to join an assault party.
-     *
-     * @param calledThiefId called thief id.
-     */
-    private void setCalledThiefId(int calledThiefId) {
-        this.calledThiefId = calledThiefId;
-    }
-
-    /**
-     * Get the id of the available assault party.
-     *
-     * @return available assault party id.
-     */
-    private int getAvailableAssaultPartyId() {
-        return availableAssaultPartyId;
-    }
-
-    /**
-     * Set the id of the available assault party.
-     *
-     * @param availableAssaultPartyId available assault party id.
-     */
-    private void setAvailableAssaultPartyId(int availableAssaultPartyId) {
-        this.availableAssaultPartyId = availableAssaultPartyId;
-    }
-
-    /**
-     * Check the flag that indicates if the operation ended or not.
-     *
-     * @return true if operation has ended - false otherwise.
-     */
-    private boolean getEndOfOperations() {
-        return endOfOperations;
-    }
-
-    /**
-     * Set the flag to indicate the operation ended.
-     */
-    private void setEndOfOperations() {
-        this.endOfOperations = true;
     }
 }

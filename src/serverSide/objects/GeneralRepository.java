@@ -1,18 +1,25 @@
 package serverSide.objects;
 
-import clientSide.entities.*;
-import genclass.*;
+import java.rmi.*;
+import interfaces.*;
 import serverSide.main.*;
+import clientSide.entities.*;
+import genclass.GenericIO;
+import genclass.TextFile;
 import java.util.Objects;
 
 /**
  * General repository.
  *
- * It is responsible to keep the visible internal state of the heist and provide means to it to be
- * printed in the logging file. It is implemented as an implicit monitor. All public methods are
- * executed in mutual exclusion. There are no internal synchronization points.
+ * It is responsible to keep the visible internal state of the heist and provide
+ * means to it to be printed in the logging file.
+ * It is implemented as an implicit monitor.
+ * All public methods are executed in mutual exclusion.
+ * There are no internal synchronization points.
+ * Implementation of a client-server model of type 2 (server replication).
+ * Communication is based on Java RMI.
  */
-public class GeneralRepository {
+public class GeneralRepository implements GeneralRepositoryInterface {
     /**
      * Number of entity groups requesting the shutdown.
      */
@@ -34,29 +41,34 @@ public class GeneralRepository {
     private int[] ordinaryThiefState;
 
     /**
-     * Situation of the ordinary thief # (# - 1 .. M-1) either 'W' (waiting to join a party) or 'P'
+     * Situation of the ordinary thief # (# - 1 .. M-1) either 'W' (waiting to join
+     * a party) or 'P'
      * (in party).
      */
     private char[] ordinaryThiefSituation;
 
     /**
-     * maximum displacement of the ordinary thief # (# - 1 .. M-1) a random number between md and
+     * maximum displacement of the ordinary thief # (# - 1 .. M-1) a random number
+     * between md and
      * MD.
      */
     private int[] ordinaryThiefMaximumDisplacement;
 
     /**
-     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) room identification (1 .. N).
+     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) room identification (1
+     * .. N).
      */
     private int[] assaultPartyRoomId;
 
     /**
-     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) member identification (1 .. N).
+     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) member identification (1
+     * .. N).
      */
     private int[][] assaultPartyElementId;
 
     /**
-     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) present position (0 .. DT RId).
+     * Assault party # (# - 1, (M-1)/K) elem # (# - 1 .. K) present position (0 ..
+     * DT RId).
      */
     private int[][] assaultPartyElementPosition;
 
@@ -66,12 +78,14 @@ public class GeneralRepository {
     private int[][] assaultPartyElementCanvas;
 
     /**
-     * room identification (1 .. N) number of paintings presently hanging on the walls.
+     * room identification (1 .. N) number of paintings presently hanging on the
+     * walls.
      */
     private int[] museumRoomNumberPaintings;
 
     /**
-     * Room identification (1 .. N) distance from outside gathering site, a random number between d
+     * Room identification (1 .. N) distance from outside gathering site, a random
+     * number between d
      * and D.
      */
     private int[] museumRoomDistance;
@@ -126,12 +140,15 @@ public class GeneralRepository {
      * Operation initialization of simulation.
      *
      * @param logFileName name of the logging file.
-     * @param maxDis maximum displacement of the ordinary thieves.
-     * @param numPaint number of paintings in each room.
-     * @param roomDist distance between each room and the outside gathering site.
+     * @param maxDis      maximum displacement of the ordinary thieves.
+     * @param numPaint    number of paintings in each room.
+     * @param roomDist    distance between each room and the outside gathering site.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
      */
+    @Override
     public synchronized void initSimul(String logFileName, int[] maxDis, int[] numPaint,
-            int[] roomDist) {
+            int[] roomDist) throws RemoteException {
         /* Store the logging filename */
         if (!Objects.equals(logFileName, ""))
             this.logFileName = logFileName;
@@ -153,7 +170,167 @@ public class GeneralRepository {
     }
 
     /**
-     * Write the header and first state line to the logging file. Internal operation.
+     * Set the current state of the master thief.
+     *
+     * @param masterThiefState the current state of the master thief.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setMasterThiefState(int masterThiefState) throws RemoteException {
+        this.masterThiefState = masterThiefState;
+        reportStatus();
+    }
+
+    /**
+     * Set the current state of an ordinary thief.
+     *
+     * @param thiefId            the thief id.
+     * @param ordinaryThiefState the ordinary thief state.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setOrdinaryThiefState(int thiefId, int ordinaryThiefState) throws RemoteException {
+        this.ordinaryThiefState[thiefId] = ordinaryThiefState;
+        reportStatus();
+    }
+
+    /**
+     * Set the current room id of an assault party.
+     *
+     * @param assaultPartyId     the assault party id.
+     * @param assaultPartyRoomId the target room id of the assault party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setAssaultPartyRoomId(int assaultPartyId, int assaultPartyRoomId) throws RemoteException {
+        this.assaultPartyRoomId[assaultPartyId] = assaultPartyRoomId;
+        reportStatus();
+    }
+
+    /**
+     * Set the current element id of an assault party.
+     *
+     * @param assaultPartyId the assault party id.
+     * @param elementId      the element id.
+     * @param thiefId        thief id.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setAssaultPartyElementId(int assaultPartyId, int elementId,
+            int thiefId) throws RemoteException {
+        /* Change state to crawling inwards */
+        this.ordinaryThiefState[thiefId] = OrdinaryThiefStates.CRAWLING_INWARDS;
+
+        /* Update thief situation */
+        ordinaryThiefSituation[thiefId] = 'P';
+
+        /* Update assault party info */
+        this.assaultPartyElementId[assaultPartyId][elementId] = thiefId;
+        this.assaultPartyElementPosition[assaultPartyId][elementId] = 0;
+        this.assaultPartyElementCanvas[assaultPartyId][elementId] = 0;
+
+        reportStatus();
+    }
+
+    /**
+     * Set the current element position of an assault party.
+     *
+     * @param assaultPartyId              the assault party id.
+     * @param elementId                   the element id.
+     * @param assaultPartyElementPosition the target element position of the assault
+     *                                    party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setAssaultPartyElementPosition(int assaultPartyId, int elementId,
+            int assaultPartyElementPosition) throws RemoteException {
+        this.assaultPartyElementPosition[assaultPartyId][elementId] = assaultPartyElementPosition;
+        reportStatus();
+    }
+
+    /**
+     * Set the current element canvas of an assault party.
+     *
+     * @param assaultPartyId            the assault party id.
+     * @param elementId                 the element id.
+     * @param assaultPartyElementCanvas the target element canvas of the assault
+     *                                  party.
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void setAssaultPartyElementCanvas(int assaultPartyId, int elementId,
+            boolean assaultPartyElementCanvas) throws RemoteException {
+        this.assaultPartyElementCanvas[assaultPartyId][elementId] = assaultPartyElementCanvas ? 1 : 0;
+
+        /* Decrement the number of canvas in the room */
+        if (assaultPartyElementCanvas)
+            museumRoomNumberPaintings[assaultPartyRoomId[assaultPartyId]]--;
+
+        reportStatus();
+    }
+
+    /**
+     * Increment canvas stolen by a thief, if he has one and remove the thief from
+     * the assault
+     * party.
+     *
+     * @param assaultPartyId assault party id.
+     * @param elementId      element id (position of the thief in the party).
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void endAssaultPartyElementMission(int assaultPartyId, int elementId) throws RemoteException {
+        /* Increment number of paintings stolen if there's a canvas */
+        if (assaultPartyElementCanvas[assaultPartyId][elementId] > 0)
+            stolenPaintings++;
+
+        /* Update thief situation */
+        this.ordinaryThiefSituation[this.assaultPartyElementId[assaultPartyId][elementId]] = 'W';
+
+        /* Remove thief info from assault party */
+        this.assaultPartyElementId[assaultPartyId][elementId] = -1;
+        this.assaultPartyElementPosition[assaultPartyId][elementId] = -1;
+        this.assaultPartyElementCanvas[assaultPartyId][elementId] = -1;
+
+        /* Check if there are still thieves in party */
+        int i = 0;
+        for (; i < SimulPar.K; i++)
+            if (this.assaultPartyElementId[assaultPartyId][i] != -1)
+                break;
+
+        /* Clear assault party target room if all thieves have leaved */
+        if (i == SimulPar.K)
+            this.assaultPartyRoomId[assaultPartyId] = -1;
+
+        /* Change master thief state to deciding what to do */
+        this.masterThiefState = MasterThiefStates.DECIDING_WHAT_TO_DO;
+
+        reportStatus();
+    }
+
+    /**
+     * Operation server shutdown.
+     * 
+     * @throws RemoteException if either the invocation of the remote method, or the
+     *                         communication with the registry service fails
+     */
+    @Override
+    public synchronized void shutdown() throws RemoteException {
+        nEntities += 1;
+        if (nEntities >= SimulPar.E)
+            ServerHeistToTheMuseumGeneralRepository.shutdown();
+    }
+
+    /**
+     * Write the header and first state line to the logging file. Internal
+     * operation.
      */
     private void reportInitialStatus() {
         TextFile log = new TextFile();
@@ -204,28 +381,28 @@ public class GeneralRepository {
         lineStatus += getMasterThiefState() + "  ";
         for (int thief = 0; thief < SimulPar.M - 1; thief++) {
             lineStatus += getOrdinaryThiefState(thief) + " ";
-            lineStatus += getOrdinaryThiefSituation(thief) + "  ";
-            lineStatus += getOrdinaryThiefMaximumDisplacement(thief) + "    ";
+            lineStatus += ordinaryThiefSituation[thief] + "  ";
+            lineStatus += ordinaryThiefMaximumDisplacement[thief] + "    ";
         }
         log.writelnString(lineStatus);
 
         /* Write second status line */
         lineStatus = "     ";
         for (int assPart = 0; assPart < (SimulPar.M - 1) / SimulPar.K; assPart++) {
-            int roomId = getAssaultPartyRoomId(assPart);
+            int roomId = assaultPartyRoomId[assPart];
             lineStatus += (roomId == -1 ? "-" : roomId + 1) + "    ";
             for (int elem = 0; elem < SimulPar.K; elem++) {
-                int elementId = getAssaultPartyElementId(assPart, elem);
+                int elementId = assaultPartyElementId[assPart][elem];
                 lineStatus += (elementId == -1 ? "-" : elementId + 1) + "  ";
-                int position = getAssaultPartyElementPosition(assPart, elem);
+                int position = assaultPartyElementPosition[assPart][elem];
                 lineStatus += (position == -1 ? "--" : String.format("%02d", position)) + "  ";
-                int canvas = getAssaultPartyElementCanvas(assPart, elem);
+                int canvas = assaultPartyElementCanvas[assPart][elem];
                 lineStatus += (canvas == -1 ? "-" : canvas) + "   ";
             }
         }
         for (int room = 0; room < SimulPar.N; room++) {
-            lineStatus += String.format("%02d", getMuseumRoomNumberPaintings(room)) + " ";
-            lineStatus += String.format("%02d", getMuseumRoomDistance(room)) + "   ";
+            lineStatus += String.format("%02d", museumRoomNumberPaintings[room]) + " ";
+            lineStatus += String.format("%02d", museumRoomDistance[room]) + "   ";
         }
         log.writelnString(lineStatus);
 
@@ -251,8 +428,7 @@ public class GeneralRepository {
             System.exit(1);
         }
 
-        log.writelnString("My friends, tonight's effort produced " + getStolenPaintings()
-                + " priceless paintings!");
+        log.writelnString("My friends, tonight's effort produced " + stolenPaintings + " priceless paintings!");
 
         if (!log.close()) {
             GenericIO
@@ -262,132 +438,12 @@ public class GeneralRepository {
     }
 
     /**
-     * Set the current state of the master thief.
-     *
-     * @param masterThiefState the current state of the master thief.
-     */
-    public synchronized void setMasterThiefState(int masterThiefState) {
-        this.masterThiefState = masterThiefState;
-        reportStatus();
-    }
-
-    /**
-     * Set the current state of an ordinary thief.
-     *
-     * @param thiefId the thief id.
-     * @param ordinaryThiefState the ordinary thief state.
-     */
-    public synchronized void setOrdinaryThiefState(int thiefId, int ordinaryThiefState) {
-        this.ordinaryThiefState[thiefId] = ordinaryThiefState;
-        reportStatus();
-    }
-
-    /**
-     * Set the current room id of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param assaultPartyRoomId the target room id of the assault party.
-     */
-    public synchronized void setAssaultPartyRoomId(int assaultPartyId, int assaultPartyRoomId) {
-        this.assaultPartyRoomId[assaultPartyId] = assaultPartyRoomId;
-        reportStatus();
-    }
-
-    /**
-     * Set the current element id of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param thiefId thief id.
-     */
-    public synchronized void setAssaultPartyElementId(int assaultPartyId, int elementId,
-            int thiefId) {
-        /* Change state to crawling inwards */
-        ordinaryThiefState[thiefId] = OrdinaryThiefStates.CRAWLING_INWARDS;
-
-        /* Update thief situation */
-        setOrdinaryThiefSituation(thiefId, 'P');
-
-        /* Update assault party info */
-        this.assaultPartyElementId[assaultPartyId][elementId] = thiefId;
-        this.assaultPartyElementPosition[assaultPartyId][elementId] = 0;
-        this.assaultPartyElementCanvas[assaultPartyId][elementId] = 0;
-
-        reportStatus();
-    }
-
-    /**
-     * Set the current element position of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param assaultPartyElementPosition the target element position of the assault party.
-     */
-    public synchronized void setAssaultPartyElementPosition(int assaultPartyId, int elementId,
-            int assaultPartyElementPosition) {
-        this.assaultPartyElementPosition[assaultPartyId][elementId] = assaultPartyElementPosition;
-        reportStatus();
-    }
-
-    /**
-     * Set the current element canvas of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @param assaultPartyElementCanvas the target element canvas of the assault party.
-     */
-    public synchronized void setAssaultPartyElementCanvas(int assaultPartyId, int elementId,
-            boolean assaultPartyElementCanvas) {
-        this.assaultPartyElementCanvas[assaultPartyId][elementId] =
-                assaultPartyElementCanvas ? 1 : 0;
-
-        /* Decrement the number of canvas in the room */
-        if (assaultPartyElementCanvas)
-            decrementMuseumRoomNumberPaintings(getAssaultPartyRoomId(assaultPartyId));
-
-        reportStatus();
-    }
-
-    /**
-     * Increment canvas stolen by a thief, if he has one and remove the thief from the assault
-     * party.
-     *
-     * @param assaultPartyId assault party id.
-     * @param elementId element id (position of the thief in the party).
-     */
-    public synchronized void endAssaultPartyElementMission(int assaultPartyId, int elementId) {
-        /* Increment number of paintings stolen if there's a canvas */
-        if (getAssaultPartyElementCanvas(assaultPartyId, elementId) > 0)
-            incrementStolenPaintings();
-
-        /* Remove ordinary thief from the assault party */
-        quitAssaultParty(assaultPartyId, elementId);
-
-        /* Change master thief state to deciding what to do */
-        masterThiefState = MasterThiefStates.DECIDING_WHAT_TO_DO;
-
-        reportStatus();
-    }
-
-    /**
-     * Operation server shutdown.
-     *
-     * New operation.
-     */
-    public synchronized void shutdown() {
-        nEntities += 1;
-        if (nEntities >= SimulPar.E)
-            ServerHeistToTheMuseumGeneralRepository.waitConnection = false;
-        notifyAll();
-    }
-
-    /**
      * Get the current state of the master thief.
      *
      * @return the current state of the master thief.
      */
     private String getMasterThiefState() {
-        switch (this.masterThiefState) {
+        switch (masterThiefState) {
             case MasterThiefStates.PLANNING_THE_HEIST:
                 return "PLAN";
             case MasterThiefStates.DECIDING_WHAT_TO_DO:
@@ -410,7 +466,7 @@ public class GeneralRepository {
      * @return the current state of the ordinary thief.
      */
     private String getOrdinaryThiefState(int thiefId) {
-        switch (this.ordinaryThiefState[thiefId]) {
+        switch (ordinaryThiefState[thiefId]) {
             case OrdinaryThiefStates.CONCENTRATION_SITE:
                 return "CONC";
             case OrdinaryThiefStates.CRAWLING_INWARDS:
@@ -424,148 +480,5 @@ public class GeneralRepository {
             default:
                 return "ERRO";
         }
-    }
-
-    /**
-     * Get the current situation of an ordinary thief.
-     *
-     * @param thiefId the thief id.
-     * @return the current situation of the ordinary thief.
-     */
-    private char getOrdinaryThiefSituation(int thiefId) {
-        return this.ordinaryThiefSituation[thiefId];
-    }
-
-    /**
-     * Set the current situation of an ordinary thief.
-     *
-     * @param thiefId the thief id.
-     * @param ordinaryThiefSituation the ordinary thief situation.
-     */
-    private void setOrdinaryThiefSituation(int thiefId, char ordinaryThiefSituation) {
-        this.ordinaryThiefSituation[thiefId] = ordinaryThiefSituation;
-    }
-
-    /**
-     * Get the current maximum displacement of an ordinary thief.
-     *
-     * @param thiefId the thief id.
-     * @return the maximum displacement of the ordinary thief.
-     */
-    private int getOrdinaryThiefMaximumDisplacement(int thiefId) {
-        return this.ordinaryThiefMaximumDisplacement[thiefId];
-    }
-
-    /**
-     * Get the current room id of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @return the target room id of the assault party.
-     */
-    private int getAssaultPartyRoomId(int assaultPartyId) {
-        return this.assaultPartyRoomId[assaultPartyId];
-    }
-
-    /**
-     * Get the current element id of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @return the target element id of the assault party.
-     */
-    private int getAssaultPartyElementId(int assaultPartyId, int elementId) {
-        return this.assaultPartyElementId[assaultPartyId][elementId];
-    }
-
-    /**
-     * Get the current element position of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @return the target element position of the assault party.
-     */
-    private int getAssaultPartyElementPosition(int assaultPartyId, int elementId) {
-        return this.assaultPartyElementPosition[assaultPartyId][elementId];
-    }
-
-    /**
-     * Get the current element canvas of an assault party.
-     *
-     * @param assaultPartyId the assault party id.
-     * @param elementId the element id.
-     * @return the target element canvas of the assault party.
-     */
-    private int getAssaultPartyElementCanvas(int assaultPartyId, int elementId) {
-        return this.assaultPartyElementCanvas[assaultPartyId][elementId];
-    }
-
-    /**
-     * Get the current number of paintings in a room.
-     *
-     * @param roomId the room id.
-     * @return the number of paintings in the room.
-     */
-    private int getMuseumRoomNumberPaintings(int roomId) {
-        return this.museumRoomNumberPaintings[roomId];
-    }
-
-    /**
-     * Set the current number of paintings in a room.
-     *
-     * @param roomId the room id.
-     * @param museumRoomNumberPaintings the number of paintings in the room.
-     */
-    private void decrementMuseumRoomNumberPaintings(int roomId) {
-        this.museumRoomNumberPaintings[roomId]--;
-    }
-
-    /**
-     * Get the current distance to a room.
-     *
-     * @param roomId the room id.
-     * @return the distance to the room.
-     */
-    private int getMuseumRoomDistance(int roomId) {
-        return this.museumRoomDistance[roomId];
-    }
-
-    /**
-     * Get the number of stolen paintings.
-     *
-     * @return the number of stolen paintings.
-     */
-    private int getStolenPaintings() {
-        return this.stolenPaintings;
-    }
-
-    /**
-     * Increment the number of stolen paintings.
-     */
-    private void incrementStolenPaintings() {
-        this.stolenPaintings++;
-    }
-
-    /**
-     * Remove the association of a thief to an assault party.
-     *
-     * @param assaultPartyId assault party id.
-     * @param elementId element id (position of the thief inside the assault party).
-     */
-    private void quitAssaultParty(int assaultPartyId, int elementId) {
-        /* Update thief situation */
-        this.ordinaryThiefSituation[this.assaultPartyElementId[assaultPartyId][elementId]] = 'W';
-
-        /* Remove thief info from assault party */
-        this.assaultPartyElementId[assaultPartyId][elementId] = -1;
-        this.assaultPartyElementPosition[assaultPartyId][elementId] = -1;
-        this.assaultPartyElementCanvas[assaultPartyId][elementId] = -1;
-
-        /* End method if there still is thiefs in party */
-        for (int i = 0; i < SimulPar.K; i++)
-            if (this.assaultPartyElementId[assaultPartyId][i] != -1)
-                return;
-
-        /* Clear assault party target room */
-        this.assaultPartyRoomId[assaultPartyId] = -1;
     }
 }

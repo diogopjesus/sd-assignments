@@ -17,7 +17,7 @@ public interface ConcentrationSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public boolean amINeeded() throws RemoteException;
+    public ReturnBoolean amINeeded(int ordId, int ordState) throws RemoteException;
 
     /**
      * Operation prepare assault party.
@@ -29,7 +29,7 @@ public interface ConcentrationSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void prepareAssaultParty(int assaultPartyId, int roomId) throws RemoteException;
+    public int prepareAssaultParty(int assaultPartyId, int roomId) throws RemoteException;
 
     /**
      * Operation prepare excursion.
@@ -40,7 +40,7 @@ public interface ConcentrationSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public int prepareExcursion() throws RemoteException;
+    public ReturnInt prepareExcursion(int ordId) throws RemoteException;
 
     /**
      * Operation sum up results.
@@ -50,7 +50,7 @@ public interface ConcentrationSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void sumUpResults() throws RemoteException;
+    public int sumUpResults() throws RemoteException;
 
     /**
      * Operation server shutdown.

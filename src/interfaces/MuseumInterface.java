@@ -14,10 +14,11 @@ public interface MuseumInterface extends Remote {
      * It is called by an ordinary thief to roll a canvas from a room.
      *
      * @param assaultPartyId assault party id.
+     * @param ordId          identification of the ordinary thief.
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public void rollACanvas(int assaultPartyId) throws RemoteException;
+    public void rollACanvas(int assaultPartyId, int ordId) throws RemoteException;
 
     /**
      * Get the distance to a room.
