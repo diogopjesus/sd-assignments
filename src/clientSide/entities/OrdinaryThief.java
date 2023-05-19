@@ -1,6 +1,8 @@
 package clientSide.entities;
 
-import clientSide.stubs.*;
+import java.rmi.*;
+import interfaces.*;
+import genclass.GenericIO;
 
 /**
  * Ordinary thief thread.
@@ -26,37 +28,37 @@ public class OrdinaryThief extends Thread {
     /**
      * Reference to the control collection site.
      */
-    private ControlCollectionSiteStub contColSiteStub;
+    private ControlCollectionSiteInterface contColSiteStub;
 
     /**
      * Reference to the concentration site.
      */
-    private ConcentrationSiteStub concentSiteStub;
+    private ConcentrationSiteInterface concentSiteStub;
 
     /**
      * Reference to the assault parties.
      */
-    private AssaultPartyStub[] assPartStub;
+    private AssaultPartyInterface[] assPartStub;
 
     /**
      * Reference to the museum.
      */
-    private MuseumStub museumStub;
+    private MuseumInterface museumStub;
 
     /**
      * Ordinary thief constructor.
      *
-     * @param name thread name.
-     * @param ordinaryThiefId ordinary thief id.
+     * @param name                thread name.
+     * @param ordinaryThiefId     ordinary thief id.
      * @param maximumDisplacement maximum displacement.
-     * @param contColSiteStub reference to the control collection site.
-     * @param concentSiteStub reference to the concentration site.
-     * @param assPartStub reference to the assault parties.
-     * @param museumStub reference to the museum.
+     * @param contColSiteStub     reference to the control collection site.
+     * @param concentSiteStub     reference to the concentration site.
+     * @param assPartStub         reference to the assault parties.
+     * @param museumStub          reference to the museum.
      */
     public OrdinaryThief(String name, int ordinaryThiefId, int maximumDisplacement,
-            ControlCollectionSiteStub contColSiteStub, ConcentrationSiteStub concentSiteStub,
-            AssaultPartyStub[] assPartStub, MuseumStub museumStub) {
+            ControlCollectionSiteInterface contColSiteStub, ConcentrationSiteInterface concentSiteStub,
+            AssaultPartyInterface[] assPartStub, MuseumInterface museumStub) {
         super(name);
         this.ordinaryThiefId = ordinaryThiefId;
         this.maximumDisplacement = maximumDisplacement;
@@ -128,18 +130,161 @@ public class OrdinaryThief extends Thread {
     public void run() {
         int assaultPartyId;
 
-        while (concentSiteStub.amINeeded()) {
-            assaultPartyId = concentSiteStub.prepareExcursion();
+        while (amINeeded()) {
+            assaultPartyId = prepareExcursion();
 
-            while (assPartStub[assaultPartyId].crawlIn());
+            while (crawlIn(assaultPartyId))
+                ;
 
-            museumStub.rollACanvas(assaultPartyId);
+            rollACanvas(assaultPartyId);
 
-            assPartStub[assaultPartyId].reverseDirection();
+            reverseDirection(assaultPartyId);
 
-            while (assPartStub[assaultPartyId].crawlOut());
+            while (crawlOut(assaultPartyId))
+                ;
 
-            contColSiteStub.handACanvas(assaultPartyId);
+            handACanvas(assaultPartyId);
+        }
+    }
+
+    /**
+     * Ordinary thief is needed.
+     * 
+     * Remote operation.
+     * 
+     * @return true, if the ordinary thief is needed - false, otherwise.
+     */
+    private boolean amINeeded() {
+        ReturnBoolean ret = null;
+
+        try {
+            ret = concentSiteStub.amINeeded(ordinaryThiefId, ordinaryThiefState);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on amINeeded: " + e.getMessage());
+            System.exit(1);
+        }
+
+        ordinaryThiefState = ret.getIntStateVal();
+
+        return ret.getBooleanVal();
+    }
+
+    /**
+     * Ordinary thief prepares the excursion.
+     * 
+     * Remote operation.
+     * 
+     * @return assault party id.
+     */
+    private int prepareExcursion() {
+        ReturnInt ret = null;
+
+        try {
+            ret = concentSiteStub.prepareExcursion(ordinaryThiefId);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on prepareExcursion: " + e.getMessage());
+            System.exit(1);
+        }
+
+        ordinaryThiefState = ret.getIntStateVal();
+
+        return ret.getIntVal();
+    }
+
+    /**
+     * Ordinary thief crawls in.
+     * 
+     * Remote operation.
+     * 
+     * @return true, if the ordinary thief can crawl in - false, otherwise.
+     */
+    private boolean crawlIn(int assaultPartyId) {
+        ReturnBoolean ret = null;
+
+        try {
+            ret = assPartStub[assaultPartyId].crawlIn(ordinaryThiefId, ordinaryThiefState);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on crawlIn: " + e.getMessage());
+            System.exit(1);
+        }
+
+        ordinaryThiefState = ret.getIntStateVal();
+
+        return ret.getBooleanVal();
+    }
+
+    /**
+     * Ordinary thief rolls a canvas.
+     * 
+     * Remote operation.
+     */
+    private void rollACanvas(int assaultPartyId) {
+        try {
+            museumStub.rollACanvas(assaultPartyId, ordinaryThiefId);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on rollACanvas: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Ordinary thief reverses direction.
+     * 
+     * Remote operation.
+     */
+    private void reverseDirection(int assaultPartyId) {
+        int state = -1;
+
+        try {
+            state = assPartStub[assaultPartyId].reverseDirection(ordinaryThiefId);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on reverseDirection: " + e.getMessage());
+            System.exit(1);
+        }
+
+        ordinaryThiefState = state;
+    }
+
+    /**
+     * Ordinary thief crawls out.
+     * 
+     * Remote operation.
+     * 
+     * @return true, if the ordinary thief can crawl out - false, otherwise.
+     */
+    private boolean crawlOut(int assaultPartyId) {
+        ReturnBoolean ret = null;
+
+        try {
+            ret = assPartStub[assaultPartyId].crawlOut(ordinaryThiefId, ordinaryThiefState);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on crawlOut: " + e.getMessage());
+            System.exit(1);
+        }
+
+        ordinaryThiefState = ret.getIntStateVal();
+
+        return ret.getBooleanVal();
+    }
+
+    /**
+     * Ordinary thief hands a canvas.
+     * 
+     * Remote operation.
+     */
+    private void handACanvas(int assaultPartyId) {
+        try {
+            contColSiteStub.handACanvas(assaultPartyId, ordinaryThiefId);
+        } catch (RemoteException e) {
+            GenericIO.writelnString(
+                    "Ordinary thief " + ordinaryThiefId + " remote exception on handACanvas: " + e.getMessage());
+            System.exit(1);
         }
     }
 }

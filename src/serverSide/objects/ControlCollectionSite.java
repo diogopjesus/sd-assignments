@@ -145,11 +145,10 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
      * It is called by the master thief to appraise the situation.
      *
      * @return 'P' if we should prepare an assault party - 'R' if we should wait for
-     *         the ordinary
-     *         thieves - 'E' if we should end the operation.
+     *         the ordinary thieves - 'E' if we should end the operation.
      */
     @Override
-    public synchronized char appraiseSit(int ordId) {
+    public synchronized char appraiseSit() {
         // Wait arrival of ordinary thieves if:
         // - All assault parties are in mission;
         // - there is one assault party in mission, the number of empty rooms is equal
@@ -161,8 +160,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
         try {
             targetRoom = assaultPartiesStub[getAssaultPartyOnMissionId()].getTargetRoom();
         } catch (RemoteException e) {
-            GenericIO.writelnString(
-                    "OrdinaryThief " + ordId + " remote exception on appraiseSit - getTargetRoom: " + e.getMessage());
+            GenericIO.writelnString("MasterThief remote exception on appraiseSit - getTargetRoom: " + e.getMessage());
             System.exit(1);
         }
 

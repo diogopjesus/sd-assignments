@@ -28,7 +28,7 @@ public interface ControlCollectionSiteInterface extends Remote {
      * @throws RemoteException if either the invocation of the remote method, or the
      *                         communication with the registry service fails
      */
-    public char appraiseSit(int ordId) throws RemoteException;
+    public char appraiseSit() throws RemoteException;
 
     /**
      * Operation take a rest.

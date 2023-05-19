@@ -1,6 +1,8 @@
 package clientSide.entities;
 
-import clientSide.stubs.*;
+import java.rmi.*;
+import interfaces.*;
+import genclass.GenericIO;
 
 /**
  * Master thief thread.
@@ -16,35 +18,34 @@ public class MasterThief extends Thread {
     /**
      * Reference to the control collection site.
      */
-    private final ControlCollectionSiteStub contColSiteStub;
+    private final ControlCollectionSiteInterface contColSiteStub;
 
     /**
      * Reference to the concentration site.
      */
-    private final ConcentrationSiteStub concentSiteStub;
+    private final ConcentrationSiteInterface concentSiteStub;
 
     /**
      * Reference to the assault parties.
      */
-    private final AssaultPartyStub[] assPartStub;
+    private final AssaultPartyInterface[] assPartStub;
 
     /**
      * Master thief constructor.
      *
-     * @param name thread name.
+     * @param name            thread name.
      * @param contColSiteStub reference to the control collection site.
      * @param concentSiteStub reference to the concentration site.
-     * @param assPartStub reference to the assault parties.
+     * @param assPartStub     reference to the assault parties.
      */
-    public MasterThief(String name, ControlCollectionSiteStub contColSiteStub,
-            ConcentrationSiteStub concentSiteStub, AssaultPartyStub[] assPartStub) {
+    public MasterThief(String name, ControlCollectionSiteInterface contColSiteStub,
+            ConcentrationSiteInterface concentSiteStub, AssaultPartyInterface[] assPartStub) {
         super(name);
         this.masterThiefState = MasterThiefStates.PLANNING_THE_HEIST;
         this.contColSiteStub = contColSiteStub;
         this.concentSiteStub = concentSiteStub;
         this.assPartStub = assPartStub;
     }
-
 
     /**
      * Get master thief state.
@@ -72,29 +73,198 @@ public class MasterThief extends Thread {
         char oper;
         int assaultPartyId, roomId;
 
-        contColSiteStub.startOperations();
+        startOperations();
 
-        while ((oper = contColSiteStub.appraiseSit()) != 'E') {
+        while ((oper = appraiseSit()) != 'E') {
             switch (oper) {
                 case 'P':
-                    assaultPartyId = contColSiteStub.getAvailableAssaultParty();
-                    roomId = contColSiteStub.getAvailableRoom();
+                    assaultPartyId = getAvailableAssaultParty();
+                    roomId = getAvailableRoom();
 
-                    concentSiteStub.prepareAssaultParty(assaultPartyId, roomId);
+                    prepareAssaultParty(assaultPartyId, roomId);
 
-                    assPartStub[assaultPartyId].sendAssaultParty();
+                    sendAssaultParty(assaultPartyId);
 
                     break;
 
                 case 'R':
-                    contColSiteStub.takeARest();
+                    takeARest();
 
-                    contColSiteStub.collectACanvas();
+                    collectACanvas();
 
                     break;
             }
         }
 
-        concentSiteStub.sumUpResults();
+        sumUpResults();
+    }
+
+    /**
+     * Master thief start operations.
+     * 
+     * Remote operation.
+     */
+    private void startOperations() {
+        int state = -1;
+
+        try {
+            state = contColSiteStub.startOperations();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on startOperations: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
+    }
+
+    /**
+     * Master thief appraise situation.
+     * 
+     * Remote operation.
+     * 
+     * @return 'P' if we should prepare an assault party - 'R' if we should wait for
+     *         the ordinary thieves - 'E' if we should end the operation.
+     */
+    private char appraiseSit() {
+        char oper = 0x00; // return value
+
+        try {
+            oper = contColSiteStub.appraiseSit();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on appraiseSit: " + e.getMessage());
+            System.exit(1);
+        }
+
+        return oper;
+    }
+
+    /**
+     * Master thief get available assault party.
+     * 
+     * Remote operation.
+     * 
+     * @return Assault party id.
+     */
+    private int getAvailableAssaultParty() {
+        int assaultPartyId = -1;
+
+        try {
+            assaultPartyId = contColSiteStub.getAvailableAssaultParty();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on getAvailableAssaultParty: " + e.getMessage());
+            System.exit(1);
+        }
+
+        return assaultPartyId;
+    }
+
+    /**
+     * Master thief get available room.
+     * 
+     * Remote operation.
+     * 
+     * @return Room id.
+     */
+    private int getAvailableRoom() {
+        int roomId = -1;
+
+        try {
+            roomId = contColSiteStub.getAvailableRoom();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on getAvailableRoom: " + e.getMessage());
+            System.exit(1);
+        }
+
+        return roomId;
+    }
+
+    /**
+     * Master thief prepare assault party.
+     * 
+     * Remote operation.
+     * 
+     * @param assaultPartyId Assault party id.
+     * @param roomId         Room id.
+     */
+    private void prepareAssaultParty(int assaultPartyId, int roomId) {
+        int state = -1;
+
+        try {
+            state = concentSiteStub.prepareAssaultParty(assaultPartyId, roomId);
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on prepareAssaultParty: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
+    }
+
+    /**
+     * Master thief send assault party.
+     * 
+     * Remote operation.
+     * 
+     * @param assaultPartyId Assault party id.
+     */
+    private void sendAssaultParty(int assaultPartyId) {
+        int state = -1;
+
+        try {
+            state = assPartStub[assaultPartyId].sendAssaultParty();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on sendAssaultParty: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
+    }
+
+    /**
+     * Master thief take a rest.
+     * 
+     * Remote operation.
+     */
+    private void takeARest() {
+        int state = -1;
+
+        try {
+            state = contColSiteStub.takeARest();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on takeARest: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
+    }
+
+    /**
+     * Master thief collect a canvas.
+     * 
+     * Remote operation.
+     */
+    private void collectACanvas() {
+        int state = -1;
+
+        try {
+            state = contColSiteStub.collectACanvas();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on collectACanvas: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
+    }
+
+    private void sumUpResults() {
+        int state = -1;
+
+        try {
+            state = concentSiteStub.sumUpResults();
+        } catch (RemoteException e) {
+            GenericIO.writelnString("MasterThief remote exception on sumUpResults: " + e.getMessage());
+            System.exit(1);
+        }
+
+        masterThiefState = state;
     }
 }
