@@ -165,7 +165,7 @@ public class ClientHeistToTheMuseum {
       System.exit(1);
     }
 
-    masterThief = new MasterThief("mas_0", contColSiteStub, concSiteStub, assPartStub);
+    masterThief = new MasterThief("mas_1", contColSiteStub, concSiteStub, assPartStub);
 
     for (int i = 0; i < SimulPar.M - 1; i++)
       ordThieves[i] = new OrdinaryThief("ord_" + (i + 1), i, maxDis[i], contColSiteStub,

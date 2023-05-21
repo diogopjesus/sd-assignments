@@ -93,8 +93,7 @@ public class ServerHeistToTheMuseumConcentrationSite {
 
     /* get a remote reference to the control collection site object */
 
-    String nameEntryControlCollectionSite = "ControlCollectionSite"; // public name of the control collection site
-                                                                     // object
+    String nameEntryControlCollectionSite = "ControlCollectionSite"; // public name of the cont coll site object
     ControlCollectionSiteInterface contColSiteStub = null; // remote reference to the control collection site object
 
     try {
