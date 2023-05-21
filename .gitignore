@@ -24,3 +24,5 @@ test/
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+
+.exec
