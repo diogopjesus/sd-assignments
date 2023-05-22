@@ -157,11 +157,14 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
     // - There is one assault party in mission, and all rooms are empty.
 
     int targetRoom = NOT_A_ROOM; // Target room of the assault party in mission
-    try {
-      targetRoom = assaultPartiesStub[getAssaultPartyOnMissionId()].getTargetRoom();
-    } catch (RemoteException e) {
-      GenericIO.writelnString("MasterThief remote exception on appraiseSit - getTargetRoom: " + e.getMessage());
-      System.exit(1);
+    int assPartOnMisId = getAssaultPartyOnMissionId(); // Id of the ass part in mission (-1 if there is none)
+    if (assPartOnMisId != NOT_A_PARTY) {
+      try {
+        targetRoom = assaultPartiesStub[assPartOnMisId].getTargetRoom();
+      } catch (RemoteException e) {
+        GenericIO.writelnString("MasterThief remote exception on appraiseSit - getTargetRoom: " + e.getMessage());
+        System.exit(1);
+      }
     }
 
     if ((availableAssaultParties() == 0)
