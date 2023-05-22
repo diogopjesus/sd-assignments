@@ -105,7 +105,7 @@ public class ServerHeistToTheMuseumAssaultParty {
 
     /* instantiate a assault party object */
 
-    AssaultParty assPart = new AssaultParty(reposStub, assPartId); // assault party object
+    AssaultParty assPart = new AssaultParty(reposStub, assPartId - 1); // assault party object
     AssaultPartyInterface assPartStub = null; // remote reference to the assault party object
 
     try {
