@@ -153,7 +153,7 @@ public class OrdinaryThief extends Thread {
     ReturnBoolean ret = null;
 
     try {
-      ret = assPartStub[assaultPartyId].crawlIn(ordinaryThiefId, ordinaryThiefState);
+      ret = assPartStub[assaultPartyId].crawlIn(ordinaryThiefId, maximumDisplacement);
     } catch (RemoteException e) {
       GenericIO.writelnString(
           "Ordinary thief " + ordinaryThiefId + " remote exception on crawlIn: " + e.getMessage());
@@ -215,7 +215,7 @@ public class OrdinaryThief extends Thread {
     ReturnBoolean ret = null;
 
     try {
-      ret = assPartStub[assaultPartyId].crawlOut(ordinaryThiefId, ordinaryThiefState);
+      ret = assPartStub[assaultPartyId].crawlOut(ordinaryThiefId, maximumDisplacement);
     } catch (RemoteException e) {
       GenericIO.writelnString(
           "Ordinary thief " + ordinaryThiefId + " remote exception on crawlOut: " + e.getMessage());
