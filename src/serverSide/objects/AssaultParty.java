@@ -216,7 +216,7 @@ public class AssaultParty implements AssaultPartyInterface {
       /* If thief is at the back of the pack */
       else if (thiefAtBack() == ordId) {
         /* Maximum movement allowed to thief */
-        thiefMovement = Math.min(SimulPar.S, maxDis);
+        thiefMovement = maxDis;
         /* Search for the furthest available position */
         while (thiefInPosition(thiefPosition + thiefMovement) && thiefMovement > 0)
           thiefMovement--;
@@ -231,7 +231,7 @@ public class AssaultParty implements AssaultPartyInterface {
         // if thief ahead and behind are separated by less than the maximum separation
         if (getThiefPosition(thiefAhead) - getThiefPosition(thiefBehind) <= SimulPar.S) {
           /* Maximum movement allowed to thief */
-          thiefMovement = Math.min(SimulPar.S, maxDis);
+          thiefMovement = Math.min((getThiefPosition(thiefAhead) - thiefPosition) + SimulPar.S, maxDis);
           /* Search for the furthest available position */
           while (thiefInPosition(thiefPosition + thiefMovement) && thiefMovement > 0)
             thiefMovement--;
@@ -254,8 +254,7 @@ public class AssaultParty implements AssaultPartyInterface {
         /* Update thief position */
         updateThiefPosition(ordId, thiefNextPosition);
         try {
-          reposStub.setAssaultPartyElementPosition(assaultPartyId,
-              getThiefElement(ordId), thiefNextPosition);
+          reposStub.setAssaultPartyElementPosition(assaultPartyId, getThiefElement(ordId), thiefNextPosition);
         } catch (RemoteException e) {
           GenericIO.writelnString(
               "OrdinaryThief " + ordId + " remote exception on crawlIn - setAssaultPartyElementPosition: "
@@ -371,7 +370,7 @@ public class AssaultParty implements AssaultPartyInterface {
       /* If thief is at the back of the pack */
       else if (thiefAtBack() == ordId) {
         /* Maximum movement allowed to thief */
-        thiefMovement = Math.min(SimulPar.S, maxDis);
+        thiefMovement = maxDis;
         /* Search for the furthest available position */
         while (thiefInPosition(thiefPosition - thiefMovement) && thiefMovement > 0)
           thiefMovement--;
@@ -386,7 +385,7 @@ public class AssaultParty implements AssaultPartyInterface {
         // if thief ahead and behind are separated by less than the maximum separation
         if (getThiefPosition(thiefBehind) - getThiefPosition(thiefAhead) <= SimulPar.S) {
           /* Maximum movement allowed to thief */
-          thiefMovement = Math.min(SimulPar.S, maxDis);
+          thiefMovement = Math.min((thiefPosition - getThiefPosition(thiefAhead)) + SimulPar.S, maxDis);
           /* Search for the furthest available position */
           while (thiefInPosition(thiefPosition - thiefMovement) && thiefMovement > 0)
             thiefMovement--;
