@@ -1,6 +1,6 @@
 # SD Assignments
 This repository contains the assignments developed for the Distributed Systems course at Universidade de Aveiro.
-Assignment descriptions can be found [here](https://github.com/diogopjesus/sd-assignments/tree/main/others).
+Assignment descriptions can be found [here](https://github.com/diogopjesus/sd-assignments/tree/main/archive).
 
 ## Assignment 1
 Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag/first-assignment).
@@ -13,6 +13,6 @@ Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag
 **Final Grade**: 16/16.
 
 ## Assignment 3
-Code not yet available.
+Code available [here]().
 
-**Final Grade**: ??/16.
+**Final Grade**: 16/16.

@@ -10,9 +10,9 @@ indent_style = space
 max_line_length = 80
 
 [*.java]
-indent_size = 4
+indent_size = 2
 max_line_length = 140
-continuation_indent_size = 8
+continuation_indent_size = 4
 
 [*.{py,sh,yml}]
 indent_size = 2

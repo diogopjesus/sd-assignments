@@ -5,6 +5,9 @@
 # Log file
 *.log
 
+# stat file
+stat
+
 log/
 
 doc/
@@ -12,6 +15,8 @@ doc/
 build/
 
 test/
+
+export/
 
 .password
 
@@ -24,3 +29,5 @@ test/
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+
+exec
