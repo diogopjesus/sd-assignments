@@ -146,7 +146,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * It is called by the master thief to send the assault party on mission
    */
   @Override
-  public synchronized int sendAssaultParty() {
+  public synchronized int sendAssaultParty() throws RemoteException {
     assaultPartyState = CRAWLING_IN;
 
     /* Define the first thief to move */
@@ -175,7 +175,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return true if can continue to crawl in - false otherwise.
    */
   @Override
-  public synchronized ReturnBoolean crawlIn(int ordId, int maxDis) {
+  public synchronized ReturnBoolean crawlIn(int ordId, int maxDis) throws RemoteException {
     ordStates[ordId] = OrdinaryThiefStates.CRAWLING_INWARDS;
 
     /* Wait until is time to move */
@@ -297,7 +297,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * to out.
    */
   @Override
-  public synchronized int reverseDirection(int ordId) {
+  public synchronized int reverseDirection(int ordId) throws RemoteException {
     numberOfReversedThieves++;
 
     /* If all thieves reversed direction, update assault party state */
@@ -328,7 +328,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return true if can continue to crawl out - false otherwise.
    */
   @Override
-  public synchronized ReturnBoolean crawlOut(int ordId, int maxDis) {
+  public synchronized ReturnBoolean crawlOut(int ordId, int maxDis) throws RemoteException {
     ordStates[ordId] = OrdinaryThiefStates.CRAWLING_OUTWARDS;
 
     /* Wait until is time to move */
@@ -451,7 +451,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param targetRoom target room id.
    */
   @Override
-  public synchronized void setTargetRoom(int targetRoom) {
+  public synchronized void setTargetRoom(int targetRoom) throws RemoteException {
     this.targetRoom = targetRoom;
   }
 
@@ -461,7 +461,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return Target room.
    */
   @Override
-  public synchronized int getTargetRoom() {
+  public synchronized int getTargetRoom() throws RemoteException {
     return targetRoom;
   }
 
@@ -471,7 +471,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param targetRoomDistance target room distance.
    */
   @Override
-  public synchronized void setTargetRoomDistance(int targetRoomDistance) {
+  public synchronized void setTargetRoomDistance(int targetRoomDistance) throws RemoteException {
     this.targetRoomDistance = targetRoomDistance;
   }
 
@@ -481,7 +481,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return true if the assault party is available, false otherwise.
    */
   @Override
-  public synchronized boolean isAvailable() {
+  public synchronized boolean isAvailable() throws RemoteException {
     return assaultPartyState == ON_HOLD;
   }
 
@@ -491,7 +491,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return true if the assault party is full, false otherwise.
    */
   @Override
-  public synchronized boolean isFull() {
+  public synchronized boolean isFull() throws RemoteException {
     return numberOfAssaultPartyMembers == SimulPar.K;
   }
 
@@ -501,7 +501,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param thiefId thief id.
    */
   @Override
-  public synchronized void joinAssaultParty(int thiefId) {
+  public synchronized void joinAssaultParty(int thiefId) throws RemoteException {
     try {
       /* Store thief id */
       assaultPartyMembers[numberOfAssaultPartyMembers][0] = thiefId;
@@ -520,7 +520,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param thiefId thief id.
    */
   @Override
-  public synchronized void quitAssaultParty(int thiefId) {
+  public synchronized void quitAssaultParty(int thiefId) throws RemoteException {
     numberOfAssaultPartyMembers--;
     if (numberOfAssaultPartyMembers == 0) {
       /* Clean assault party data related to mission */
@@ -539,7 +539,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param thiefId thief id.
    * @param canvas  true if is holding a canvas - false, otherwise.
    */
-  public synchronized void setHoldingCanvas(int thiefId, boolean canvas) {
+  public synchronized void setHoldingCanvas(int thiefId, boolean canvas) throws RemoteException {
     int thiefPlace = 0;
     try {
       while (assaultPartyMembers[thiefPlace][0] != thiefId)
@@ -558,7 +558,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @param thiefId thief id.
    * @return True if is holding a canvas, false otherwise.
    */
-  public synchronized boolean isHoldingCanvas(int thiefId) {
+  public synchronized boolean isHoldingCanvas(int thiefId) throws RemoteException {
     int thiefPlace = 0;
     try {
       while (assaultPartyMembers[thiefPlace][0] != thiefId)
@@ -579,7 +579,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * @return thief element.
    */
   @Override
-  public synchronized int getThiefElement(int thiefId) {
+  public synchronized int getThiefElement(int thiefId) throws RemoteException {
     int thiefElement = -1;
     for (int i = 0; i < SimulPar.K; i++)
       if (assaultPartyMembers[i][0] == thiefId) {
@@ -595,7 +595,7 @@ public class AssaultParty implements AssaultPartyInterface {
    * New operation.
    */
   @Override
-  public synchronized void shutdown() {
+  public synchronized void shutdown() throws RemoteException {
     nEntities += 1;
     if (nEntities >= SimulPar.E)
       ServerHeistToTheMuseumAssaultParty.shutdown();

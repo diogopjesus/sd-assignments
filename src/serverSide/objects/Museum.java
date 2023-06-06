@@ -78,7 +78,7 @@ public class Museum implements MuseumInterface {
    *                         communication with the registry service fails
    */
   @Override
-  public synchronized void rollACanvas(int assaultPartyId, int ordId) {
+  public synchronized void rollACanvas(int assaultPartyId, int ordId) throws RemoteException {
     ord[ordId] = (Thread) Thread.currentThread();
 
     /* Get target room from assault party */
@@ -133,7 +133,7 @@ public class Museum implements MuseumInterface {
    * @return distance to a room.
    */
   @Override
-  public synchronized int getRoomDistance(int roomId) {
+  public synchronized int getRoomDistance(int roomId) throws RemoteException {
     return roomDistances[roomId];
   }
 
@@ -146,7 +146,7 @@ public class Museum implements MuseumInterface {
    * @param roomDistances distance to each room.
    */
   @Override
-  public synchronized void setRoomInfo(int[] canvasInRoom, int[] roomDistances) {
+  public synchronized void setRoomInfo(int[] canvasInRoom, int[] roomDistances) throws RemoteException {
     this.canvasInRoom = canvasInRoom;
     this.roomDistances = roomDistances;
   }
@@ -157,7 +157,7 @@ public class Museum implements MuseumInterface {
    * New operation.
    */
   @Override
-  public synchronized void shutdown() {
+  public synchronized void shutdown() throws RemoteException {
     nEntities += 1;
     if (nEntities >= SimulPar.E)
       ServerHeistToTheMuseumMuseum.shutdown();

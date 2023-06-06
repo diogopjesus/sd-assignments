@@ -13,6 +13,6 @@ Code available [here](https://github.com/diogopjesus/sd-assignments/releases/tag
 **Final Grade**: 16/16.
 
 ## Assignment 3
-Code not yet available.
+Code available [here]().
 
-**Final Grade**: ??/16.
+**Final Grade**: 16/16.

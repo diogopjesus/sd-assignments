@@ -134,7 +134,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * It is called by the master thief to start the operations.
    */
   @Override
-  public synchronized int startOperations() {
+  public synchronized int startOperations() throws RemoteException {
     masState = MasterThiefStates.DECIDING_WHAT_TO_DO;
     return masState;
   }
@@ -148,7 +148,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    *         the ordinary thieves - 'E' if we should end the operation.
    */
   @Override
-  public synchronized char appraiseSit() {
+  public synchronized char appraiseSit() throws RemoteException {
     // Wait arrival of ordinary thieves if:
     // - All assault parties are in mission;
     // - there is one assault party in mission, the number of empty rooms is equal
@@ -191,7 +191,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * site.
    */
   @Override
-  public synchronized int takeARest() {
+  public synchronized int takeARest() throws RemoteException {
     int masState = MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL;
     try {
       reposStub.setMasterThiefState(MasterThiefStates.WAITING_FOR_GROUP_ARRIVAL);
@@ -222,7 +222,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * @param assaultPartyId assault party id.
    */
   @Override
-  public synchronized void handACanvas(int assaultPartyId, int ordId) {
+  public synchronized void handACanvas(int assaultPartyId, int ordId) throws RemoteException {
     /* Add thief to the waiting queue */
     try {
       handCanvasQueue.write(ordId);
@@ -264,7 +264,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * operations.
    */
   @Override
-  public synchronized int collectACanvas() {
+  public synchronized int collectACanvas() throws RemoteException {
     int ordinaryThiefId = NOT_A_THIEF;
     try {
       ordinaryThiefId = handCanvasQueue.read();
@@ -334,7 +334,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    *         otherwise.
    */
   @Override
-  public synchronized int getAvailableAssaultParty() {
+  public synchronized int getAvailableAssaultParty() throws RemoteException {
     int availableAssaultParty = NOT_A_PARTY;
 
     for (int i = 0; i < ((SimulPar.M - 1) / SimulPar.K); i++)
@@ -359,7 +359,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    *         otherwise.
    */
   @Override
-  public synchronized int getAvailableRoom() {
+  public synchronized int getAvailableRoom() throws RemoteException {
     int availableRoom = NOT_A_ROOM;
 
     for (int i = 0; i < SimulPar.N; i++)
@@ -404,7 +404,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * @param assaultPartyId assault party id.
    */
   @Override
-  public synchronized void setThiefToParty(int thiefId, int assaultPartyId) {
+  public synchronized void setThiefToParty(int thiefId, int assaultPartyId) throws RemoteException {
     this.thievesParties[thiefId] = assaultPartyId;
   }
 
@@ -414,7 +414,7 @@ public class ControlCollectionSite implements ControlCollectionSiteInterface {
    * New operation.
    */
   @Override
-  public synchronized void shutdown() {
+  public synchronized void shutdown() throws RemoteException {
     nEntities += 1;
     if (nEntities >= SimulPar.E)
       ServerHeistToTheMuseumControlCollectionSite.shutdown();

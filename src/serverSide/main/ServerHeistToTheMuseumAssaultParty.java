@@ -21,12 +21,16 @@ public class ServerHeistToTheMuseumAssaultParty {
 
   /**
    * Main method.
-   *
-   * args[0] - assault party identification (1, (SimulPar.M-1)/SimulPar.K)
-   * args[1] - port number for listening to service requests
-   * args[2] - name of the platform where is located the RMI registering service
-   * args[3] - port number where the registering service is listening to service
-   * requests
+   * 
+   * @param args runtime arguments
+   *             args[0] - assault party identification (1,
+   *             (SimulPar.M-1)/SimulPar.K)
+   *             args[1] - port number for listening to service requests
+   *             args[2] - name of the platform where is located the RMI
+   *             registering service
+   *             args[3] - port number where the registering service is listening
+   *             to service
+   *             requests
    */
   public static void main(String[] args) {
     int assPartId = -1; // assault party identification

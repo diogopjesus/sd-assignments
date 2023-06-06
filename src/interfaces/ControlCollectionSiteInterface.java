@@ -13,6 +13,7 @@ public interface ControlCollectionSiteInterface extends Remote {
    *
    * It is called by the master thief to start the operations.
    *
+   * @return master thief state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -36,6 +37,7 @@ public interface ControlCollectionSiteInterface extends Remote {
    * It is called by the master thief to wait until a new thief has arrived the
    * control collection site.
    *
+   * @return master thief state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -49,6 +51,7 @@ public interface ControlCollectionSiteInterface extends Remote {
    * canvas was collected.
    *
    * @param assaultPartyId assault party id.
+   * @param ordId          id of the ordinary thief
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -61,6 +64,7 @@ public interface ControlCollectionSiteInterface extends Remote {
    * thief in queue. After collecting the canvas, he wakes up the ordinary thief
    * to proceed operations.
    *
+   * @return master thief state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */

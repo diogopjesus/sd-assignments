@@ -7,10 +7,11 @@ if [ "$1" = "help" ] || [ "$1" = "" ]; then
     echo "Usage: run.sh OPTION [ARGUMENT]"
     echo
     echo "Options:"
-    echo "  build             Build project."
+    echo "  build [local]     Build project."
+    echo "  deploy            Deploy and run project into class servers."
+    echo "  kill              Kill all processes running on class servers."
+    echo "  get-log           Get log file from class servers."
     echo "  doc               Generate javadoc."
-    echo "  deploy            Deploy project into class servers."
-    echo "  local             Run project locally."
     echo "  clean             Remove all generated files."
     echo "  clean-all         Remove all generated files and env files."
     echo "  check-log FILE    Check if log file is valid."
@@ -22,10 +23,12 @@ fi
 if [ "$1" = "clean" ]; then
     rm -r src/*/*.class 2> /dev/null
     rm -r src/*/*/*.class 2> /dev/null
+    rm -r src/*/*/*/*.class 2> /dev/null
     rm -r log/*.log 2> /dev/null
     rm -r doc/ 2> /dev/null
     rm -r build/ 2> /dev/null
-    rm -r test/ 2> /dev/null
+    rm -rf export/ 2> /dev/null
+    rm -rf stat 2> /dev/null
     exit 0;
 fi
 
@@ -33,10 +36,12 @@ fi
 if [ "$1" = "clean-all" ]; then
     rm -r src/*/*.class 2> /dev/null
     rm -r src/*/*/*.class 2> /dev/null
+    rm -r src/*/*/*/*.class 2> /dev/null
     rm -r log/*.log 2> /dev/null
     rm -r doc/ 2> /dev/null
     rm -r build/ 2> /dev/null
-    rm -r test/ 2> /dev/null
+    rm -rf export/ 2> /dev/null
+    rm -rf stat 2> /dev/null
     rm .env 2> /dev/null
     rm .password 2> /dev/null
     exit 0;
@@ -58,9 +63,9 @@ fi
 
 # check if dotenv file exists
 if [ ! -f ".env" ]; then
-    echo ".env file not found!";
+    echo "Warning: .env file not found!";
     # Check if user wants to create .env file
-    read -p "Do you want to create a .env file? (Y/n) "
+    read -p "Info: Do you want to create a .env file? (Y/n) "
     if [[ $REPLY =~ ^[Nn]$ ]]; then
         exit 0;
     fi
@@ -72,8 +77,8 @@ fi
 source .env
 
 # check if script is being run at root of project
-if [ ! -d $SRC_PATH ]; then
-    echo "Please run script at root of project!"
+if [ ! -d src/ ]; then
+    echo "Error: Please run script at the root of the project!"
     exit 1;
 fi
 
@@ -88,29 +93,52 @@ fi
 
 # compile project
 if [ "$1" = "build" ]; then
-    # Build and generate local
-    $SCRIPTS_PATH/buildAndGenerateLocal.sh
-    exit $?;
+    if [ "$2" = "local" ]; then
+      $SCRIPTS_PATH/buildAndGenerateLocal.sh $(whoami)
+    else
+      $SCRIPTS_PATH/buildAndGenerateGlobal.sh
+    fi
+
+    if [ $? -ne 0 ]; then
+      echo "Error: Build failed!" >&2;
+      exit $?;
+    fi
+    exit 0;
 fi
 
 # deploy to class servers
 if [ "$1" = "deploy" ]; then
-    $SCRIPTS_PATH/buildAndGenerateGlobal.sh
-    if [ $? ~= 0 ]; then
-        echo "Error: Build failed!" >&2;
-        exit 1;
+    $SCRIPTS_PATH/checkRMI.sh > /dev/null
+    ret=$?
+
+    if [ $ret == 2 ]; then
+      echo "Info: Deploying for the first time...";
+      $SCRIPTS_PATH/deployAndRunFirstTime.sh
+    elif [ $ret == 1 ]; then
+      echo "Warning: One of RMI Registry or Registry is not running!";
+      echo "Warning: Killing both processes and deploying...";
+      $SCRIPTS_PATH/killAllProcesses.sh
+      $SCRIPTS_PATH/deployAndRunFirstTime.sh
+    elif [ $ret == 0 ]; then
+      echo "Info: RMI Registry and Registry are already running.";
+      echo "Info: Deploying...";
+      $SCRIPTS_PATH/deployAndRunOtherTimes.sh
+    else
+      echo "Error: Something went wrong!" >&2;
+      exit 1;
     fi
-    $SCRIPTS_PATH/deployAndRun.sh
+
     exit 0;
 fi
 
-# run locally
-if [ "$1" = "local" ]; then
-    $SCRIPTS_PATH/buildAndGenerateLocal.sh
-    if [ $? ~= 0 ]; then
-        echo "Error: Build failed!" >&2;
-        exit 1;
-    fi
-    $SCRIPTS_PATH/runLocal.sh
+# kill all processes running on class servers
+if [ "$1" = "kill" ]; then
+    $SCRIPTS_PATH/killAllProcesses.sh
+    exit 0;
+fi
+
+# get log file from class servers
+if [ "$1" = "get-log" ]; then
+    $SCRIPTS_PATH/getLog.sh
     exit 0;
 fi

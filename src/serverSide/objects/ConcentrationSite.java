@@ -95,8 +95,6 @@ public class ConcentrationSite implements ConcentrationSiteInterface {
    * @param contColSiteStub    control collection site.
    * @param assaultPartiesStub assault parties.
    * @param museumStub         museum.
-   * @throws RemoteException if either the invocation of the remote method, or the
-   *                         communication with the registry service fails
    */
   public ConcentrationSite(GeneralRepositoryInterface reposStub,
       ControlCollectionSiteInterface contColSiteStub, AssaultPartyInterface[] assaultPartiesStub,

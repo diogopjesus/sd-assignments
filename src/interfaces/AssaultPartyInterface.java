@@ -14,6 +14,7 @@ public interface AssaultPartyInterface extends Remote {
    *
    * It is called by the master thief to send the assault party on mission
    *
+   * @return master thief state
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -24,7 +25,10 @@ public interface AssaultPartyInterface extends Remote {
    *
    * It is called by the ordinary thief to crawl into the museum.
    *
-   * @return true if can continue to crawl in - false otherwise.
+   * @param ordId  id of the ordinary thief
+   * @param maxDis maximum displacement
+   * @return true if can continue to crawl in - false otherwise and the state of
+   *         the ordinary thief
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -36,6 +40,8 @@ public interface AssaultPartyInterface extends Remote {
    * It is called by the ordinary thief to reverse the crawling direction from in
    * to out.
    *
+   * @param ordId ordinary thief id
+   * @return ordinary thief state
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -46,7 +52,10 @@ public interface AssaultPartyInterface extends Remote {
    *
    * It is called by the ordinary thief to crawl out of the museum.
    *
-   * @return true if can continue to crawl out - false otherwise.
+   * @param ordId  ordinary thief id
+   * @param maxDis maximum displacement
+   * @return true if can continue to crawl out - false otherwise and the state of
+   *         the ordinary thief
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
