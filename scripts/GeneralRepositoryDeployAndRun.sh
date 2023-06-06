@@ -1,13 +1,17 @@
+#!/bin/bash
+
+source .env
+
 echo "Transfering data to the general repository node."
-sshpass -f password ssh sd108@l040101-ws07.ua.pt 'mkdir -p test/HeistToTheMuseum'
-sshpass -f password ssh sd108@l040101-ws07.ua.pt 'rm -rf test/HeistToTheMuseum/*'
-sshpass -f password scp dirGeneralRepository.zip sd108@l040101-ws07.ua.pt:test/HeistToTheMuseum
+sshpass -f .password ssh $LOGIN@$NODE07 'mkdir -p test/HeistToTheMuseum'
+sshpass -f .password ssh $LOGIN@$NODE07 'rm -rf test/HeistToTheMuseum/*'
+sshpass -f .password scp $EXPORT_PATH/dirGeneralRepository.zip $LOGIN@$NODE07:test/HeistToTheMuseum
 
 echo "Decompressing data sent to the general repository node."
-sshpass -f password ssh sd108@l040101-ws07.ua.pt 'cd test/HeistToTheMuseum ; unzip -uq dirGeneralRepository.zip'
+sshpass -f .password ssh $LOGIN@$NODE07 'cd test/HeistToTheMuseum ; unzip -uq dirGeneralRepository.zip'
 
 echo "Executing program at the general repository node."
-sshpass -f password ssh sd108@l040101-ws07.ua.pt 'cd test/HeistToTheMuseum/dirGeneralRepository ; ./repos_com_d.sh sd108'
+sshpass -f .password ssh $LOGIN@$NODE07 "cd test/HeistToTheMuseum/dirGeneralRepository ; ./repos_com_d.sh $LOGIN"
 
 echo "Server shutdown."
-sshpass -f password ssh sd108@l040101-ws07.ua.pt 'cd test/HeistToTheMuseum/dirGeneralRepository ; less stat'
+sshpass -f .password ssh $LOGIN@$NODE07 'cd test/HeistToTheMuseum/dirGeneralRepository ; less stat'

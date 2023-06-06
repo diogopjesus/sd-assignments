@@ -20,8 +20,11 @@ SCRIPTS_PATH=$ROOT_PATH/scripts/
 SRC_PATH=$ROOT_PATH/src/
 TEST_PATH=$ROOT_PATH/test/
 UTILS_PATH=$ROOT_PATH/utils/
+EXPORT_PATH=$ROOT_PATH/export/
+
 # get login from user
 read -p "Please enter your login: " LOGIN
+
 # get first port number from user
 read -p "Please enter the first port number: " PORT0
 if [[ ! $PORT0 =~ ^-?[0-9]+$ ]]; then
@@ -32,10 +35,12 @@ if [ "$PORT0" -lt 0 ] || [ "$PORT0" -gt 65535 ]; then
   echo "Error: Port number must be between 0 and 65535"
   exit 1
 fi
+
 #generate other port numbers
 for i in $(seq 1 10); do
   eval "PORT${i}=$(expr $PORT0 + $i)"
 done
+
 # get password from user
 read -sp "Please enter your password: " PASSWORD
 echo
@@ -51,6 +56,7 @@ echo "SCRIPTS_PATH=$SCRIPTS_PATH" >> $ENV_FILE
 echo "SRC_PATH=$SRC_PATH" >> $ENV_FILE
 echo "TEST_PATH=$TEST_PATH" >> $ENV_FILE
 echo "UTILS_PATH=$UTILS_PATH" >> $ENV_FILE
+echo "EXPORT_PATH=$EXPORT_PATH" >> $ENV_FILE
 echo "LOGIN=$LOGIN" >> $ENV_FILE
 echo "NODE01=l040101-ws01.ua.pt" >> $ENV_FILE
 echo "NODE02=l040101-ws02.ua.pt" >> $ENV_FILE
