@@ -24,6 +24,8 @@ public class ServerRegisterRemoteObject {
    *             registering service
    *             args[2] - port nunber where the registering service is listening
    *             to service requests
+   * 
+   * @param args program arguments
    */
   public static void main(String[] args) {
     int portNumb = -1; // port number for listening to service requests

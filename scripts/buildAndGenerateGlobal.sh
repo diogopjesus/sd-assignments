@@ -1,238 +1,166 @@
-#!/bin/bash
-
-source .env
-
 echo "Compiling source code."
-cd $SRC_PATH
-javac --release 8 */*.java */*/*.java
+javac */*.java */*/*.java
 
 echo "Distributing intermediate code to the different execution environments."
 
-mkdir -p $BUILD_PATH
-cd $BUILD_PATH
+echo "  RMI registry"
+rm -rf dirRMIRegistry/interfaces
+mkdir -p dirRMIRegistry/interfaces
+cp interfaces/*.class dirRMIRegistry/interfaces
+
+echo "  Register Remote Objects"
+rm -rf dirRegistry/serverSide dirRegistry/interfaces
+mkdir -p dirRegistry/serverSide \
+         dirRegistry/serverSide/main \
+         dirRegistry/serverSide/objects \
+         dirRegistry/interfaces
+cp serverSide/main/ServerRegisterRemoteObject.class dirRegistry/serverSide/main
+cp serverSide/objects/RegisterRemoteObject.class dirRegistry/serverSide/objects
+cp interfaces/Register.class dirRegistry/interfaces
 
 echo "  General Repository"
-rm -rf dirGeneralRepository
-mkdir -p dirGeneralRepository \
-         dirGeneralRepository/serverSide dirGeneralRepository/serverSide/main dirGeneralRepository/serverSide/entities dirGeneralRepository/serverSide/sharedRegions \
-         dirGeneralRepository/clientSide dirGeneralRepository/clientSide/entities dirGeneralRepository/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class \
-   $SRC_PATH/serverSide/main/ServerHeistToTheMuseumGeneralRepository.class \
+rm -rf dirGeneralRepository/serverSide dirGeneralRepository/clientSide dirGeneralRepository/interfaces
+mkdir -p dirGeneralRepository/serverSide \
+         dirGeneralRepository/serverSide/main \
+         dirGeneralRepository/serverSide/objects \
+         dirGeneralRepository/interfaces \
+         dirGeneralRepository/clientSide \
+         dirGeneralRepository/clientSide/entities
+cp serverSide/main/SimulPar.class \
+   serverSide/main/ServerHeistToTheMuseumGeneralRepository.class \
    dirGeneralRepository/serverSide/main
-
-cp $SRC_PATH/serverSide/entities/GeneralRepositoryClientProxy.class dirGeneralRepository/serverSide/entities
-
-cp $SRC_PATH/serverSide/sharedRegions/GeneralRepositoryInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/GeneralRepository.class \
-   dirGeneralRepository/serverSide/sharedRegions
-
-cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
+cp serverSide/objects/GeneralRepository.class dirGeneralRepository/serverSide/objects
+cp interfaces/Register.class \
+   interfaces/GeneralRepositoryInterface.class \
+   dirGeneralRepository/interfaces
+cp clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThiefStates.class \
    dirGeneralRepository/clientSide/entities
 
-cp $SRC_PATH/commInfra/Message.class \
-   $SRC_PATH/commInfra/MessageType.class \
-   $SRC_PATH/commInfra/MessageException.class \
-   $SRC_PATH/commInfra/ServerCom.class \
-   dirGeneralRepository/commInfra
-
-
 echo "  Assault Party"
-rm -rf dirAssaultParty
-mkdir -p dirAssaultParty \
-         dirAssaultParty/serverSide dirAssaultParty/serverSide/main dirAssaultParty/serverSide/entities dirAssaultParty/serverSide/sharedRegions \
-         dirAssaultParty/clientSide dirAssaultParty/clientSide/entities dirAssaultParty/clientSide/stubs \
+rm -rf dirAssaultParty/serverSide \
+       dirAssaultParty/clientSide \
+       dirAssaultParty/interfaces \
+       dirAssaultParty/commInfra
+mkdir -p dirAssaultParty/serverSide \
+         dirAssaultParty/serverSide/main \
+         dirAssaultParty/serverSide/objects \
+         dirAssaultParty/interfaces \
+         dirAssaultParty/clientSide \
+         dirAssaultParty/clientSide/entities \
          dirAssaultParty/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class \
-   $SRC_PATH/serverSide/main/ServerHeistToTheMuseumAssaultParty.class \
+cp serverSide/main/SimulPar.class \
+   serverSide/main/ServerHeistToTheMuseumAssaultParty.class \
    dirAssaultParty/serverSide/main
-
-cp $SRC_PATH/serverSide/entities/AssaultPartyClientProxy.class dirAssaultParty/serverSide/entities
-
-cp $SRC_PATH/serverSide/sharedRegions/GeneralRepositoryInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/AssaultPartyInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ConcentrationSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ControlCollectionSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/MuseumInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/AssaultParty.class \
-   dirAssaultParty/serverSide/sharedRegions
-
-cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
+cp serverSide/objects/AssaultParty.class dirAssaultParty/serverSide/objects
+cp interfaces/*.class dirAssaultParty/interfaces
+cp clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThiefStates.class \
    dirAssaultParty/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   dirAssaultParty/clientSide/stubs
-
-cp $SRC_PATH/commInfra/*.class dirAssaultParty/commInfra
-
+cp commInfra/*.class dirAssaultParty/commInfra
 
 echo "  Concentration Site"
-rm -rf dirConcentrationSite
-mkdir -p dirConcentrationSite \
-         dirConcentrationSite/serverSide dirConcentrationSite/serverSide/main dirConcentrationSite/serverSide/entities dirConcentrationSite/serverSide/sharedRegions \
-         dirConcentrationSite/clientSide dirConcentrationSite/clientSide/entities dirConcentrationSite/clientSide/stubs \
+rm -rf dirConcentrationSite/serverSide \
+       dirConcentrationSite/clientSide \
+       dirConcentrationSite/interfaces \
+       dirConcentrationSite/commInfra
+mkdir -p dirConcentrationSite/serverSide \
+         dirConcentrationSite/serverSide/main \
+         dirConcentrationSite/serverSide/objects \
+         dirConcentrationSite/interfaces \
+         dirConcentrationSite/clientSide \
+         dirConcentrationSite/clientSide/entities \
          dirConcentrationSite/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class \
-   $SRC_PATH/serverSide/main/ServerHeistToTheMuseumConcentrationSite.class \
+cp serverSide/main/SimulPar.class \
+   serverSide/main/ServerHeistToTheMuseumConcentrationSite.class \
    dirConcentrationSite/serverSide/main
-
-cp $SRC_PATH/serverSide/entities/ConcentrationSiteClientProxy.class dirConcentrationSite/serverSide/entities
-
-cp $SRC_PATH/serverSide/sharedRegions/GeneralRepositoryInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/AssaultPartyInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ConcentrationSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ControlCollectionSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/MuseumInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ConcentrationSite.class \
-   dirConcentrationSite/serverSide/sharedRegions
-
-cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
+cp serverSide/objects/ConcentrationSite.class dirConcentrationSite/serverSide/objects
+cp interfaces/*.class dirConcentrationSite/interfaces
+cp clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThiefStates.class \
    dirConcentrationSite/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
-   dirConcentrationSite/clientSide/stubs
-
-cp $SRC_PATH/commInfra/*.class dirConcentrationSite/commInfra
-
+cp commInfra/*.class dirConcentrationSite/commInfra
 
 echo "  Control Collection Site"
-rm -rf dirControlCollectionSite
-mkdir -p dirControlCollectionSite \
-         dirControlCollectionSite/serverSide dirControlCollectionSite/serverSide/main dirControlCollectionSite/serverSide/entities dirControlCollectionSite/serverSide/sharedRegions \
-         dirControlCollectionSite/clientSide dirControlCollectionSite/clientSide/entities dirControlCollectionSite/clientSide/stubs \
+rm -rf dirControlCollectionSite/serverSide \
+       dirControlCollectionSite/clientSide \
+       dirControlCollectionSite/interfaces \
+       dirControlCollectionSite/commInfra
+mkdir -p dirControlCollectionSite/serverSide \
+         dirControlCollectionSite/serverSide/main \
+         dirControlCollectionSite/serverSide/objects \
+         dirControlCollectionSite/interfaces \
+         dirControlCollectionSite/clientSide \
+         dirControlCollectionSite/clientSide/entities \
          dirControlCollectionSite/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class \
-   $SRC_PATH/serverSide/main/ServerHeistToTheMuseumControlCollectionSite.class \
+cp serverSide/main/SimulPar.class \
+   serverSide/main/ServerHeistToTheMuseumControlCollectionSite.class \
    dirControlCollectionSite/serverSide/main
-
-cp $SRC_PATH/serverSide/entities/ControlCollectionSiteClientProxy.class dirControlCollectionSite/serverSide/entities
-
-cp $SRC_PATH/serverSide/sharedRegions/GeneralRepositoryInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/AssaultPartyInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ConcentrationSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ControlCollectionSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/MuseumInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ControlCollectionSite.class \
-   dirControlCollectionSite/serverSide/sharedRegions
-
-cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
+cp serverSide/objects/ControlCollectionSite.class dirControlCollectionSite/serverSide/objects
+cp interfaces/*.class dirControlCollectionSite/interfaces
+cp clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThiefStates.class \
    dirControlCollectionSite/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   dirControlCollectionSite/clientSide/stubs
-
-cp $SRC_PATH/commInfra/*.class dirControlCollectionSite/commInfra
-
+cp commInfra/*.class dirControlCollectionSite/commInfra
 
 echo "  Museum"
-rm -rf dirMuseum
-mkdir -p dirMuseum \
-         dirMuseum/serverSide dirMuseum/serverSide/main dirMuseum/serverSide/entities dirMuseum/serverSide/sharedRegions \
-         dirMuseum/clientSide dirMuseum/clientSide/entities dirMuseum/clientSide/stubs \
+rm -rf dirMuseum/serverSide \
+       dirMuseum/clientSide \
+       dirMuseum/interfaces \
+       dirMuseum/commInfra
+mkdir -p dirMuseum/serverSide \
+         dirMuseum/serverSide/main \
+         dirMuseum/serverSide/objects \
+         dirMuseum/interfaces \
+         dirMuseum/clientSide \
+         dirMuseum/clientSide/entities \
          dirMuseum/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class \
-   $SRC_PATH/serverSide/main/ServerHeistToTheMuseumMuseum.class \
+cp serverSide/main/SimulPar.class \
+   serverSide/main/ServerHeistToTheMuseumMuseum.class \
    dirMuseum/serverSide/main
-
-cp $SRC_PATH/serverSide/entities/MuseumClientProxy.class dirMuseum/serverSide/entities
-
-cp $SRC_PATH/serverSide/sharedRegions/GeneralRepositoryInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/AssaultPartyInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ConcentrationSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/ControlCollectionSiteInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/MuseumInterface.class \
-   $SRC_PATH/serverSide/sharedRegions/Museum.class \
-   dirMuseum/serverSide/sharedRegions
-
-cp $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   $SRC_PATH/clientSide/entities/MasterThiefCloning.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefCloning.class \
+cp serverSide/objects/Museum.class dirMuseum/serverSide/objects
+cp interfaces/*.class dirMuseum/interfaces
+cp clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThiefStates.class \
    dirMuseum/clientSide/entities
+cp commInfra/*.class dirMuseum/commInfra
 
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   dirMuseum/clientSide/stubs
-
-cp $SRC_PATH/commInfra/*.class dirMuseum/commInfra
-
-
-echo "  Master Thief"
-rm -rf dirMasterThief
-mkdir -p dirMasterThief \
-         dirMasterThief/serverSide dirMasterThief/serverSide/main \
-         dirMasterThief/clientSide dirMasterThief/clientSide/main dirMasterThief/clientSide/entities dirMasterThief/clientSide/stubs \
-         dirMasterThief/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class dirMasterThief/serverSide/main
-
-cp $SRC_PATH/clientSide/main/ClientHeistToTheMuseumMasterThief.class dirMasterThief/clientSide/main
-
-cp $SRC_PATH/clientSide/entities/MasterThief.class \
-   $SRC_PATH/clientSide/entities/MasterThiefStates.class \
-   dirMasterThief/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   $SRC_PATH/clientSide/stubs/ConcentrationSiteStub.class \
-   $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
-   $SRC_PATH/clientSide/stubs/MuseumStub.class \
-   dirMasterThief/clientSide/stubs
-
-cp $SRC_PATH/commInfra/Message.class \
-   $SRC_PATH/commInfra/MessageType.class \
-   $SRC_PATH/commInfra/MessageException.class \
-   $SRC_PATH/commInfra/ClientCom.class \
-   dirMasterThief/commInfra
-
-
-echo "  Ordinary Thieves"
-rm -rf dirOrdinaryThieves
-mkdir -p dirOrdinaryThieves \
-         dirOrdinaryThieves/serverSide dirOrdinaryThieves/serverSide/main \
-         dirOrdinaryThieves/clientSide dirOrdinaryThieves/clientSide/main dirOrdinaryThieves/clientSide/entities dirOrdinaryThieves/clientSide/stubs \
-         dirOrdinaryThieves/commInfra
-
-cp $SRC_PATH/serverSide/main/SimulPar.class dirOrdinaryThieves/serverSide/main
-
-cp $SRC_PATH/clientSide/main/ClientHeistToTheMuseumOrdinaryThief.class dirOrdinaryThieves/clientSide/main
-
-cp $SRC_PATH/clientSide/entities/OrdinaryThief.class \
-   $SRC_PATH/clientSide/entities/OrdinaryThiefStates.class \
-   dirOrdinaryThieves/clientSide/entities
-
-cp $SRC_PATH/clientSide/stubs/GeneralRepositoryStub.class \
-   $SRC_PATH/clientSide/stubs/AssaultPartyStub.class \
-   $SRC_PATH/clientSide/stubs/ConcentrationSiteStub.class \
-   $SRC_PATH/clientSide/stubs/ControlCollectionSiteStub.class \
-   $SRC_PATH/clientSide/stubs/MuseumStub.class \
-   dirOrdinaryThieves/clientSide/stubs
-
-cp $SRC_PATH/commInfra/Message.class \
-   $SRC_PATH/commInfra/MessageType.class \
-   $SRC_PATH/commInfra/MessageException.class \
-   $SRC_PATH/commInfra/ClientCom.class \
-   dirOrdinaryThieves/commInfra
-
+echo "  Client"
+rm -rf dirClient/serverSide \
+       dirClient/clientSide \
+       dirClient/interfaces
+mkdir -p dirClient/serverSide \
+         dirClient/serverSide/main \
+         dirClient/clientSide \
+         dirClient/clientSide/main \
+         dirClient/clientSide/entities \
+         dirClient/interfaces
+cp serverSide/main/SimulPar.class dirClient/serverSide/main
+cp clientSide/main/ClientHeistToTheMuseum.class dirClient/clientSide/main
+cp clientSide/entities/MasterThief.class \
+   clientSide/entities/MasterThiefStates.class \
+   clientSide/entities/OrdinaryThief.class \
+   clientSide/entities/OrdinaryThiefStates.class \
+   dirClient/clientSide/entities
+cp interfaces/GeneralRepositoryInterface.class \
+   interfaces/AssaultPartyInterface.class \
+   interfaces/ConcentrationSiteInterface.class \
+   interfaces/ControlCollectionSiteInterface.class \
+   interfaces/MuseumInterface.class \
+   interfaces/ReturnBoolean.class \
+   interfaces/ReturnInt.class \
+   dirClient/interfaces
 
 echo "Compressing execution environments."
+
+echo "  RMI registry"
+rm -f  dirRMIRegistry.zip
+zip -rq dirRMIRegistry.zip dirRMIRegistry
+
+echo "  Register Remote Objects"
+rm -f  dirRegistry.zip
+zip -rq dirRegistry.zip dirRegistry
+
 echo "  General Repository"
 rm -f  dirGeneralRepository.zip
 zip -rq dirGeneralRepository.zip dirGeneralRepository
@@ -253,10 +181,6 @@ echo "  Museum"
 rm -f  dirMuseum.zip
 zip -rq dirMuseum.zip dirMuseum
 
-echo "  Master Thief"
-rm -f  dirMasterThief.zip
-zip -rq dirMasterThief.zip dirMasterThief
-
-echo "  Ordinary Thieves"
-rm -f  dirOrdinaryThieves.zip
-zip -rq dirOrdinaryThieves.zip dirOrdinaryThieves
+echo "  Client"
+rm -f  dirClient.zip
+zip -rq dirClient.zip dirClient

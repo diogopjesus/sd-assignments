@@ -13,6 +13,8 @@ public interface ConcentrationSiteInterface extends Remote {
    *
    * It is called by the ordinary thief to check if he is needed.
    *
+   * @param ordId    id of the ordinary thief
+   * @param ordState state of the ordinary thief
    * @return true if he is needed - false otherwise (to end operations).
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
@@ -26,6 +28,7 @@ public interface ConcentrationSiteInterface extends Remote {
    *
    * @param assaultPartyId assault party id.
    * @param roomId         room id.
+   * @return master thief state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -36,7 +39,9 @@ public interface ConcentrationSiteInterface extends Remote {
    *
    * It is called by an ordinary thief to prepare excursion.
    *
-   * @return id of the assault party that the thief joined.
+   * @param ordId id of the ordinary thief
+   * @return id of the assault party that the thief joined and ordinary thief
+   *         state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */
@@ -47,6 +52,7 @@ public interface ConcentrationSiteInterface extends Remote {
    *
    * It is called by the master thief to sum up the results of the heist.
    *
+   * @return master thief state.
    * @throws RemoteException if either the invocation of the remote method, or the
    *                         communication with the registry service fails
    */

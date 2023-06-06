@@ -1,14 +1,10 @@
-#!/bin/bash
-
-source .env
-
 echo "Transfering data to the museum node."
-sshpass -f .password ssh $LOGIN@$NODE05 'mkdir -p test/HeistToTheMuseum'
-sshpass -f .password ssh $LOGIN@$NODE05 'rm -rf test/HeistToTheMuseum/*'
-sshpass -f .password scp $BUILD_PATH/dirMuseum.zip $LOGIN@$NODE05:test/HeistToTheMuseum
+sshpass -f password ssh sd108@l040101-ws06.ua.pt 'mkdir -p test/HeistToTheMuseum'
+sshpass -f password ssh sd108@l040101-ws06.ua.pt 'rm -rf test/HeistToTheMuseum/*'
+sshpass -f password scp dirMuseum.zip sd108@l040101-ws06.ua.pt:test/HeistToTheMuseum
 
 echo "Decompressing data sent to the museum node."
-sshpass -f .password ssh $LOGIN@$NODE05 'cd test/HeistToTheMuseum ; unzip -uq dirMuseum.zip'
+sshpass -f password ssh sd108@l040101-ws06.ua.pt 'cd test/HeistToTheMuseum ; unzip -uq dirMuseum.zip'
 
-echo "Executing program at the server museum."
-sshpass -f .password ssh $LOGIN@$NODE05 "cd test/HeistToTheMuseum/dirMuseum ; java serverSide.main.ServerHeistToTheMuseumMuseum $PORT0 $NODE06 $PORT0 $NODE01 $PORT0 $NODE02 $PORT0"
+echo "Executing program at the museum node."
+sshpass -f password ssh sd108@l040101-ws06.ua.pt 'cd test/HeistToTheMuseum/dirMuseum ; ./museum_com_d.sh sd108'
